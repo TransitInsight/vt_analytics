@@ -1,0 +1,30 @@
+import dash_core_components as dcc
+import dash_html_components as html
+from dash.dependencies import Input, Output
+
+from app import app
+from views import vobcfault_v, view2
+from navbar import Navbar
+
+nav = Navbar()
+
+
+app.layout = html.Div([
+    html.Div([nav]),
+    dcc.Location(id='url', refresh=False),
+    html.Div(id='page-content')
+])
+
+
+@app.callback(Output('page-content', 'children'),
+              [Input('url', 'pathname')])
+def display_page(pathname):
+    if pathname == '/views/vobcfault_v':
+        return vobcfault_v.layout
+    elif pathname == '/views/view2':
+        return view2.layout
+    else:
+        return '404: missing app = {}'.format(pathname)
+
+if __name__ == '__main__':
+    app.run_server(debug=True)
