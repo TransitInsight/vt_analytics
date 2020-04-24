@@ -2,6 +2,7 @@
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
+from datetime import datetime
 
 from app import app
 
@@ -79,6 +80,18 @@ def create_dropdown_options():
 #%%
 layout = html.Div([
     html.H3('VOBC Fault'),
+
+    html.Div([
+        html.H3('Select start and end dates:'),
+        dcc.DatePickerRange(
+            id='my_date_picker',
+            min_date_allowed=datetime(2015, 1, 1),
+            max_date_allowed=datetime.today(),
+            start_date=datetime(2018, 1, 1),
+            end_date=datetime.today()
+        )
+    ], style={'display':'inline-block'}),
+
     dcc.Dropdown(
         id='app-1-dropdown',
         options=create_dropdown_options(),
@@ -96,9 +109,12 @@ layout = html.Div([
 
 @app.callback(
     Output('app-1-display-value', 'children'),
-    [Input('app-1-dropdown', 'value')])
-def display_value(value):
-    return 'You have selected in app1: "{}"'.format(value)
+    [Input('app-1-dropdown', 'value'),
+     Input('my_date_picker', 'start_date'),
+     Input('my_date_picker', 'end_date') 
+    ])
+def display_value(value, start_date, end_date):
+    return 'You have selected in app1: "{}" start = {}, end={}'.format(value, start_date, end_date)
 
 @app.callback(
     Output('plot', 'figure'),
