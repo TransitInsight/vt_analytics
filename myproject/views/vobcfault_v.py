@@ -82,7 +82,6 @@ layout = html.Div([
     html.H3('VOBC Fault'),
 
     html.Div([
-        html.H3('Select start and end dates:'),
         dcc.DatePickerRange(
             id='my_date_picker',
             min_date_allowed=datetime(2015, 1, 1),
@@ -90,13 +89,15 @@ layout = html.Div([
             start_date=datetime(2018, 1, 1),
             end_date=datetime.today()
         )
-    ], style={'display':'inline-block'}),
+    ], style={'display':'inline-block', 'width': '30%'}),
 
-    dcc.Dropdown(
-        id='app-1-dropdown',
-        options=create_dropdown_options(),
-        value='00. All'
-    ),
+    html.Div([
+        dcc.Dropdown(
+            id='app-1-dropdown',
+            options=create_dropdown_options(),
+            value='00. All'
+        )
+    ], style={'display':'inline-block', 'width': '30%'}),
 
     html.Div(id='app-1-display-value'),
     dcc.Link('Go to App 2', href='/views/view2'),
@@ -118,7 +119,11 @@ def display_value(value, start_date, end_date):
 
 @app.callback(
     Output('plot', 'figure'),
-    [Input('app-1-dropdown', 'value')])
-def display_figure(value):
+    [
+        Input('app-1-dropdown', 'value'),
+        Input('my_date_picker', 'start_date'),
+        Input('my_date_picker', 'end_date') 
+    ])
+def display_figure(value, start_date, end_date):
     f = create_fig(value)
     return f
