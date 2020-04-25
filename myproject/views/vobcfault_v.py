@@ -43,7 +43,7 @@ color_dict = {
 
 #%%
 def create_fig(fault_name, start_date, end_date):
-    df_res = vobcfault_m.get_count_by_fc(fault_name, start_date, end_date)
+    df_res = vobcfault_m.get_count_by(fault_name, start_date, end_date)
     
     df_list = []
     df_list.append(df_res[(df_res['VOBCID']<=150)] )
@@ -53,8 +53,8 @@ def create_fig(fault_name, start_date, end_date):
     i = 1
     for df in df_list:
         j = 0
-        for fault_code in sorted(df['FaultName'].unique()):
-            df_fc = df[df['FaultName']==fault_code]
+        for fault_code in sorted(df['faultName'].unique()):
+            df_fc = df[df['faultName']==fault_code]
             fig.append_trace(go.Bar(
                     name=fault_code, x=df_fc['VOBCID'], y=df_fc['FaultCount'], 
                     legendgroup=fault_code, showlegend = i==1,
@@ -72,11 +72,11 @@ def create_fig(fault_name, start_date, end_date):
 #%%
 
 def create_dropdown_options():
-    df_res = vobcfault_m.get_count()
+    df_res = vobcfault_m.get_all_fault()
 
     fc_options = []
     fc_options.append({'label':'00. All','value':'00. All'})
-    for fc in df_res['FaultName'].unique():
+    for fc in df_res['faultName'].unique():
         fc_options.append({'label':fc,'value':fc})
     return fc_options
 
