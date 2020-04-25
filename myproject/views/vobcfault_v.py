@@ -3,6 +3,7 @@ import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
 from datetime import datetime
+from datetime import timedelta
 
 from app import app
 
@@ -15,6 +16,9 @@ from plotly.subplots import make_subplots
 
 
 #%%
+
+filter_start_date = datetime(2015, 1, 1)
+filter_end_date = datetime.today()
 
 color_dict = {
     0: "#074263", 
@@ -38,8 +42,8 @@ color_dict = {
     18: "#20124D"}
 
 #%%
-def create_fig(fault_name):
-    df_res = vobcfault_m.get_count_by_fc(fault_name)
+def create_fig(fault_name, start_date, end_date):
+    df_res = vobcfault_m.get_count_by_fc(fault_name, start_date, end_date)
     
     df_list = []
     df_list.append(df_res[(df_res['VOBCID']<=150)] )
@@ -84,10 +88,10 @@ layout = html.Div([
     html.Div([
         dcc.DatePickerRange(
             id='my_date_picker',
-            min_date_allowed=datetime(2015, 1, 1),
-            max_date_allowed=datetime.today(),
-            start_date=datetime(2018, 1, 1),
-            end_date=datetime.today()
+            min_date_allowed=datetime(2014, 1, 1),
+            max_date_allowed=datetime.today() + timedelta(days=1),
+            start_date=filter_start_date,
+            end_date=filter_end_date
         )
     ], style={'display':'inline-block', 'width': '30%'}),
 
@@ -103,7 +107,7 @@ layout = html.Div([
     dcc.Link('Go to App 2', href='/views/view2'),
 
     html.Div([
-        dcc.Graph(id='plot', figure=create_fig('00. All'))], 
+        dcc.Graph(id='plot', figure=create_fig('00. All', filter_start_date, filter_end_date))], 
         style={'width':'80%', 'display':'inline-block'}
     )
 ])
@@ -125,5 +129,5 @@ def display_value(value, start_date, end_date):
         Input('my_date_picker', 'end_date') 
     ])
 def display_figure(value, start_date, end_date):
-    f = create_fig(value)
+    f = create_fig(value, start_date, end_date)
     return f

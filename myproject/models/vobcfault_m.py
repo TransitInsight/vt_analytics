@@ -20,7 +20,7 @@ def get_faultname():
     return df
 
 
-def get_count_by_fc(fault_name):
+def get_count_by_fc(fault_name, start_date, end_date):
     if (fault_name.startswith('00') ):
         return get_count()
 
