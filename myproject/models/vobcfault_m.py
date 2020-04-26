@@ -12,7 +12,7 @@ def run_query(query):
 
     query = {
         "query": query,
-        "fetch_size":2000
+        "fetch_size": cfg.es_fetch_size
     }
 
     response = requests.post(cfg.ElasticSearchDS['sqlurl'], headers=headers, data=json.dumps(query))
@@ -58,3 +58,22 @@ def get_all_fault():
     query = "SELECT faultName, count(*) as FaultCount from dlr_vobc_fault group by faultName LIMIT 50"
     df = run_query(query)
     return df
+
+def get_count_trend(fault_name, start_date, end_date):
+    fault_condition = ''
+    if (not fault_name.startswith('00') ):
+        fault_condition = " and faultName = '{}'".format(fault_name)    
+
+    if (type(start_date) is datetime):
+        start_date = start_date.strftime("%Y-%m-%dT%H:%M:%S")
+    if (type(end_date) is datetime):
+        end_date = end_date.strftime("%Y-%m-%dT%H:%M:%S")
+
+    query = ("SELECT faultName, loggedDate as LoggedDate, count(*) as FaultCount"
+            " from dlr_vobc_fault"
+            " where vobcid <=300 and loggedAt >= '{}' and loggedAt < '{}' {}" 
+            " group by faultName, loggedDate  LIMIT 5000").format(start_date, end_date, fault_condition)
+    df = run_query(query)
+    return df
+
+# %%

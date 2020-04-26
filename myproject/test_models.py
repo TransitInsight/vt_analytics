@@ -56,6 +56,16 @@ class TestVOBC(unittest.TestCase):
         df = vobcDA.get_all_fault()
         self.assertTrue(df['faultName'].count() == 15)
 
+
+    def test_get_fc_trend(self):
+        df = vobcDA.get_count_trend('00. All')
+        self.assertTrue(df['loggedDate'].count() > 1000)
+        self.assertTrue(len(df['faultName'].unique()) == 15)
+
+        df1 = vobcDA.get_count_trend('03. FAR Level 3 Fault')
+        self.assertTrue(df['loggedDate'].count() > df1['loggedDate'].count())
+
+
     def test_isupper(self):
         self.assertTrue('FOO'.isupper())
         self.assertFalse('Foo'.isupper())

@@ -9,48 +9,19 @@ from datetime import timedelta
 from app import app
 
 from myproject.models import vobcfault_m
+import myproject.config as cfg
 import pandas as pd
 import plotly.graph_objs as go
 from plotly.subplots import make_subplots
-import plotly.io as pio
 
 #%%
 
-'''Default template: 'plotly'
-Available templates:
-    ['ggplot2', 'seaborn', 'simple_white', 'plotly',
-        'plotly_white', 'plotly_dark', 'presentation', 'xgridoff',
-        'ygridoff', 'gridon', 'none']'''
-pio.templates.default = "simple_white"
-
-#%%
 
 filter_start_date = datetime(2015, 1, 1)
 filter_end_date = datetime.today()
 
-color_dict = {
-    '00': "#074263", 
-    '01': "#0B5394", 
-    '02': "#3D85C6", 
-    '03': "#6D9EEB", 
-    '04': "#A4C2F4",
-    '05': "#CFE2F3", 
-    '06': "#5B0F00", 
-    '07': "#85200C", 
-    '08': "#A61C00", 
-    '09': "#CC4125", 
-    '10': "#DD7E6B", 
-    '11': "#E6B8AF", 
-    '12': "#F8CBAD", 
-    '13': "#F4CCCC", 
-    '14': "#274E13", 
-    '15': "#38761D", 
-    '16': "#E06666", 
-    '17': "#CC0000", 
-    '18': "#20124D"}
-
 #%%
-def create_fig(fault_name, start_date, end_date):
+def create_fig_bar(fault_name, start_date, end_date):
     df_res = vobcfault_m.get_count_by(fault_name, start_date, end_date)
     
     df_list = []
@@ -65,7 +36,7 @@ def create_fig(fault_name, start_date, end_date):
             df_fc = df[df['faultName']==fault_code]
             fig.append_trace(go.Bar(
                     name=fault_code, x=df_fc['VOBCID'], y=df_fc['FaultCount'], 
-                    legendgroup=fault_code, showlegend = i==1, marker=dict(color=color_dict[fault_code[:2]])
+                    legendgroup=fault_code, showlegend = i==1, marker=dict(color=cfg.vobc_fault_color_dict[fault_code[:2]])
                     ), 
                     row=i, col=1)    
             j+=1
@@ -85,6 +56,33 @@ def create_fig(fault_name, start_date, end_date):
         margin=dict(l=20, r=20, t=50, b=20))
     fig.update_xaxes(row=1,col=1, dtick = 4, title_text='vobc id')#, type='category')
     fig.update_xaxes(row=2,col=1, dtick = 4, title_text='vobc id')#, type='category')
+    fig.update_yaxes(range=[0,y_max], title_text='fault count')
+
+    return fig
+
+
+def create_fig_area(fault_name, start_date, end_date):
+
+    if (type(start_date) is datetime):
+        start_date = start_date.strftime("%Y-%m-%dT%H:%M:%S")
+    if (type(end_date) is datetime):
+        end_date = end_date.strftime("%Y-%m-%dT%H:%M:%S")
+
+    df = vobcfault_m.get_count_trend(fault_name, start_date, end_date)
+    y_max = df.groupby(['LoggedDate']).max().max() * 1.01
+    fig = go.Figure()
+
+    for fault_code in sorted(df['faultName'].unique()):
+        df_fc = df[df['faultName']==fault_code]
+        fig.add_trace(go.Scatter(x=df_fc['LoggedDate'], y=df_fc['FaultCount'],
+            showlegend = False, 
+            fillcolor=cfg.vobc_fault_color_dict[fault_code[:2]],
+            line_color=cfg.vobc_fault_color_dict[fault_code[:2]],
+            stackgroup = 'one'
+            )) 
+
+    fig.update_layout(height=600, margin=dict(l=20, r=20, t=50, b=20))
+    fig.update_xaxes(title_text='date')#, type='category')
     fig.update_yaxes(range=[0,y_max], title_text='fault count')
 
     return fig
@@ -120,9 +118,13 @@ def create_layout():
             )
         ], style={'display':'inline-block', 'font-size':'120%', 'width': '300px', 'margin-top':'8px'})
 
-    fg_div = html.Div([
-            dcc.Graph(id='plot', figure=create_fig('00. All', filter_start_date, filter_end_date))], 
-            style={'width':'40%', 'display':'inline-block'}
+    fg_div_bar = html.Div([
+            dcc.Graph(id='fig_bar', figure=create_fig_bar('00. All', filter_start_date, filter_end_date))], 
+            style={'width':'90%', 'display':'inline-block'}
+        )
+    fg_div_area = html.Div([
+            dcc.Graph(id='fig_area', figure=create_fig_area('00. All', filter_start_date, filter_end_date))], 
+            style={'width':'90%', 'display':'inline-block'}
         )
 
     retDiv = html.Div(
@@ -135,7 +137,12 @@ def create_layout():
                     dbc.Col(fault_name_div, width='auto'),
                 ]
             ),
-            dbc.Row(dbc.Col(fg_div)),
+            dbc.Row(
+                [
+                    dbc.Col(fg_div_area),
+                    dbc.Col(fg_div_bar)
+                ]
+            ),
         ]
     )
     return retDiv
@@ -145,12 +152,23 @@ def create_layout():
 layout = create_layout()
 
 @app.callback(
-    Output('plot', 'figure'),
+    Output('fig_bar', 'figure'),
     [
         Input('app-1-dropdown', 'value'),
         Input('my_date_picker', 'start_date'),
         Input('my_date_picker', 'end_date') 
     ])
 def display_figure(value, start_date, end_date):
-    f = create_fig(value, start_date, end_date)
+    f = create_fig_bar(value, start_date, end_date)
+    return f
+
+@app.callback(
+    Output('fig_area', 'figure'),
+    [
+        Input('app-1-dropdown', 'value'),
+        Input('my_date_picker', 'start_date'),
+        Input('my_date_picker', 'end_date') 
+    ])
+def display_figure(value, start_date, end_date):
+    f = create_fig_area(value, start_date, end_date)
     return f
