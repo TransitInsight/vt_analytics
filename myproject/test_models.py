@@ -31,6 +31,12 @@ class TestVOBC(unittest.TestCase):
         self.assertTrue( df_all['FaultCount'].count() > 0 )
 
 
+    # def test_dt_convert(self):
+    #     dtStr = '2014-01-01T00:00:00'
+    #     dt = datetime.strptime(dtStr, '%Y-%m-%d H:%M:%S')
+    #     self.assertTrue( type(dt) is str )
+
+
     def test_runquery(self):
         df = vobcDA.run_query("SELECT faultName, loggedAt, velocity from dlr_vobc_fault where loggedAt >= '2014-01-01T00:00:00' and loggedAt < '2015-04-25T00:13:26.017995' LIMIT 2000 ")
         self.assertTrue( df['loggedAt'].count() > 1000 )

@@ -46,8 +46,8 @@ def create_fig(fault_name, start_date, end_date):
     df_res = vobcfault_m.get_count_by(fault_name, start_date, end_date)
     
     df_list = []
-    df_list.append(df_res[(df_res['VOBCID']<=150)] )
-    df_list.append(df_res[(df_res['VOBCID']>150)] )
+    df_list.append(df_res[(df_res['VOBCID']<=150)].sort_values(by=['VOBCID']) )
+    df_list.append(df_res[(df_res['VOBCID']>150)].sort_values(by=['VOBCID']) )
 
     fig = make_subplots(rows=2, cols=1, shared_yaxes=True)
     i = 1
@@ -65,8 +65,19 @@ def create_fig(fault_name, start_date, end_date):
         i+=1
 
     y_max = df_res.groupby(['VOBCID']).sum().max()[0] * 1.02
-    fig.update_layout(barmode='stack', height=700, paper_bgcolor="LightSteelBlue")
-    fig.update_yaxes(range=[0,y_max])
+
+    if (type(start_date) is datetime):
+        start_date = start_date.strftime("%Y-%m-%dT%H:%M:%S")
+    if (type(end_date) is datetime):
+        end_date = end_date.strftime("%Y-%m-%dT%H:%M:%S")
+
+    title_text = 'VOBC Fault Histogram ({} - {})'.format(start_date[0:10], end_date[0:10])
+    fig.update_layout(barmode='stack', height=700, paper_bgcolor="LightSteelBlue", title = { 'text': title_text, 'font':{'size':20}, 'yanchor': 'top' },
+        margin=dict(l=20, r=20, t=50, b=20))
+    fig.update_xaxes(row=1,col=1, dtick = 2, title_text='vobc id')#, type='category')
+    fig.update_xaxes(row=2,col=1, dtick = 2, title_text='vobc id')#, type='category')
+    fig.update_yaxes(range=[0,y_max], title_text='fault count')
+
     return fig
 
 #%%
@@ -83,8 +94,6 @@ def create_dropdown_options():
 
 #%%
 layout = html.Div([
-    html.H3('VOBC Fault'),
-
     html.Div([
         dcc.DatePickerRange(
             id='my_date_picker',
@@ -103,7 +112,6 @@ layout = html.Div([
         )
     ], style={'display':'inline-block', 'width': '30%'}),
 
-    html.Div(id='app-1-display-value'),
     dcc.Link('Go to App 2', href='/views/view2'),
 
     html.Div([
@@ -111,15 +119,6 @@ layout = html.Div([
         style={'width':'80%', 'display':'inline-block'}
     )
 ])
-
-@app.callback(
-    Output('app-1-display-value', 'children'),
-    [Input('app-1-dropdown', 'value'),
-     Input('my_date_picker', 'start_date'),
-     Input('my_date_picker', 'end_date') 
-    ])
-def display_value(value, start_date, end_date):
-    return 'You have selected in app1: "{}" start = {}, end={}'.format(value, start_date, end_date)
 
 @app.callback(
     Output('plot', 'figure'),
