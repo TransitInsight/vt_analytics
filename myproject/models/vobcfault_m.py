@@ -15,7 +15,7 @@ def run_query(query):
         "fetch_size":2000
     }
 
-    response = requests.post("http://win2019:9200/_xpack/sql", headers=headers, data=json.dumps(query))
+    response = requests.post(cfg.ElasticSearchDS['sqlurl'], headers=headers, data=json.dumps(query))
 
     df = pd.json_normalize(response.json(),'rows')
     df.columns = [d['name'] for d in response.json()['columns']]

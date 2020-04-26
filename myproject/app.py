@@ -5,6 +5,7 @@ import dash_bootstrap_components as dbc
 # app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
 
+#app = dash.Dash(__name__, external_stylesheets=[dbc.themes.LUX])
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.UNITED])
 
 
