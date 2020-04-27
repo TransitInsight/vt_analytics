@@ -15,25 +15,44 @@ ElasticSearchDS = {
 }
 
 
-vobc_fault_color_dict = {
-    '00': "#074263", 
-    '01': "#0B5394", 
-    '02': "#3D85C6", 
-    '03': "#6D9EEB", 
-    '04': "#A4C2F4",
-    '05': "#CFE2F3", 
-    '06': "#5B0F00", 
-    '07': "#85200C", 
-    '08': "#A61C00", 
-    '09': "#CC4125", 
-    '10': "#DD7E6B", 
-    '11': "#E6B8AF", 
-    '12': "#F8CBAD", 
-    '13': "#F4CCCC", 
-    '14': "#274E13", 
-    '15': "#38761D", 
-    '16': "#E06666", 
-    '17': "#CC0000", 
-    '18': "#20124D"}
-
 es_fetch_size = 5000
+
+
+vobc_fault_color_dict = {
+    -1: "#074263", 
+    1: "#0B5394", 
+    2: "#3D85C6", 
+    3: "#6D9EEB", 
+    4: "#A4C2F4",
+    5: "#CFE2F3", 
+    6: "#5B0F00", 
+    7: "#85200C", 
+    8: "#A61C00", 
+    9: "#CC4125", 
+    10: "#DD7E6B", 
+    11: "#E6B8AF", 
+    12: "#F8CBAD", 
+    13: "#F4CCCC", 
+    14: "#274E13", 
+    15: "#38761D", 
+    16: "#E06666", 
+    17: "#CC0000", 
+    18: "#20124D"}
+
+vobc_fault_name_dict = {
+    -1: '00. All',
+    1: '01. Passenger Alarm',
+    2: '02. FAR Level 2 Fault',
+    3: '03. FAR Level 3 Fault',
+    4: '04. Failed to Dock',
+    5: '05. Dynamic Brake Failure',
+    6: '06. Converter Failure',
+    7: '07. FAR Level 1 Fault',
+    8: '08. Train Overspeed',
+    9: '09. Target Point Overshoot',
+    10: '10. Rollback',
+    11: '11. V = 0 Failure',
+    12: '12. Obstruction in AUTO Mode',
+    13: '13. EB Test Failure',
+    14: '14. Power Deselect Failure',
+    15: '15. Loss of Door Closed Status'}

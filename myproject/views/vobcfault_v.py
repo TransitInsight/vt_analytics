@@ -22,8 +22,8 @@ filter_start_date = datetime(2015, 1, 1)
 filter_end_date = datetime.today()
 
 #%%
-def create_fig_bar(fault_name, start_date, end_date):
-    df_res = vobcfault_m.get_count_by(fault_name, start_date, end_date)
+def create_fig_bar(fault_code, start_date, end_date):
+    df_res = vobcfault_m.get_count_by(fault_code, start_date, end_date)
     
     df_list = []
     df_list.append(df_res[(df_res['VOBCID']<=150)].sort_values(by=['VOBCID']) )
@@ -33,17 +33,21 @@ def create_fig_bar(fault_name, start_date, end_date):
     i = 1
     for df in df_list:
         j = 0
-        for fault_code in sorted(df['faultName'].unique()):
-            df_fc = df[df['faultName']==fault_code]
+        for fault_code in sorted(df['faultCode'].unique()):
+            df_fc = df[df['faultCode']==fault_code]
             fig.append_trace(go.Bar(
-                    name=fault_code, x=df_fc['VOBCID'], y=df_fc['FaultCount'], 
-                    legendgroup=fault_code, showlegend = i==1, marker=dict(color=cfg.vobc_fault_color_dict[fault_code[:2]])
+                    name=vobcfault_m.get_fault_name(fault_code), 
+                    x=df_fc['VOBCID'], 
+                    y=df_fc['FaultCount'], 
+                    legendgroup=vobcfault_m.get_fault_name(fault_code), 
+                    showlegend = i==1,
+                    marker=dict(color=cfg.vobc_fault_color_dict[fault_code])
                     ), 
                     row=i, col=1)    
             j+=1
         i+=1
 
-    y_max = df_res.groupby(['VOBCID']).sum().max()[0] * 1.02
+    y_max = df.groupby(['VOBCID']).sum().FaultCount.max() * 1.01
 
     if (type(start_date) is datetime):
         start_date = start_date.strftime("%Y-%m-%dT%H:%M:%S")
@@ -62,7 +66,7 @@ def create_fig_bar(fault_name, start_date, end_date):
     return fig
 
 
-def create_fig_area(fault_name, start_date, end_date):
+def create_fig_area(fault_name, start_date, end_date, click_value):
 
     if (type(start_date) is datetime):
         start_date = start_date.strftime("%Y-%m-%dT%H:%M:%S")
@@ -73,12 +77,12 @@ def create_fig_area(fault_name, start_date, end_date):
     y_max = df.groupby(['LoggedDate']).max().max() * 1.01
     fig = go.Figure()
 
-    for fault_code in sorted(df['faultName'].unique()):
-        df_fc = df[df['faultName']==fault_code]
+    for fc_code in sorted(df['faultCode'].unique()):
+        df_fc = df[df['faultCode']==fc_code]
         fig.add_trace(go.Scatter(x=df_fc['LoggedDate'], y=df_fc['FaultCount'],
             showlegend = False, 
-            fillcolor=cfg.vobc_fault_color_dict[fault_code[:2]],
-            line_color=cfg.vobc_fault_color_dict[fault_code[:2]],
+            fillcolor=cfg.vobc_fault_color_dict[fc_code],
+            line_color=cfg.vobc_fault_color_dict[fc_code],
             stackgroup = 'one'
             )) 
 
@@ -89,14 +93,6 @@ def create_fig_area(fault_name, start_date, end_date):
     return fig
 
 #%%
-
-def create_dropdown_options():
-    df_res = vobcfault_m.get_all_fault()
-
-    fc_options = [{'label':x, "value":x} for x in df_res['faultName'].unique()]
-    fc_options.insert(0,{'label':'00. All','value':'00. All'})
-
-    return fc_options
 
 def create_layout():
     
@@ -114,17 +110,17 @@ def create_layout():
     fault_name_div = html.Div([
             dcc.Dropdown(
                 id='app-1-dropdown',
-                options=create_dropdown_options(),
-                value='00. All'
+                options=vobcfault_m.create_dropdown_options(),
+                value=-1
             )
         ], style={'display':'inline-block', 'font-size':'120%', 'width': '300px', 'margin-top':'8px'})
 
     fg_div_bar = html.Div([
-            dcc.Graph(id='fig_bar', figure=create_fig_bar('00. All', filter_start_date, filter_end_date))], 
+            dcc.Graph(id='fig_bar', figure=create_fig_bar(-1, filter_start_date, filter_end_date))], 
             style={'width':'100%', 'display':'inline-block'}
         )
     fg_div_area = html.Div([
-            dcc.Graph(id='fig_area', figure=create_fig_area('00. All', filter_start_date, filter_end_date))], 
+            dcc.Graph(id='fig_area', figure=create_fig_area(-1, filter_start_date, filter_end_date, None))], 
             style={'width':'100%', 'display':'inline-block'}
         )
 
@@ -153,7 +149,39 @@ def create_layout():
                         ),
                     dbc.Col(
                         html.Div([
+                            html.Pre(id='selectoutput_bar', style={'paddingTop':35})
+                            ], style={'paddingTop':35})
+                        ),
+                    dbc.Col(
+                        html.Div([
+                            html.Pre(id='relayoutoutput_bar', style={'paddingTop':35})
+                            ], style={'paddingTop':35})
+                        ),
+                    dbc.Col(
+                        html.Div([
+                            html.Pre(id='restyleoutput_bar', style={'paddingTop':35})
+                            ], style={'paddingTop':35})
+                        ),
+
+
+                    dbc.Col(
+                        html.Div([
                             html.Pre(id='clickoutput_area', style={'paddingTop':35})
+                            ], style={'paddingTop':35})
+                        ),
+                    dbc.Col(
+                        html.Div([
+                            html.Pre(id='selectoutput_area', style={'paddingTop':35})
+                            ], style={'paddingTop':35})
+                        ),
+                    dbc.Col(
+                        html.Div([
+                            html.Pre(id='relayoutoutput_area', style={'paddingTop':35})
+                            ], style={'paddingTop':35})
+                        ),
+                    dbc.Col(
+                        html.Div([
+                            html.Pre(id='restyleoutput_area', style={'paddingTop':35})
                             ], style={'paddingTop':35})
                         )
                 ]
@@ -173,7 +201,7 @@ layout = create_layout()
         Input('my_date_picker', 'start_date'),
         Input('my_date_picker', 'end_date') 
     ])
-def display_figure(value, start_date, end_date):
+def display_figure_bar(value, start_date, end_date):
     f = create_fig_bar(value, start_date, end_date)
     return f
 
@@ -182,19 +210,48 @@ def display_figure(value, start_date, end_date):
     [
         Input('app-1-dropdown', 'value'),
         Input('my_date_picker', 'start_date'),
-        Input('my_date_picker', 'end_date') 
+        Input('my_date_picker', 'end_date') ,
+        Input('fig_bar', 'clickData')
+
     ])
-def display_figure(value, start_date, end_date):
-    f = create_fig_area(value, start_date, end_date)
+def display_figure_area(value, start_date, end_date, click_value):
+    f = create_fig_area(value, start_date, end_date, click_value)
     return f
 
+#####----------------------------------------------------
 @app.callback(
     Output('clickoutput_bar', 'children'),
     [
         Input('fig_bar', 'clickData')
     ])
 def clicked_bar_data(value):
-    return json.dumps(value, indent=2)
+    return 'click: ' + json.dumps(value, indent=2)
+
+
+@app.callback(
+    Output('selectoutput_bar', 'children'),
+    [
+        Input('fig_bar', 'selectedData')
+    ])
+def select_bar_data(value):
+    return 'select : ' +json.dumps(value, indent=2)
+
+@app.callback(
+    Output('relayoutoutput_bar', 'children'),
+    [
+        Input('fig_bar', 'relayoutData')
+    ])
+def relayout_bar_data(value):
+    return 'relayout :' + json.dumps(value, indent=2)
+
+@app.callback(
+    Output('restyleoutput_bar', 'children'),
+    [
+        Input('fig_bar', 'restyleData')
+    ])
+def restyle_bar_data(value):
+    return 'restyle:' + json.dumps(value, indent=2)
+
 
 
 @app.callback(
@@ -203,4 +260,31 @@ def clicked_bar_data(value):
         Input('fig_area', 'clickData')
     ])
 def clicked_area_data(value):
-    return json.dumps(value, indent=2)
+    return 'click : ' + json.dumps(value, indent=2)
+
+
+@app.callback(
+    Output('selectoutput_area', 'children'),
+    [
+        Input('fig_area', 'selectedData')
+    ])
+def select_area_data(value):
+    return 'select :' + json.dumps(value, indent=2)
+
+
+@app.callback(
+    Output('relayoutoutput_area', 'children'),
+    [
+        Input('fig_area', 'relayoutData')
+    ])
+def relayout_area_data(value):
+    return 'relayout: ' + json.dumps(value, indent=2)
+
+
+@app.callback(
+    Output('restyleoutput_area', 'children'),
+    [
+        Input('fig_area', 'restyleData')
+    ])
+def restyle_area_data(value):
+    return 'restyle:' + json.dumps(value, indent=2)
