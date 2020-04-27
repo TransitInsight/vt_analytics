@@ -22,5 +22,5 @@ layout = html.Div([
 @app.callback(
     Output('app-2-display-value', 'children'),
     [Input('app-2-dropdown', 'value')])
-def display_value(value):
+def display_value(clicked_date):
     return 'You have selected in app2 "{}"'.format(value)

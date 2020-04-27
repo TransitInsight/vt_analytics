@@ -1,4 +1,5 @@
 #%%
+import json
 import dash_core_components as dcc
 import dash_html_components as html
 import dash_bootstrap_components as dbc
@@ -50,10 +51,10 @@ def create_fig_bar(fault_name, start_date, end_date):
         end_date = end_date.strftime("%Y-%m-%dT%H:%M:%S")
 
     #title_text = 'VOBC Fault Histogram ({} - {})'.format(start_date[0:10], end_date[0:10])
-    fig.update_layout(barmode='stack', height=600, 
+    fig.update_layout(barmode='stack', height=600, hovermode='closest',
         #paper_bgcolor="LightSteelBlue", 
         #title = { 'text': title_text, 'font':{'size':20}, 'yanchor': 'top' },
-        margin=dict(l=20, r=20, t=50, b=20))
+        margin=dict(l=2, r=2, t=30, b=2))
     fig.update_xaxes(row=1,col=1, dtick = 4, title_text='vobc id')#, type='category')
     fig.update_xaxes(row=2,col=1, dtick = 4, title_text='vobc id')#, type='category')
     fig.update_yaxes(range=[0,y_max], title_text='fault count')
@@ -81,7 +82,7 @@ def create_fig_area(fault_name, start_date, end_date):
             stackgroup = 'one'
             )) 
 
-    fig.update_layout(height=600, margin=dict(l=20, r=20, t=50, b=20))
+    fig.update_layout(height=600, margin=dict(l=2, r=2, t=30, b=2), hovermode='closest')
     fig.update_xaxes(title_text='date')#, type='category')
     fig.update_yaxes(range=[0,y_max], title_text='fault count')
 
@@ -120,11 +121,11 @@ def create_layout():
 
     fg_div_bar = html.Div([
             dcc.Graph(id='fig_bar', figure=create_fig_bar('00. All', filter_start_date, filter_end_date))], 
-            style={'width':'90%', 'display':'inline-block'}
+            style={'width':'100%', 'display':'inline-block'}
         )
     fg_div_area = html.Div([
             dcc.Graph(id='fig_area', figure=create_fig_area('00. All', filter_start_date, filter_end_date))], 
-            style={'width':'90%', 'display':'inline-block'}
+            style={'width':'100%', 'display':'inline-block'}
         )
 
     retDiv = html.Div(
@@ -139,10 +140,24 @@ def create_layout():
             ),
             dbc.Row(
                 [
-                    dbc.Col(fg_div_area),
-                    dbc.Col(fg_div_bar)
+                    dbc.Col(fg_div_bar, width = 6),
+                    dbc.Col(fg_div_area, width = 6)
                 ]
             ),
+            dbc.Row(
+                [
+                    dbc.Col(
+                        html.Div([
+                            html.Pre(id='clickoutput_bar', style={'paddingTop':35})
+                            ], style={'paddingTop':35})
+                        ),
+                    dbc.Col(
+                        html.Div([
+                            html.Pre(id='clickoutput_area', style={'paddingTop':35})
+                            ], style={'paddingTop':35})
+                        )
+                ]
+            )
         ]
     )
     return retDiv
@@ -172,3 +187,20 @@ def display_figure(value, start_date, end_date):
 def display_figure(value, start_date, end_date):
     f = create_fig_area(value, start_date, end_date)
     return f
+
+@app.callback(
+    Output('clickoutput_bar', 'children'),
+    [
+        Input('fig_bar', 'clickData')
+    ])
+def clicked_bar_data(value):
+    return json.dumps(value, indent=2)
+
+
+@app.callback(
+    Output('clickoutput_area', 'children'),
+    [
+        Input('fig_area', 'clickData')
+    ])
+def clicked_area_data(value):
+    return json.dumps(value, indent=2)
