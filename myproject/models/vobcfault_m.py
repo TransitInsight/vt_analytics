@@ -58,10 +58,13 @@ def get_all_fault():
     df = run_query(query)
     return df
 
-def get_count_trend(fault_code, start_date, end_date):
+def get_count_trend(fault_code, start_date, end_date, vobcid):
     fault_condition = ''
+    vobc_condition = ''
     if (fault_code != -1 ):
         fault_condition = " and faultCode  = {}".format(fault_code)    
+    if (vobcid != -1 ):
+        vobc_condition = " and vobcid = {}".format(vobcid)    
 
     if (type(start_date) is datetime):
         start_date = start_date.strftime("%Y-%m-%dT%H:%M:%S")
@@ -70,8 +73,8 @@ def get_count_trend(fault_code, start_date, end_date):
 
     query = ("SELECT faultName, faultCode, loggedDate as LoggedDate, count(*) as FaultCount"
             " from dlr_vobc_fault"
-            " where vobcid <=300 and loggedAt >= '{}' and loggedAt < '{}' {}" 
-            " group by faultName, faultCode, loggedDate  LIMIT 5000").format(start_date, end_date, fault_condition)
+            " where vobcid <=300 and loggedAt >= '{}' and loggedAt < '{}' {} {}" 
+            " group by faultName, faultCode, loggedDate  LIMIT 5000").format(start_date, end_date, fault_condition, vobc_condition)
     df = run_query(query)
     return df
 

@@ -56,13 +56,21 @@ class TestVOBC(unittest.TestCase):
 
 
     def test_get_fc_trend(self):
-        df = vobcDA.get_count_trend(-1, '2014-01-01T00:00:00', '2015-04-25T00:13:26.017995')
+        df = vobcDA.get_count_trend(-1, '2014-01-01T00:00:00', '2015-04-25T00:13:26.017995', -1)
         self.assertTrue(df['LoggedDate'].count() > 1000)
         self.assertTrue(len(df['faultName'].unique()) == 15)
 
-        df1 = vobcDA.get_count_trend(3, '2014-01-01T00:00:00', '2015-04-25T00:13:26.017995')
+        df1 = vobcDA.get_count_trend(3, '2014-01-01T00:00:00', '2015-04-25T00:13:26.017995', -1)
         self.assertTrue(df['LoggedDate'].count() > df1['LoggedDate'].count())
 
+
+    def test_get_fc_trend1(self):
+        df = vobcDA.get_count_trend(-1, '2014-01-01T00:00:00', '2015-04-25T00:13:26.017995', -1)
+        self.assertTrue(df['LoggedDate'].count() > 1000)
+        self.assertTrue(len(df['faultName'].unique()) == 15)
+
+        df1 = vobcDA.get_count_trend(-1, '2014-01-01T00:00:00', '2015-04-25T00:13:26.017995', 2)
+        self.assertTrue(df['LoggedDate'].count() > df1['LoggedDate'].count())
 
     def test_isupper(self):
         self.assertTrue('FOO'.isupper())

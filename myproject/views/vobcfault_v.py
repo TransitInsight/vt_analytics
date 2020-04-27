@@ -56,6 +56,7 @@ def create_fig_bar(fault_code, start_date, end_date):
 
     #title_text = 'VOBC Fault Histogram ({} - {})'.format(start_date[0:10], end_date[0:10])
     fig.update_layout(barmode='stack', height=600, hovermode='closest',
+        #legend=dict(x=-.1, y=0),
         #paper_bgcolor="LightSteelBlue", 
         #title = { 'text': title_text, 'font':{'size':20}, 'yanchor': 'top' },
         margin=dict(l=2, r=2, t=30, b=2))
@@ -66,14 +67,25 @@ def create_fig_bar(fault_code, start_date, end_date):
     return fig
 
 
-def create_fig_area(fault_name, start_date, end_date, click_value):
+def create_fig_area(fault_code, start_date, end_date, click_value):
 
     if (type(start_date) is datetime):
         start_date = start_date.strftime("%Y-%m-%dT%H:%M:%S")
     if (type(end_date) is datetime):
         end_date = end_date.strftime("%Y-%m-%dT%H:%M:%S")
 
-    df = vobcfault_m.get_count_trend(fault_name, start_date, end_date)
+    click_fault_code = -1
+    click_vobcid = -1
+    title = 'date'
+    if (click_value != None):
+        click_vobcid = click_value['points'][0]['x']
+        click_fault_code = click_value['points'][0]['curveNumber'] + 1 #click curveNumber is between 0 and 14
+        if (click_fault_code > 15) :
+            click_fault_code -= 15
+        fault_code = click_fault_code
+        title = 'date (vobc={}, fault={})'.format(click_vobcid, fault_code)
+
+    df = vobcfault_m.get_count_trend(fault_code, start_date, end_date, click_vobcid)
     y_max = df.groupby(['LoggedDate']).max().max() * 1.01
     fig = go.Figure()
 
@@ -81,13 +93,14 @@ def create_fig_area(fault_name, start_date, end_date, click_value):
         df_fc = df[df['faultCode']==fc_code]
         fig.add_trace(go.Scatter(x=df_fc['LoggedDate'], y=df_fc['FaultCount'],
             showlegend = False, 
-            fillcolor=cfg.vobc_fault_color_dict[fc_code],
+            #fillcolor=cfg.vobc_fault_color_dict[fc_code],
             line_color=cfg.vobc_fault_color_dict[fc_code],
             stackgroup = 'one'
             )) 
 
-    fig.update_layout(height=600, margin=dict(l=2, r=2, t=30, b=2), hovermode='closest')
-    fig.update_xaxes(title_text='date')#, type='category')
+    fig.update_layout(height=300, margin=dict(l=2, r=10, t=30, b=2), hovermode='closest')
+    
+    fig.update_xaxes(title_text=title)#, type='category')
     fig.update_yaxes(range=[0,y_max], title_text='fault count')
 
     return fig
@@ -136,8 +149,8 @@ def create_layout():
             ),
             dbc.Row(
                 [
-                    dbc.Col(fg_div_bar, width = 6),
-                    dbc.Col(fg_div_area, width = 6)
+                    dbc.Col(fg_div_bar, width = 8),
+                    dbc.Col(fg_div_area, width = 4)
                 ]
             ),
             dbc.Row(
