@@ -18,6 +18,8 @@ def run_query(query):
     response = requests.post(cfg.ElasticSearchDS['sqlurl'], headers=headers, data=json.dumps(query))
 
     df = pd.json_normalize(response.json(),'rows')
+    if (df.shape[0] == 0):
+        return df
     df.columns = [d['name'] for d in response.json()['columns']]
 
     for c in response.json()['columns']:

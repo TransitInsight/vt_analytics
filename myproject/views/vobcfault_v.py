@@ -19,7 +19,7 @@ from plotly.subplots import make_subplots
 
 
 filter_start_date = datetime(2015, 1, 1)
-filter_end_date = datetime.today()
+filter_end_date = datetime(2015, 4, 1)
 
 #%%
 def create_fig_bar(fault_code, start_date, end_date):
@@ -82,12 +82,15 @@ def create_fig_area(fault_code, start_date, end_date, click_value):
         click_fault_code = click_value['points'][0]['curveNumber'] + 1 #click curveNumber is between 0 and 14
         if (click_fault_code > 15) :
             click_fault_code -= 15
-        fault_code = click_fault_code
+        if (fault_code == -1): #if not -1, the dropdown only selected on Fault, so the click must be on the same fault, no need to change
+            fault_code = click_fault_code
         title = 'date (vobc={}, fault={})'.format(click_vobcid, fault_code)
 
     df = vobcfault_m.get_count_trend(fault_code, start_date, end_date, click_vobcid)
-    y_max = df.groupby(['LoggedDate']).max().max() * 1.01
     fig = go.Figure()
+    if (df.empty):
+        return fig
+    y_max = df.groupby(['LoggedDate']).max().max() * 1.01
 
     for fc_code in sorted(df['faultCode'].unique()):
         df_fc = df[df['faultCode']==fc_code]
@@ -97,6 +100,12 @@ def create_fig_area(fault_code, start_date, end_date, click_value):
             line_color=cfg.vobc_fault_color_dict[fc_code],
             stackgroup = 'one'
             )) 
+        # fig.add_trace(go.Scatter(x=df_fc['LoggedDate'], y=df_fc['FaultCount'],
+        #     showlegend = False, 
+        #     line_color=cfg.vobc_fault_color_dict[fc_code],
+        #     hoverinfo='text+name',
+        #     line_shape = 'linear'
+        #     )) 
 
     fig.update_layout(height=300, margin=dict(l=2, r=10, t=30, b=2), hovermode='closest')
     
@@ -224,7 +233,7 @@ def display_figure_bar(value, start_date, end_date):
         Input('app-1-dropdown', 'value'),
         Input('my_date_picker', 'start_date'),
         Input('my_date_picker', 'end_date') ,
-        Input('fig_bar', 'clickData')
+        Input('fig_bar', 'hoverData')
 
     ])
 def display_figure_area(value, start_date, end_date, click_value):
