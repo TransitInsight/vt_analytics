@@ -72,6 +72,15 @@ class TestVOBC(unittest.TestCase):
         df1 = vobcDA.get_count_trend(-1, '2014-01-01T00:00:00', '2015-04-25T00:13:26.017995', 2)
         self.assertTrue(df['LoggedDate'].count() > df1['LoggedDate'].count())
 
+
+    def test_get_fc_location(self):
+        df = vobcDA.get_count_location(-1, '2014-01-01T00:00:00', '2015-04-25T00:13:26.017995', -1)
+        self.assertTrue(df['LocationName'].count() > 1000)
+        self.assertTrue(len(df['faultName'].unique()) == 15)
+
+        df1 = vobcDA.get_count_trend(-1, '2014-01-01T00:00:00', '2015-04-25T00:13:26.017995', 2)
+        self.assertTrue(df['LocationName'].count() > df1['LoggedDate'].count())
+
     def test_isupper(self):
         self.assertTrue('FOO'.isupper())
         self.assertFalse('Foo'.isupper())

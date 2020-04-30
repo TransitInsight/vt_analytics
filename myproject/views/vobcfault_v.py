@@ -22,7 +22,7 @@ filter_start_date = datetime(2015, 1, 1)
 filter_end_date = datetime(2015, 4, 1)
 
 #%%
-def create_fig_bar(fault_code, start_date, end_date):
+def create_fig_by_vobc(fault_code, start_date, end_date):
     df_res = vobcfault_m.get_count_by(fault_code, start_date, end_date)
     
     df_list = []
@@ -67,7 +67,7 @@ def create_fig_bar(fault_code, start_date, end_date):
     return fig
 
 
-def create_fig_area(fault_code, start_date, end_date, click_value):
+def create_fig_by_trend(fault_code, start_date, end_date, click_value):
 
     if (type(start_date) is datetime):
         start_date = start_date.strftime("%Y-%m-%dT%H:%M:%S")
@@ -100,12 +100,6 @@ def create_fig_area(fault_code, start_date, end_date, click_value):
             line_color=cfg.vobc_fault_color_dict[fc_code],
             stackgroup = 'one'
             )) 
-        # fig.add_trace(go.Scatter(x=df_fc['LoggedDate'], y=df_fc['FaultCount'],
-        #     showlegend = False, 
-        #     line_color=cfg.vobc_fault_color_dict[fc_code],
-        #     hoverinfo='text+name',
-        #     line_shape = 'linear'
-        #     )) 
 
     fig.update_layout(height=300, margin=dict(l=2, r=10, t=30, b=2), hovermode='closest')
     
@@ -113,6 +107,49 @@ def create_fig_area(fault_code, start_date, end_date, click_value):
     fig.update_yaxes(range=[0,y_max], title_text='fault count')
 
     return fig
+
+
+def create_fig_by_location(fault_code, start_date, end_date, click_value):
+
+    if (type(start_date) is datetime):
+        start_date = start_date.strftime("%Y-%m-%dT%H:%M:%S")
+    if (type(end_date) is datetime):
+        end_date = end_date.strftime("%Y-%m-%dT%H:%M:%S")
+
+    click_fault_code = -1
+    click_vobcid = -1
+    title = 'location'
+    if (click_value != None):
+        click_vobcid = click_value['points'][0]['x']
+        click_fault_code = click_value['points'][0]['curveNumber'] + 1 #click curveNumber is between 0 and 14
+        if (click_fault_code > 15) :
+            click_fault_code -= 15
+        if (fault_code == -1): #if not -1, the dropdown only selected on Fault, so the click must be on the same fault, no need to change
+            fault_code = click_fault_code
+        title = 'location (vobc={}, fault={})'.format(click_vobcid, fault_code)
+
+    df = vobcfault_m.get_count_location(fault_code, start_date, end_date, click_vobcid)
+    fig = go.Figure()
+    if (df.empty):
+        return fig
+    y_max = df.groupby(['LocationName']).max().max() * 1.01
+
+    for fc_code in sorted(df['faultCode'].unique()):
+        df_fc = df[df['faultCode']==fc_code]
+        fig.add_trace(go.Bar(x=df_fc['LocationName'], y=df_fc['FaultCount'],
+            showlegend = False ,
+            marker=dict(color=cfg.vobc_fault_color_dict[6])
+            #fillcolor=cfg.vobc_fault_color_dict[fc_code],
+            #line_color=cfg.vobc_fault_color_dict[fc_code],
+            )) 
+
+    fig.update_layout(barmode='stack',height=300, margin=dict(l=2, r=10, t=30, b=2), hovermode='closest')
+    
+    fig.update_xaxes(title_text=title)#, type='category')
+    fig.update_yaxes(range=[0,y_max], title_text='fault location')
+
+    return fig
+
 
 #%%
 
@@ -131,20 +168,25 @@ def create_layout():
 
     fault_name_div = html.Div([
             dcc.Dropdown(
-                id='app-1-dropdown',
+                id='fault-dropdown',
                 options=vobcfault_m.create_dropdown_options(),
                 value=-1
             )
         ], style={'display':'inline-block', 'font-size':'120%', 'width': '300px', 'margin-top':'8px'})
 
-    fg_div_bar = html.Div([
-            dcc.Graph(id='fig_bar', figure=create_fig_bar(-1, filter_start_date, filter_end_date))], 
+    fg_div_by_fault = html.Div([
+            dcc.Graph(id='fig_by_fault', figure=create_fig_by_vobc(-1, filter_start_date, filter_end_date))], 
             style={'width':'100%', 'display':'inline-block'}
         )
-    fg_div_area = html.Div([
-            dcc.Graph(id='fig_area', figure=create_fig_area(-1, filter_start_date, filter_end_date, None))], 
+    fg_div_by_trend = html.Div([
+            dcc.Graph(id='fig_by_trend', figure=create_fig_by_trend(-1, filter_start_date, filter_end_date, None))], 
             style={'width':'100%', 'display':'inline-block'}
         )
+    fg_div_by_location  = html.Div([
+            dcc.Graph(id='fig_by_location', figure=create_fig_by_location(-1, filter_start_date, filter_end_date, None))], 
+            style={'width':'100%', 'display':'inline-block'}
+        )
+
 
     retDiv = html.Div(
         [
@@ -158,8 +200,9 @@ def create_layout():
             ),
             dbc.Row(
                 [
-                    dbc.Col(fg_div_bar, width = 8),
-                    dbc.Col(fg_div_area, width = 4)
+                    dbc.Col(fg_div_by_fault, width = 8),
+                    dbc.Col(fg_div_by_trend, width = 4),
+                    dbc.Col(fg_div_by_location, width = 4)
                 ]
             ),
             dbc.Row(
@@ -217,34 +260,34 @@ def create_layout():
 layout = create_layout()
 
 @app.callback(
-    Output('fig_bar', 'figure'),
+    Output('fig_by_fault', 'figure'),
     [
-        Input('app-1-dropdown', 'value'),
+        Input('fault-dropdown', 'value'),
         Input('my_date_picker', 'start_date'),
         Input('my_date_picker', 'end_date') 
     ])
 def display_figure_bar(value, start_date, end_date):
-    f = create_fig_bar(value, start_date, end_date)
+    f = create_fig_by_vobc(value, start_date, end_date)
     return f
 
 @app.callback(
-    Output('fig_area', 'figure'),
+    Output('fig_by_trend', 'figure'),
     [
-        Input('app-1-dropdown', 'value'),
+        Input('fault-dropdown', 'value'),
         Input('my_date_picker', 'start_date'),
         Input('my_date_picker', 'end_date') ,
-        Input('fig_bar', 'hoverData')
+        Input('fig_by_fault', 'hoverData')
 
     ])
 def display_figure_area(value, start_date, end_date, click_value):
-    f = create_fig_area(value, start_date, end_date, click_value)
+    f = create_fig_by_trend(value, start_date, end_date, click_value)
     return f
 
 #####----------------------------------------------------
 @app.callback(
     Output('clickoutput_bar', 'children'),
     [
-        Input('fig_bar', 'clickData')
+        Input('fig_by_fault', 'clickData')
     ])
 def clicked_bar_data(value):
     return 'click: ' + json.dumps(value, indent=2)
@@ -253,7 +296,7 @@ def clicked_bar_data(value):
 @app.callback(
     Output('selectoutput_bar', 'children'),
     [
-        Input('fig_bar', 'selectedData')
+        Input('fig_by_fault', 'selectedData')
     ])
 def select_bar_data(value):
     return 'select : ' +json.dumps(value, indent=2)
@@ -261,7 +304,7 @@ def select_bar_data(value):
 @app.callback(
     Output('relayoutoutput_bar', 'children'),
     [
-        Input('fig_bar', 'relayoutData')
+        Input('fig_by_fault', 'relayoutData')
     ])
 def relayout_bar_data(value):
     return 'relayout :' + json.dumps(value, indent=2)
@@ -269,7 +312,7 @@ def relayout_bar_data(value):
 @app.callback(
     Output('restyleoutput_bar', 'children'),
     [
-        Input('fig_bar', 'restyleData')
+        Input('fig_by_fault', 'restyleData')
     ])
 def restyle_bar_data(value):
     return 'restyle:' + json.dumps(value, indent=2)
@@ -279,7 +322,7 @@ def restyle_bar_data(value):
 @app.callback(
     Output('clickoutput_area', 'children'),
     [
-        Input('fig_area', 'clickData')
+        Input('fig_by_trend', 'clickData')
     ])
 def clicked_area_data(value):
     return 'click : ' + json.dumps(value, indent=2)
@@ -288,7 +331,7 @@ def clicked_area_data(value):
 @app.callback(
     Output('selectoutput_area', 'children'),
     [
-        Input('fig_area', 'selectedData')
+        Input('fig_by_trend', 'selectedData')
     ])
 def select_area_data(value):
     return 'select :' + json.dumps(value, indent=2)
@@ -297,7 +340,7 @@ def select_area_data(value):
 @app.callback(
     Output('relayoutoutput_area', 'children'),
     [
-        Input('fig_area', 'relayoutData')
+        Input('fig_by_trend', 'relayoutData')
     ])
 def relayout_area_data(value):
     return 'relayout: ' + json.dumps(value, indent=2)
@@ -306,7 +349,7 @@ def relayout_area_data(value):
 @app.callback(
     Output('restyleoutput_area', 'children'),
     [
-        Input('fig_area', 'restyleData')
+        Input('fig_by_trend', 'restyleData')
     ])
 def restyle_area_data(value):
     return 'restyle:' + json.dumps(value, indent=2)

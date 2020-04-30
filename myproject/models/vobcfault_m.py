@@ -80,6 +80,26 @@ def get_count_trend(fault_code, start_date, end_date, vobcid):
     df = run_query(query)
     return df
 
+def get_count_location(fault_code, start_date, end_date, vobcid):
+    fault_condition = ''
+    vobc_condition = ''
+    if (fault_code != -1 ):
+        fault_condition = " and faultCode  = {}".format(fault_code)    
+    if (vobcid != -1 ):
+        vobc_condition = " and vobcid = {}".format(vobcid)    
+
+    if (type(start_date) is datetime):
+        start_date = start_date.strftime("%Y-%m-%dT%H:%M:%S")
+    if (type(end_date) is datetime):
+        end_date = end_date.strftime("%Y-%m-%dT%H:%M:%S")
+
+    query = ("SELECT faultName, faultCode, locationName as LocationName, count(*) as FaultCount"
+            " from dlr_vobc_fault"
+            " where vobcid <=300 and loggedAt >= '{}' and loggedAt < '{}' {} {}" 
+            " group by faultName, faultCode, locationName  LIMIT 5000").format(start_date, end_date, fault_condition, vobc_condition)
+    df = run_query(query)
+    return df
+
 # %%
 
 def create_dropdown_options():
