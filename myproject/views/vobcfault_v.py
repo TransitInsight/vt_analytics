@@ -61,24 +61,14 @@ def create_fig_by_vobc(fault_code, start_date, end_date):
     return fig
 
 
-def create_fig_by_trend(fault_code, start_date, end_date, click_value):
+def create_fig_by_trend(fault_code, start_date, end_date, vobc_id):
 
     start_date, end_date = util.NormalizeDate(start_date, end_date)
 
-    click_fault_code = -1
-    click_vobcid = -1
-    title = ''
-    if (click_value != None):
-        click_vobcid = click_value['points'][0]['x']
-        click_fault_code = click_value['points'][0]['curveNumber'] + 1 #click curveNumber is between 0 and 14
-        if (click_fault_code > 15) :
-            click_fault_code -= 15
-        if (fault_code == -1): #if not -1, the dropdown only selected one Fault, so the click must be on the same fault, no need to change
-            fault_code = click_fault_code
-        title = 'vobc={}, fault={}'.format(click_vobcid, fault_code)
+    title = 'vobc={}, fault={}'.format(vobc_id, fault_code)
 
     fig = make_subplots(rows=2, cols=1)
-    df = vobcfault_m.get_count_trend(fault_code, start_date, end_date, click_vobcid)
+    df = vobcfault_m.get_count_trend(fault_code, start_date, end_date, vobc_id)
     if (not df.empty):
         y_max = df.groupby(['LoggedDate']).max().max() * 1.01
     
@@ -93,7 +83,7 @@ def create_fig_by_trend(fault_code, start_date, end_date, click_value):
         fig.update_xaxes(row = 1, col = 1, title_text=title)#, type='category')
         fig.update_yaxes(row = 1, col = 1, range=[0,y_max], title_text='fault count by date')
 
-    df = vobcfault_m.get_count_location(fault_code, start_date, end_date, click_vobcid)
+    df = vobcfault_m.get_count_location(fault_code, start_date, end_date, vobc_id)
     if (not df.empty):
         y_max = df.groupby(['LocationName']).max().max() * 1.01
     
@@ -179,7 +169,7 @@ def create_layout():
             style={'width':'100%', 'display':'inline-block'}
         )
     fg_div_by_trend = html.Div([
-            dcc.Graph(id='fig_by_trend', figure=create_fig_by_trend(-1, filter_start_date, filter_end_date, None))], 
+            dcc.Graph(id='fig_by_trend', figure=create_fig_by_trend(-1, filter_start_date, filter_end_date, -1))], 
             style={'width':'100%', 'display':'inline-block'}
         )
 
@@ -274,7 +264,18 @@ def display_figure_bar(value, start_date, end_date):
 
     ])
 def display_figure_area(value, start_date, end_date, click_value):
-    f = create_fig_by_trend(value, start_date, end_date, click_value)
+    fault_code = value
+    click_fault_code = -1
+    click_vobcid = -1
+    if (click_value != None):
+        click_vobcid = click_value['points'][0]['x']
+        click_fault_code = click_value['points'][0]['curveNumber'] + 1 #click curveNumber is between 0 and 14
+        if (click_fault_code > 15) :
+            click_fault_code -= 15
+        if (fault_code == -1): #if not -1, the dropdown only selected one Fault, so the click must be on the same fault, no need to change
+            fault_code = click_fault_code
+
+    f = create_fig_by_trend(fault_code, start_date, end_date, click_vobcid)
     return f
 
 # @app.callback(
