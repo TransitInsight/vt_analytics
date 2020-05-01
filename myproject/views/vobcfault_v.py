@@ -10,6 +10,7 @@ from datetime import timedelta
 from app import app
 
 from myproject.models import vobcfault_m
+from myproject.models import trainmove_m
 import myproject.config as cfg
 import myproject.util as util
 import pandas as pd
@@ -50,7 +51,7 @@ def create_fig_by_vobc(fault_code, start_date, end_date):
 
     y_max = df.groupby(['VOBCID']).sum().FaultCount.max() * 1.01
 
-    start_date, end_date = util.NormalizeDate(start_date, end_date)
+    start_date, end_date = util.date2str2(start_date, end_date)
 
     fig.update_layout(barmode='stack', height=600, hovermode='closest',
         margin=dict(l=2, r=2, t=30, b=2))
@@ -63,7 +64,7 @@ def create_fig_by_vobc(fault_code, start_date, end_date):
 
 def create_fig_by_trend(fault_code, start_date, end_date, vobc_id):
 
-    start_date, end_date = util.NormalizeDate(start_date, end_date)
+    start_date, end_date = util.date2str2(start_date, end_date)
 
     title = 'vobc={}, fault={}'.format(vobc_id, fault_code)
 
@@ -104,28 +105,17 @@ def create_fig_by_trend(fault_code, start_date, end_date, vobc_id):
 
 
 def create_fig_by_trainmove(vobc_id, op_date):
-
-    start_date, end_date = util.NormalizeOneDate(op_date)
-
-    df = vobcfault_m.get_count_location(fault_code, start_date, end_date, click_vobcid)
+    start = util.str2date1(op_date)
+    end = start + timedelta(hours=1)    
+    df = trainmove_m.get_trainmove(vobc_id, start, end)
     fig = go.Figure()
     if (df.empty):
         return fig
-    y_max = df.groupby(['LocationName']).max().max() * 1.01
 
-    for fc_code in sorted(df['faultCode'].unique()):
-        df_fc = df[df['faultCode']==fc_code]
-        fig.add_trace(go.Bar(x=df_fc['LocationName'], y=df_fc['FaultCount'],
+    fig.add_trace(go.Scatter(x=df['loggedAt'], y=df['velocity'],
             showlegend = False ,
-            marker=dict(color=cfg.vobc_fault_color_dict[6])
-            #fillcolor=cfg.vobc_fault_color_dict[fc_code],
-            #line_color=cfg.vobc_fault_color_dict[fc_code],
+            line_color="#FF0000"
             )) 
-
-    fig.update_layout(barmode='stack',height=300, margin=dict(l=2, r=10, t=30, b=2), hovermode='closest')
-    
-    fig.update_xaxes(title_text=title)#, type='category')
-    fig.update_yaxes(range=[0,y_max], title_text='fault location')
 
     return fig
 

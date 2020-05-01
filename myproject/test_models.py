@@ -3,6 +3,7 @@
 #%%
 import unittest
 import myproject.models.vobcfault_m as vobcDA
+import myproject.models.trainmove_m as trainmoveDA
 import pandas as pd
 from datetime import datetime
 from datetime import timedelta
@@ -114,6 +115,18 @@ class TestVOBC(unittest.TestCase):
         pprint.pprint(df.groupby(['VOBCID']).sum().FaultCount.max())
         #y_max = df.groupby(['VOBCID'])['FaultCount'].sum().max()
 
+
+    def test_str2date1(self):
+        dt = util.str2date1('2010-1-1')
+        self.assertTrue(isinstance(dt, datetime))
+
+        dt = util.str2date1('2015-04-25T00:13:26.017995')
+        self.assertTrue(isinstance(dt, datetime))
+        self.assertTrue(dt.year == 2015)
+
+    def test_trainmove(self):
+        df = trainmoveDA.get_trainmove(112, '2015-07-03T10:51:30.160Z', '2015-07-03T11:51:30.160Z')
+        self.assertTrue(len(df['loggedAt']) > 100)
 
 if __name__ == '__main__':
     unittest.main()

@@ -8,21 +8,15 @@ import myproject.util as util
 
 #%%
 
-def get_count_by(fault_code, start_date, end_date):
-    fault_condition = ''
-    if (fault_code != -1):
-        fault_condition = " and faultCode = {}".format(fault_code)
+def get_trainmove(vobc_id, start_date, end_date):
+    start_date, end_date = util.date2str2(start_date,end_date)
+    if (vobc_id == None or vobc_id == -1 ):
+        return None
 
-    if (type(start_date) is datetime):
-        start_date = start_date.strftime("%Y-%m-%dT%H:%M:%S")
-    if (type(end_date) is datetime):
-        end_date = end_date.strftime("%Y-%m-%dT%H:%M:%S")
-
-    query = ("SELECT faultName, faultCode, vobcid as VOBCID, count(*) as FaultCount"
-             " from dlr_vobc_fault "
-             " where vobcid <= 300 and loggedAt >= '{}' and loggedAt < '{}' {} "
-             " group by faultName, faultCode, vobcid "
-             " LIMIT 10000 ").format( start_date, end_date, fault_condition)
+    query = ("SELECT *"
+             " from dlr_train_move "
+             " where vobcid = {} and loggedAt >= '{}' and loggedAt < '{}'"
+             " order by loggedAt LIMIT 10000 ").format( vobc_id, start_date, end_date)
     
     df = util.run_query(query)
     return df

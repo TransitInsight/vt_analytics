@@ -1,22 +1,29 @@
 from datetime import datetime
 from datetime import timedelta
+import dateparser
 import requests
 import pandas as pd
 import myproject.config as cfg
 import json
 
 
-def NormalizeOneDate(op_date):
+def date2str1(op_date):
     if (type(op_date) is datetime):
         op_date = op_date.strftime("%Y-%m-%dT%H:%M:%S")
 
     return op_date
 
-def NormalizeDate(start_date, end_date):
-    start_date = NormalizeOneDate(start_date)
-    end_date = NormalizeOneDate(end_date)
+def date2str2(start_date, end_date):
+    start_date = date2str1(start_date)
+    end_date = date2str1(end_date)
 
     return start_date, end_date
+
+def str2date1(op_date):
+    if isinstance(op_date, str):
+        op_date = dateparser.parse(op_date)
+
+    return op_date
 
 
 def run_query(query):
