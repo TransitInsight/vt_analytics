@@ -2,39 +2,10 @@
 import myproject.config as cfg
 import pandas as pd
 from datetime import datetime
-import requests
 import json
+import myproject.util as util
 
 #%%
-
-def run_query(query):
-    headers = {'Content-Type': 'application/json'}
-
-    query = {
-        "query": query,
-        "fetch_size": cfg.es_fetch_size
-    }
-
-    response = requests.post(cfg.ElasticSearchDS['sqlurl'], headers=headers, data=json.dumps(query))
-
-    df = pd.json_normalize(response.json(),'rows')
-    if (df.shape[0] == 0):
-        return df
-    df.columns = [d['name'] for d in response.json()['columns']]
-
-    for c in response.json()['columns']:
-        dtype = None
-        if (c['type'] == 'text'):
-            dtype = pd.StringDtype()
-        elif (c['type'] == 'datetime'):
-            dtype = 'datetime64'
-        else:
-            dtype = None
-
-        if ( not dtype is None ):
-            df[c['name']] = pd.Series(df[c['name']], dtype=dtype)
-
-    return df
 
 def get_count_by(fault_code, start_date, end_date):
     fault_condition = ''
@@ -52,12 +23,12 @@ def get_count_by(fault_code, start_date, end_date):
              " group by faultName, faultCode, vobcid "
              " LIMIT 10000 ").format( start_date, end_date, fault_condition)
     
-    df = run_query(query)
+    df = util.run_query(query)
     return df
 
 def get_all_fault():
     query = "SELECT faultName, faultCode, count(*) as FaultCount from dlr_vobc_fault group by faultName, faultCode LIMIT 50"
-    df = run_query(query)
+    df = util.run_query(query)
     return df
 
 def get_count_trend(fault_code, start_date, end_date, vobcid):
@@ -77,7 +48,7 @@ def get_count_trend(fault_code, start_date, end_date, vobcid):
             " from dlr_vobc_fault"
             " where vobcid <=300 and loggedAt >= '{}' and loggedAt < '{}' {} {}" 
             " group by faultName, faultCode, loggedDate  LIMIT 5000").format(start_date, end_date, fault_condition, vobc_condition)
-    df = run_query(query)
+    df = util.run_query(query)
     return df
 
 def get_count_location(fault_code, start_date, end_date, vobcid):
@@ -97,7 +68,7 @@ def get_count_location(fault_code, start_date, end_date, vobcid):
             " from dlr_vobc_fault"
             " where vobcid <=300 and loggedAt >= '{}' and loggedAt < '{}' {} {}" 
             " group by faultName, faultCode, locationName  LIMIT 5000").format(start_date, end_date, fault_condition, vobc_condition)
-    df = run_query(query)
+    df = util.run_query(query)
     return df
 
 # %%

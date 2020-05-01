@@ -103,20 +103,9 @@ def create_fig_by_trend(fault_code, start_date, end_date, vobc_id):
     return fig
 
 
-def create_fig_by_move(click_vobc, click_date):
+def create_fig_by_trainmove(vobc_id, op_date):
 
-    start_date, end_date = util.NormalizeDate(start_date, end_date)
-
-    click_vobcid = -1
-    title = 'location'
-    if (click_value != None):
-        click_vobcid = click_value['points'][0]['x']
-        click_fault_code = click_value['points'][0]['curveNumber'] + 1 #click curveNumber is between 0 and 14
-        if (click_fault_code > 15) :
-            click_fault_code -= 15
-        if (fault_code == -1): #if not -1, the dropdown only selected on Fault, so the click must be on the same fault, no need to change
-            fault_code = click_fault_code
-        title = 'location (vobc={}, fault={})'.format(click_vobcid, fault_code)
+    start_date, end_date = util.NormalizeOneDate(op_date)
 
     df = vobcfault_m.get_count_location(fault_code, start_date, end_date, click_vobcid)
     fig = go.Figure()

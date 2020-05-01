@@ -11,6 +11,7 @@ import json
 import pprint
 
 import myproject.config as cfg
+import myproject.util as util
 
 #%%
 '2020-04-25T00:13:26.017995'
@@ -35,7 +36,7 @@ class TestVOBC(unittest.TestCase):
 
 
     def test_runquery(self):
-        df = vobcDA.run_query("SELECT faultName, loggedAt, velocity from dlr_vobc_fault where loggedAt >= '2014-01-01T00:00:00' and loggedAt < '2015-04-25T00:13:26.017995' LIMIT 2000 ")
+        df = util.run_query("SELECT faultName, loggedAt, velocity from dlr_vobc_fault where loggedAt >= '2014-01-01T00:00:00' and loggedAt < '2015-04-25T00:13:26.017995' LIMIT 2000 ")
         self.assertTrue( df['loggedAt'].count() > 1000 )
 
     def test_get_count_by_daterange(self):
