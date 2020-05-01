@@ -11,6 +11,7 @@ from app import app
 
 from myproject.models import vobcfault_m
 import myproject.config as cfg
+import myproject.util as util
 import pandas as pd
 import plotly.graph_objs as go
 from plotly.subplots import make_subplots
@@ -49,16 +50,9 @@ def create_fig_by_vobc(fault_code, start_date, end_date):
 
     y_max = df.groupby(['VOBCID']).sum().FaultCount.max() * 1.01
 
-    if (type(start_date) is datetime):
-        start_date = start_date.strftime("%Y-%m-%dT%H:%M:%S")
-    if (type(end_date) is datetime):
-        end_date = end_date.strftime("%Y-%m-%dT%H:%M:%S")
+    start_date, end_date = util.NormalizeDate(start_date, end_date)
 
-    #title_text = 'VOBC Fault Histogram ({} - {})'.format(start_date[0:10], end_date[0:10])
     fig.update_layout(barmode='stack', height=600, hovermode='closest',
-        #legend=dict(x=-.1, y=0),
-        #paper_bgcolor="LightSteelBlue", 
-        #title = { 'text': title_text, 'font':{'size':20}, 'yanchor': 'top' },
         margin=dict(l=2, r=2, t=30, b=2))
     fig.update_xaxes(row=1,col=1, dtick = 4, title_text='vobc id')#, type='category')
     fig.update_xaxes(row=2,col=1, dtick = 4, title_text='vobc id')#, type='category')
@@ -69,54 +63,60 @@ def create_fig_by_vobc(fault_code, start_date, end_date):
 
 def create_fig_by_trend(fault_code, start_date, end_date, click_value):
 
-    if (type(start_date) is datetime):
-        start_date = start_date.strftime("%Y-%m-%dT%H:%M:%S")
-    if (type(end_date) is datetime):
-        end_date = end_date.strftime("%Y-%m-%dT%H:%M:%S")
+    start_date, end_date = util.NormalizeDate(start_date, end_date)
 
     click_fault_code = -1
     click_vobcid = -1
-    title = 'date'
+    title = ''
     if (click_value != None):
         click_vobcid = click_value['points'][0]['x']
         click_fault_code = click_value['points'][0]['curveNumber'] + 1 #click curveNumber is between 0 and 14
         if (click_fault_code > 15) :
             click_fault_code -= 15
-        if (fault_code == -1): #if not -1, the dropdown only selected on Fault, so the click must be on the same fault, no need to change
+        if (fault_code == -1): #if not -1, the dropdown only selected one Fault, so the click must be on the same fault, no need to change
             fault_code = click_fault_code
-        title = 'date (vobc={}, fault={})'.format(click_vobcid, fault_code)
+        title = 'vobc={}, fault={}'.format(click_vobcid, fault_code)
 
+    fig = make_subplots(rows=2, cols=1)
     df = vobcfault_m.get_count_trend(fault_code, start_date, end_date, click_vobcid)
-    fig = go.Figure()
-    if (df.empty):
-        return fig
-    y_max = df.groupby(['LoggedDate']).max().max() * 1.01
-
-    for fc_code in sorted(df['faultCode'].unique()):
-        df_fc = df[df['faultCode']==fc_code]
-        fig.add_trace(go.Scatter(x=df_fc['LoggedDate'], y=df_fc['FaultCount'],
-            showlegend = False, 
-            #fillcolor=cfg.vobc_fault_color_dict[fc_code],
-            line_color=cfg.vobc_fault_color_dict[fc_code],
-            stackgroup = 'one'
-            )) 
-
-    fig.update_layout(height=300, margin=dict(l=2, r=10, t=30, b=2), hovermode='closest')
+    if (not df.empty):
+        y_max = df.groupby(['LoggedDate']).max().max() * 1.01
     
-    fig.update_xaxes(title_text=title)#, type='category')
-    fig.update_yaxes(range=[0,y_max], title_text='fault count')
+        for fc_code in sorted(df['faultCode'].unique()):
+            df_fc = df[df['faultCode']==fc_code]
+            fig.append_trace(go.Scatter(x=df_fc['LoggedDate'], y=df_fc['FaultCount'],
+                showlegend = False, 
+                line_color=cfg.vobc_fault_color_dict[fc_code],
+                stackgroup = 'one'
+                ),
+                row=1,col=1) 
+        fig.update_xaxes(row = 1, col = 1, title_text=title)#, type='category')
+        fig.update_yaxes(row = 1, col = 1, range=[0,y_max], title_text='fault count by date')
+
+    df = vobcfault_m.get_count_location(fault_code, start_date, end_date, click_vobcid)
+    if (not df.empty):
+        y_max = df.groupby(['LocationName']).max().max() * 1.01
+    
+        for fc_code in sorted(df['faultCode'].unique()):
+            df_fc = df[df['faultCode']==fc_code]
+            fig.append_trace(go.Bar(x=df_fc['LocationName'], y=df_fc['FaultCount'],
+                showlegend = False, 
+                marker=dict(color=cfg.vobc_fault_color_dict[fault_code])
+                ),
+                row=2,col=1) 
+        fig.update_xaxes(row = 2, col = 1, title_text=title)#, type='category')
+        fig.update_yaxes(row = 2, col = 1, range=[0,y_max], title_text='fault count by location')
+        
+    fig.update_layout(barmode='stack')#, row = 2, col = 1)
+    fig.update_layout(height=600, margin=dict(l=2, r=10, t=30, b=2), hovermode='closest')
 
     return fig
 
 
-def create_fig_by_location(fault_code, start_date, end_date, click_value):
+def create_fig_by_move(click_vobc, click_date):
 
-    if (type(start_date) is datetime):
-        start_date = start_date.strftime("%Y-%m-%dT%H:%M:%S")
-    if (type(end_date) is datetime):
-        end_date = end_date.strftime("%Y-%m-%dT%H:%M:%S")
+    start_date, end_date = util.NormalizeDate(start_date, end_date)
 
-    click_fault_code = -1
     click_vobcid = -1
     title = 'location'
     if (click_value != None):
@@ -182,11 +182,6 @@ def create_layout():
             dcc.Graph(id='fig_by_trend', figure=create_fig_by_trend(-1, filter_start_date, filter_end_date, None))], 
             style={'width':'100%', 'display':'inline-block'}
         )
-    fg_div_by_location  = html.Div([
-            dcc.Graph(id='fig_by_location', figure=create_fig_by_location(-1, filter_start_date, filter_end_date, None))], 
-            style={'width':'100%', 'display':'inline-block'}
-        )
-
 
     retDiv = html.Div(
         [
@@ -201,8 +196,7 @@ def create_layout():
             dbc.Row(
                 [
                     dbc.Col(fg_div_by_fault, width = 8),
-                    dbc.Col(fg_div_by_trend, width = 4),
-                    dbc.Col(fg_div_by_location, width = 4)
+                    dbc.Col(fg_div_by_trend, width = 4)
                 ]
             ),
             dbc.Row(
@@ -283,15 +277,52 @@ def display_figure_area(value, start_date, end_date, click_value):
     f = create_fig_by_trend(value, start_date, end_date, click_value)
     return f
 
-#####----------------------------------------------------
-@app.callback(
-    Output('clickoutput_bar', 'children'),
-    [
-        Input('fig_by_fault', 'clickData')
-    ])
-def clicked_bar_data(value):
-    return 'click: ' + json.dumps(value, indent=2)
+# @app.callback(
+#     #Output('fig_by_trainmove', 'figure'),
+#     Output('clickoutput_bar', 'children'),
+#     [
+#         Input('fig_by_fault', 'hoverData'),
+#         Input('fig_by_trend', 'clickData')
+#     ])
+# def display_figure_trainmove(hover_value, click_value):
+#     #f = create_fig_by_trainmove(value, start_date, end_date, click_value)
+#     return 'hover : ' + json.dumps(hover_value, indent=2) + '\nclick\n' + json.dumps(click_value, indent=2)
 
+
+#####----------------------------------------------------
+# @app.callback(
+#     Output('clickoutput_bar', 'children'),
+#     [
+#         Input('fig_by_fault', 'clickData')
+#     ])
+# def clicked_bar_data(value):
+#     return 'click: ' + json.dumps(value, indent=2)
+'''
+hover : {
+  "points": [
+    {
+      "curveNumber": 17,
+      "pointNumber": 31,
+      "pointIndex": 31,
+      "x": 228,
+      "y": 1623,
+      "label": 228,
+      "value": 1623
+    }
+  ]
+}
+click
+{
+  "points": [
+    {
+      "curveNumber": 0,
+      "pointNumber": 2,
+      "pointIndex": 2,
+      "x": "2015-03-13",
+      "y": 190
+    }
+  ]
+}'''
 
 @app.callback(
     Output('selectoutput_bar', 'children'),
