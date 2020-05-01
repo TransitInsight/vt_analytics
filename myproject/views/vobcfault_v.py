@@ -151,6 +151,10 @@ def create_layout():
             dcc.Graph(id='fig_by_trend', figure=create_fig_by_trend(-1, filter_start_date, filter_end_date, -1))], 
             style={'width':'100%', 'display':'inline-block'}
         )
+    fg_div_by_trainmove = html.Div([
+            dcc.Graph(id='fig_by_trainmove', figure=create_fig_by_trainmove(112, '2015-7-3 10:51'))], 
+            style={'width':'100%', 'display':'inline-block'}
+        )
 
     retDiv = html.Div(
         [
@@ -166,6 +170,11 @@ def create_layout():
                 [
                     dbc.Col(fg_div_by_fault, width = 8),
                     dbc.Col(fg_div_by_trend, width = 4)
+                ]
+            ),
+            dbc.Row(
+                [
+                    dbc.Col(fg_div_by_trainmove, width = 12),
                 ]
             ),
             dbc.Row(
