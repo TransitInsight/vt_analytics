@@ -56,6 +56,10 @@ class TestVOBC(unittest.TestCase):
         self.assertTrue(df['faultName'].count() == 15)
         self.assertTrue(df['faultCode'].count() == 15)
 
+    def test_get_fc_list(self):
+        df = vobcDA.get_fault_list('2015-01-01T10:00','2015-01-01T20:00', 248)
+        self.assertTrue(df['loggedAt'].count() > 0)
+
 
     def test_get_fc_trend(self):
         df = vobcDA.get_count_trend(-1, '2014-01-01T00:00:00', '2015-04-25T00:13:26.017995', -1)
@@ -125,8 +129,12 @@ class TestVOBC(unittest.TestCase):
         self.assertTrue(dt.year == 2015)
 
     def test_trainmove(self):
-        df = trainmoveDA.get_trainmove(112, '2015-07-03T10:51:30.160Z', '2015-07-03T11:51:30.160Z')
+        df = trainmoveDA.get_trainmove(248, '2015-01-03T10:51:30.160Z', '2015-01-13T11:51:30.160Z')
         self.assertTrue(len(df['loggedAt']) > 100)
+
+    def test_get_first_fault_time(self):
+        dt = vobcDA.get_first_fault_time('2015-07-03', 3, 78)
+        self.assertTrue(dt.year == 2015)
 
 if __name__ == '__main__':
     unittest.main()

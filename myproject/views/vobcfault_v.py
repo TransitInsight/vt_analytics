@@ -103,19 +103,34 @@ def create_fig_by_trend(fault_code, start_date, end_date, vobc_id):
 
     return fig
 
-
-def create_fig_by_trainmove(vobc_id, op_date):
-    start = util.str2date1(op_date)
-    end = start + timedelta(hours=1)    
-    df = trainmove_m.get_trainmove(vobc_id, start, end)
+def create_fig_by_trainmove(vobc_id, op_date, fault_code):
     fig = go.Figure()
-    if (df.empty):
-        return fig
 
-    fig.add_trace(go.Scatter(x=df['loggedAt'], y=df['velocity'],
-            showlegend = False ,
-            line_color="#FF0000"
-            )) 
+    if (vobc_id != None and op_date != None and fault_code != None):
+        op_date = util.str2date1(op_date)
+        first_fault_time = vobcfault_m.get_first_fault_time(op_date, fault_code, vobc_id)
+
+        if (first_fault_time != None):
+            start = first_fault_time - timedelta(minutes=5)
+        else:
+            start = op_date + timedelta(hours=6)
+        end = start + timedelta(hours=1)    
+
+        df = trainmove_m.get_trainmove(vobc_id, start, end)
+        if (df.empty):
+            return fig
+
+        fig.add_trace(go.Scatter(x=df['loggedAt'], y=df['velocity'],
+                showlegend = False ,
+                line_color="goldenrod"
+                )) 
+
+        fig.add_trace(go.Scatter(x=df['loggedAt'], y=df['maximumVelocity'],
+                showlegend = False ,
+                line_color="red"
+                )) 
+        title = "Velocity (VOBC={})".format(vobc_id)
+        fig.update_yaxes(title_text=title)
 
     return fig
 
@@ -152,7 +167,7 @@ def create_layout():
             style={'width':'100%', 'display':'inline-block'}
         )
     fg_div_by_trainmove = html.Div([
-            dcc.Graph(id='fig_by_trainmove', figure=create_fig_by_trainmove(112, '2015-7-3 10:51'))], 
+            dcc.Graph(id='fig_by_trainmove', figure=create_fig_by_trainmove(112, '2015-7-3 10:51', 3))], 
             style={'width':'100%', 'display':'inline-block'}
         )
 
@@ -248,7 +263,7 @@ def display_figure_bar(value, start_date, end_date):
         Input('fault-dropdown', 'value'),
         Input('my_date_picker', 'start_date'),
         Input('my_date_picker', 'end_date') ,
-        Input('fig_by_fault', 'hoverData')
+        Input('fig_by_fault', 'clickData')
 
     ])
 def display_figure_area(value, start_date, end_date, click_value):
@@ -266,16 +281,27 @@ def display_figure_area(value, start_date, end_date, click_value):
     f = create_fig_by_trend(fault_code, start_date, end_date, click_vobcid)
     return f
 
-# @app.callback(
-#     #Output('fig_by_trainmove', 'figure'),
-#     Output('clickoutput_bar', 'children'),
-#     [
-#         Input('fig_by_fault', 'hoverData'),
-#         Input('fig_by_trend', 'clickData')
-#     ])
-# def display_figure_trainmove(hover_value, click_value):
-#     #f = create_fig_by_trainmove(value, start_date, end_date, click_value)
-#     return 'hover : ' + json.dumps(hover_value, indent=2) + '\nclick\n' + json.dumps(click_value, indent=2)
+@app.callback(
+    Output('fig_by_trainmove', 'figure'),
+    #Output('clickoutput_bar', 'children'),
+    [
+        Input('fig_by_fault', 'clickData'),
+        Input('fig_by_trend', 'clickData')
+    ])
+def display_figure_trainmove(first_value, second_value):
+    vobc_id = None
+    fault_code = None
+    if first_value != None:
+        vobc_id = first_value['points'][0]['x']
+        fault_code = first_value['points'][0]['curveNumber'] + 1 #click curveNumber is between 0 and 14
+        if (fault_code > 15) :
+            fault_code -= 15
+
+    op_date = None
+    if second_value != None:
+        op_date = second_value['points'][0]['x']
+    f = create_fig_by_trainmove(vobc_id, op_date, fault_code)
+    return f#'hover : ' + json.dumps(first_value, indent=2) + '\nclick\n' + json.dumps(click_value, indent=2)
 
 
 #####----------------------------------------------------
@@ -312,7 +338,7 @@ click
     }
   ]
 }'''
-
+'''
 @app.callback(
     Output('selectoutput_bar', 'children'),
     [
@@ -373,3 +399,4 @@ def relayout_area_data(value):
     ])
 def restyle_area_data(value):
     return 'restyle:' + json.dumps(value, indent=2)
+'''

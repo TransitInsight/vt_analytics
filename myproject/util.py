@@ -35,6 +35,8 @@ def run_query(query):
     }
 
     response = requests.post(cfg.ElasticSearchDS['sqlurl'], headers=headers, data=json.dumps(query))
+    if (response.status_code != 200):
+        return None
 
     df = pd.json_normalize(response.json(),'rows')
     if (df.shape[0] == 0):

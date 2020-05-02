@@ -42,7 +42,7 @@ class TestVOBC_View(unittest.TestCase):
         self.assertTrue(isinstance(ret.children[0], dbc.Row))
 
     def test_create_fig_by_trainmove(self):
-        ret = vobcView.create_fig_by_trainmove(112, '2015-7-3 10:51')
+        ret = vobcView.create_fig_by_trainmove(248, '2015-1-1 10:12', 3)
         self.assertTrue(ret != None)
 
 if __name__ == '__main__':
