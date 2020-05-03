@@ -141,6 +141,8 @@ def create_fig_by_trainmove(vobc_id, op_date, fault_code):
     title = "Velocity (VOBC={})".format(vobc_id)
 
     df_fc = vobcfault_m.get_fault_list(start,end,vobc_id)
+    if (df_fc.empty):
+        return
     fig.add_trace(go.Scatter(x=df_fc['loggedAt'], y=df_fc['velocity'], 
             name="Vobc Fault",
             #hover_name = "faultCode",
