@@ -21,10 +21,11 @@ steps:
     versionSpec: '$(python.version)'
   displayName: 'Use Python $(python.version)'
 
-- checkout: self
-  persistCredentials: true
-  submodules: true  
-  displayName: 'self-clean-checkout'
+- script: |
+    git reset --hard HEAD
+    git clean -xffd
+    git pull  
+  displayName: 'git get latest'
 
 - script: |
     python -m pip install --upgrade pip
