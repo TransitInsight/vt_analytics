@@ -24,7 +24,7 @@ steps:
 - script: |
     git reset --hard HEAD
     git clean -xffd
-    git pull  
+    git pull origin master 
   displayName: 'git get latest'
 
 - script: |
