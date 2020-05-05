@@ -37,7 +37,7 @@ def create_fig_by_vobc(fault_code, start_date, end_date):
         j = 0
         for fault_code in sorted(df['faultCode'].unique()):
             df_fc = df[df['faultCode']==fault_code]
-            fig.append_trace(go.Bar(
+            fig.add_trace(go.Bar(
                     name=vobcfault_m.get_fault_name(fault_code), 
                     x=df_fc['VOBCID'], 
                     y=df_fc['FaultCount'], 
@@ -75,7 +75,7 @@ def create_fig_by_trend(fault_code, start_date, end_date, vobc_id):
     
         for fc_code in sorted(df['faultCode'].unique()):
             df_fc = df[df['faultCode']==fc_code]
-            fig.append_trace(go.Scatter(x=df_fc['LoggedDate'], y=df_fc['FaultCount'],
+            fig.add_trace(go.Scatter(x=df_fc['LoggedDate'], y=df_fc['FaultCount'],
                 showlegend = False, 
                 line_color=cfg.vobc_fault_color_dict[fc_code],
                 stackgroup = 'one'
@@ -90,7 +90,7 @@ def create_fig_by_trend(fault_code, start_date, end_date, vobc_id):
     
         for fc_code in sorted(df['faultCode'].unique()):
             df_fc = df[df['faultCode']==fc_code]
-            fig.append_trace(go.Bar(x=df_fc['LocationName'], y=df_fc['FaultCount'],
+            fig.add_trace(go.Bar(x=df_fc['LocationName'], y=df_fc['FaultCount'],
                 showlegend = False, 
                 marker=dict(color=cfg.vobc_fault_color_dict[fault_code])
                 ),
