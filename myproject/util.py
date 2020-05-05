@@ -32,6 +32,8 @@ def str2date1(op_date):
 
 def run_query(query):
     return run_query_in_memory(query)
+
+    #test
     # if cfg.ElasticSearchDS['in_memory']:
     #     df = run_query_in_memory(query)
     # else:
