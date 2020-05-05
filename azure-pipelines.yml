@@ -15,6 +15,12 @@ strategy:
       python.version: '3.7'
 
 steps:
+- checkout: self
+  clean: true
+  submodules: true
+  displayName: 'customized checkout'
+  
+  
 - task: UsePythonVersion@0
   inputs:
     versionSpec: '$(python.version)'
