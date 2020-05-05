@@ -23,7 +23,8 @@ steps:
 
 - checkout: self
   persistCredentials: true
-  displayName: 'self-checkout'
+  submodules: true  
+  displayName: 'self-clean-checkout'
 
 - script: |
     python -m pip install --upgrade pip
