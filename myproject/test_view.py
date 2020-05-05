@@ -1,14 +1,14 @@
-import myproject.views.vobcfault_v as vobcView
-import pandas as pd
-from datetime import datetime
-from datetime import timedelta
-import requests
-import json
-import pprint
-import dash_core_components as dcc
-import dash_bootstrap_components as dbc
+# import myproject.views.vobcfault_v as vobcView
+# import pandas as pd
+# from datetime import datetime
+# from datetime import timedelta
+# import requests
+# import json
+# import pprint
+# import dash_core_components as dcc
+# import dash_bootstrap_components as dbc
 
-import myproject.config as cfg
+# import myproject.config as cfg
 
 # def test_create_fig_by_trend():
 #     ret = vobcView.create_fig_by_trend(-1, '2014-01-01T00:00:00', '2020-04-25T00:13:26.017995', -1)
