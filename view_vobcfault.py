@@ -9,10 +9,10 @@ from datetime import timedelta
 
 from app import app
 
-from myproject.models import vobcfault_m
-from myproject.models import trainmove_m
-import myproject.config as cfg
-import myproject.util as util
+import module_vobcfault as vobcfault_m
+import module_trainmove as trainmove_m
+import config as cfg
+import util as util
 import pandas as pd
 import plotly.graph_objs as go
 from plotly.subplots import make_subplots

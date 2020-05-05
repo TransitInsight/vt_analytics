@@ -5,7 +5,7 @@ from datetime import timedelta
 import dateparser
 import requests
 import pandas as pd
-import myproject.config as cfg
+import config as cfg
 import json
 import re
 import random

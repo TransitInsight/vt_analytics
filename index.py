@@ -3,8 +3,9 @@ import dash_html_components as html
 from dash.dependencies import Input, Output
 
 from app import app
-from views import vobcfault_v, view2
 from navbar import Navbar
+import view_view2
+import view_vobcfault
 
 nav = Navbar()
 
@@ -20,9 +21,9 @@ app.layout = html.Div([
               [Input('url', 'pathname')])
 def display_page(pathname):
     if pathname == '/views/vobcfault_v':
-        return vobcfault_v.layout
+        return view_vobcfault.layout
     elif pathname == '/views/view2':
-        return view2.layout
+        return view_view2.layout
     else:
         return '404: missing app = {}'.format(pathname)
 

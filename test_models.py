@@ -1,5 +1,5 @@
-import myproject.models.vobcfault_m as vobcDA
-import myproject.models.trainmove_m as trainmoveDA
+import module_vobcfault as vobcDA
+import module_trainmove as trainmoveDA
 import pandas as pd
 from datetime import datetime
 from datetime import timedelta
@@ -7,9 +7,8 @@ import requests
 import json
 import pprint
 
-import myproject.config as cfg
-import myproject.util as util
-import myproject.config as cfg
+import util as util
+import config as cfg
 '2020-04-25T00:13:26.017995'
 '2015-01-01T00:00:00'
 
@@ -34,9 +33,9 @@ import myproject.config as cfg
 #     assert  df_all['FaultCount'].count() > 0 
 
 
-# def test_runquery():
-#     df = util.run_query("SELECT faultName, loggedAt, velocity from dlr_vobc_fault where loggedAt >= '2014-01-01T00:00:00' and loggedAt < '2015-04-25T00:13:26.017995' LIMIT 2000 ")
-#     assert  df['loggedAt'].count() > 100 
+def test_runquery():
+    df = util.run_query("SELECT faultName, loggedAt, velocity from dlr_vobc_fault where loggedAt >= '2014-01-01T00:00:00' and loggedAt < '2015-04-25T00:13:26.017995' LIMIT 2000 ")
+    assert  df['loggedAt'].count() > 100 
 
 # def test_get_count_by_daterange():
 #     df1 = vobcDA.get_count_by(-1, '2014-01-01T00:00:00', '2014-04-25T00:13:26.017995')

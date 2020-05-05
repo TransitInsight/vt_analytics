@@ -1,9 +1,9 @@
 #%%
-import myproject.config as cfg
+import config as cfg
 import pandas as pd
 from datetime import datetime
 import json
-import myproject.util as util
+import util as util
 import numpy
 import dateparser
 
