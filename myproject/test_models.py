@@ -86,12 +86,12 @@ import myproject.config as cfg
 #     df1 = vobcDA.get_count_trend(-1, '2014-01-01T00:00:00', '2015-04-25T00:13:26.017995', 2)
 #     assert IsLocalTrue(df['LocationName'].count() > df1['LoggedDate'].count())
 
-# def test_color():
-#     c = cfg.vobc_fault_color_dict[1]
-#     assert c != None
+def test_color():
+    c = cfg.vobc_fault_color_dict[1]
+    assert c != None
 
-#     c = cfg.vobc_fault_color_dict[-1]
-#     assert c != None
+    c = cfg.vobc_fault_color_dict[-1]
+    assert c != None
 
 # def test_fcname():
 #     for key, value in cfg.vobc_fault_name_dict.items():
