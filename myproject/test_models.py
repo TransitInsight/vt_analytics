@@ -127,9 +127,9 @@ def test_color():
 #     assert IsLocalTrue( dt.year == 2015 )
 
 def test_simple():
-    a = 2^2
+    a = 2*2
     assert a == 4
 
 def test_simple1():
-    a = 2^3
+    a = 2*2*2
     assert a == 8
