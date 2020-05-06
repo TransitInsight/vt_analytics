@@ -4,8 +4,8 @@ from dash.dependencies import Input, Output
 
 from app import app
 from navbar import Navbar
-import view_view2
-import view_vobcfault
+from views import view_view2 
+from views import view_vobcfault
 
 nav = Navbar()
 
