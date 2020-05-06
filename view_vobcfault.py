@@ -10,7 +10,7 @@ from datetime import timedelta
 from app import app
 
 import module_vobcfault as vobcfault_m
-import module_trainmove as trainmove_m
+from module import module_trainmove as trainmove_m
 import config as cfg
 import util as util
 import pandas as pd
