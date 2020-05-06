@@ -35,7 +35,11 @@ def test_create_layout():
     assert ret.children[0] != None
     assert isinstance(ret.children[0], dbc.Row)
 
-def test_create_fig_by_trainmove():
-    ret = vobcView.create_fig_by_trainmove(248, '2015-1-1 10:12', 3)
+def test_create_fig_by_trainmove_Vobc_None():
+    ret = vobcView.create_fig_by_trainmove(None, '2015-1-1 10:12', 3)
+    assert ret != None
+
+def test_create_fig_by_trainmove_Date_None():
+    ret = vobcView.create_fig_by_trainmove(248, None, 3)
     assert ret != None
 
