@@ -40,6 +40,10 @@ vobc_fault_color_dict = {
     17: "#CC0000", 
     18: "#20124D"}
 
+def get_fault_color(faultCode):
+    return vobc_fault_color_dict[faultCode]
+
+
 vobc_fault_name_dict = {
     -1: '00. All',
     1: '01. Passenger Alarm',

@@ -5,6 +5,7 @@ parentdir = os.path.dirname(currentdir)
 sys.path.insert(0,parentdir) 
 
 from views import view_vobcfault as vobcView
+from views.ViewTrainmoveClass import ViewTrainmoveClass
 import pandas as pd
 from datetime import datetime
 from datetime import timedelta
@@ -35,6 +36,11 @@ def test_create_layout():
     assert ret.children[0] != None
     assert isinstance(ret.children[0], dbc.Row)
 
+def test_create_fig_by_trainmove():
+    ret = vobcView.create_fig_by_trainmove(248, '2015-1-1 10:12', 3)
+    assert ret != None
+
+
 def test_create_fig_by_trainmove_Vobc_None():
     ret = vobcView.create_fig_by_trainmove(None, '2015-1-1 10:12', 3)
     assert ret != None
@@ -43,3 +49,7 @@ def test_create_fig_by_trainmove_Date_None():
     ret = vobcView.create_fig_by_trainmove(248, None, 3)
     assert ret != None
 
+def test_trainmove_view_class():
+    c = ViewTrainmoveClass(248, '2015-1-1 10:12', 3)
+    c.create_fig()
+    assert c.get_fig() != None

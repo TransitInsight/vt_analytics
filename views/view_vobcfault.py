@@ -23,6 +23,8 @@ import pandas as pd
 import plotly.graph_objs as go
 from plotly.subplots import make_subplots
 
+from views.ViewTrainmoveClass import ViewTrainmoveClass
+
 #%%
 
 
@@ -109,59 +111,10 @@ def create_fig_by_trend(fault_code, start_date, end_date, vobc_id):
 
     return fig
 
-def set_fault_color(faultCode):
-    return cfg.vobc_fault_color_dict[faultCode]
-
 def create_fig_by_trainmove(vobc_id, op_date, fault_code):
-    fig = go.Figure()
-
-    if (vobc_id is None or op_date is None or fault_code is None):
-        return fig
-
-    op_date = util.str2date1(op_date)
-    if (op_date is None):
-        return fig
-    first_fault_time = vobcfault_m.get_first_fault_time(op_date, fault_code, vobc_id)
-
-    if (first_fault_time != None):
-        start = first_fault_time - timedelta(minutes=5)
-    else:
-        start = op_date + timedelta(hours=6)
-    end = start + timedelta(hours=1)    
-
-    df = trainmove_m.get_trainmove(vobc_id, start, end)
-    if (df.empty):
-        return fig
-
-    fig.add_trace(go.Scatter(x=df['loggedAt'], y=df['velocity'],
-            name = "Actual Velocity",
-            text='Actual Velocity = ' + df['velocity'].astype(str),
-            line_color="goldenrod"
-            )) 
-
-    fig.add_trace(go.Scatter(x=df['loggedAt'], y=df['maximumVelocity'],
-            name = "Max Velocity",
-            text='Max Velocity = ' + df['maximumVelocity'].astype(str),
-            line_color="green"
-            )) 
-    title = "Velocity (VOBC={})".format(vobc_id)
-
-    df_fc = vobcfault_m.get_fault_list(start,end,vobc_id)
-    if (df_fc.empty):
-        return
-    fig.add_trace(go.Scatter(x=df_fc['loggedAt'], y=df_fc['velocity'], 
-            name="Vobc Fault",
-            #hover_name = "faultCode",
-            text='Fault = ' + df_fc['faultName'],
-            mode='markers', marker=dict(size=15, 
-                                        symbol='x',
-                                        color=list(map(set_fault_color, df_fc['faultCode']))
-                                        )
-            ))
-    fig.update_yaxes(title_text=title, showspikes=True)
-    fig.update_xaxes(showspikes=True)
-    return fig
-
+    c = ViewTrainmoveClass(vobc_id, op_date, fault_code)
+    c.create_fig()
+    return c.get_fig()
 
 #%%
 
