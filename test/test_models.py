@@ -1,12 +1,12 @@
+## to make sure pytest on Azure Pipeline can find the module package in the root folder. 
 import os,sys,inspect
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 parentdir = os.path.dirname(currentdir)
 sys.path.insert(0,parentdir) 
 
-print(parentdir)
 
-from module import module_vobcfault as vobcDA
-from module import module_trainmove as trainmoveDA
+from modules import module_vobcfault as vobcDA
+from modules import module_trainmove as trainmoveDA
 import pandas as pd
 from datetime import datetime
 from datetime import timedelta

@@ -1,3 +1,9 @@
+import os,sys,inspect
+currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+parentdir = os.path.dirname(currentdir)
+sys.path.insert(0,parentdir) 
+
+
 #%%
 import json
 import dash_core_components as dcc
@@ -9,8 +15,8 @@ from datetime import timedelta
 
 from app import app
 
-from module import module_vobcfault as vobcfault_m
-from module import module_trainmove as trainmove_m
+from modules import module_vobcfault as vobcfault_m
+from modules import module_trainmove as trainmove_m
 import config as cfg
 import util as util
 import pandas as pd
