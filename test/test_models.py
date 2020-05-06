@@ -1,3 +1,10 @@
+import os,sys,inspect
+currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+parentdir = os.path.dirname(currentdir)
+sys.path.insert(0,parentdir) 
+
+print(parentdir)
+
 from module import module_vobcfault as vobcDA
 from module import module_trainmove as trainmoveDA
 import pandas as pd
