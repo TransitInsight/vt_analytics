@@ -111,7 +111,7 @@ def create_fig_by_trend(fault_code, start_date, end_date, vobc_id):
 
     return fig
 
-def create_fig_by_trainmove(vobc_id, op_date, fault_code):
+def create_fig_by_trainmove(vobc_id, op_date, fault_code, offset=0):
     c = ViewTrainmoveClass(vobc_id, op_date, fault_code)
     c.create_fig()
     return c.get_fig()
@@ -267,9 +267,10 @@ def display_figure_area(value, start_date, end_date, click_value):
     #Output('clickoutput_bar', 'children'),
     [
         Input('fig_by_fault', 'clickData'),
-        Input('fig_by_trend', 'clickData')
+        Input('fig_by_trend', 'clickData'),
+        Input('fig_by_trainmove', 'restyleData')
     ])
-def display_figure_trainmove(first_value, second_value):
+def display_figure_trainmove(first_value, second_value, timewindow_value):
     vobc_id = None
     fault_code = None
     if first_value != None:
@@ -281,8 +282,23 @@ def display_figure_trainmove(first_value, second_value):
     op_date = None
     if second_value != None:
         op_date = second_value['points'][0]['x']
-    f = create_fig_by_trainmove(vobc_id, op_date, fault_code)
+
+
+    offset = 0
+    if timewindow_value != None:
+        offset = timewindow_value[0]['timewindow'][0]        
+
+    f = create_fig_by_trainmove(vobc_id, op_date, fault_code, offset=timedelta(hours=offset))
     return f#'hover : ' + json.dumps(first_value, indent=2) + '\nclick\n' + json.dumps(click_value, indent=2)
+
+# @app.callback(
+#     #Output('fig_by_trainmove', 'figure'),
+#     Output('clickoutput_bar', 'children'),
+#     [
+#         Input('fig_by_trainmove', 'restyleData')
+#     ])
+# def update_figure_trainmove(value):
+#     return 'restyle :' + json.dumps(value, indent=2)
 
 
 #####----------------------------------------------------

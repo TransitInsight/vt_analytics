@@ -93,6 +93,9 @@ def get_first_fault_time(op_date, fault_code, vobc_id):
 
     df = util.run_query(query)
 
+    if (df is None):
+        return op_date
+        
     dt_str = numpy.datetime_as_string(df['fcStart'][0].to_datetime64(), unit='s')
 
     return dateparser.parse(dt_str)

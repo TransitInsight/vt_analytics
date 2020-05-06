@@ -26,12 +26,16 @@ from plotly.subplots import make_subplots
 class ViewTrainmoveClass:
 
     def __init__(self, vobc_id, op_date, fault_code):
-        self.vobc_id = vobcfault_m
+        self.vobc_id = vobc_id
         self.op_date = op_date
         self.fault_code = fault_code
         self.fig = go.Figure()
 
     def create_fig(self):
+        self.add_data()
+        self.add_button()
+
+    def add_data(self):
         if (self.vobc_id is None or self.op_date is None or self.fault_code is None):
             return 
 
@@ -45,7 +49,7 @@ class ViewTrainmoveClass:
         end = start + timedelta(hours=1)    
 
         df = trainmove_m.get_trainmove(self.vobc_id, start, end)
-        if (df.empty):
+        if (df is None or df.empty):
             return 
 
         self.fig.add_trace(go.Scatter(x=df['loggedAt'], y=df['velocity'],
@@ -75,6 +79,32 @@ class ViewTrainmoveClass:
                 ))
         self.fig.update_yaxes(title_text=title, showspikes=True)
         self.fig.update_xaxes(showspikes=True)
+
+    def add_button(self):
+        self.fig.update_layout(
+            updatemenus=[
+                dict(
+                    type="buttons",
+                    direction="right",
+                    active=0,
+                    x=0.57,
+                    y=1.2,
+                    buttons=list([
+                        dict(label="<<",
+                            method="restyle",
+                            args=[{"timewindow": [-2]}]),
+                        dict(label="<",
+                            method="restyle",
+                            args=[{"timewindow": [-1]}]),
+                        dict(label=">",
+                            method="restyle",
+                            args=[{"timewindow": [1]}]),
+                        dict(label=">>",
+                            method="restyle",
+                            args=[{"timewindow": [2]}]),
+                    ]),
+                )
+            ])
 
 
     def get_fig(self):
