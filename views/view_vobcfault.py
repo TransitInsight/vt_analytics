@@ -277,7 +277,10 @@ def update_offset(prev_page, prev, next, next_page, data):
         Input('fig_by_fault', 'clickData')
 
     ])
-def display_figure_area(value, start_date, end_date, click_value):
+def display_figure_area_callback(value, start_date, end_date, click_value):
+    return display_figure_area(value, start_date, end_date, click_value)
+
+def display_figure_area(value, start_date, end_date, click_value):    
     fault_code = value
     click_fault_code = -1
     click_vobcid = -1

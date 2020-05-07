@@ -60,6 +60,27 @@ def test_trainmove_offset_callback():
     data = vobcView.update_offset( 1, 2, 0, 0, None)
     assert data['offset'] == -4
 
-def test_traimove_fig_callback():
+def test_traimove_fig_callback_none():
     ret = vobcView.display_figure_trainmove(None, None, None)
+    assert ret is not None
+
+def test_traimove_fig_callback():
+
+    points1 = [{'curveNumber': 12, 'label': 13, 'pointIndex': 3, 'pointNumber': 3, 'value': 13, 'x': 13, 'y': 13}]
+    first_value = {'points':points1}
+
+    points2 = [{'curveNumber': 14, 'pointIndex': None, 'pointNumber': None, 'x': '2019-11-28', 'y': 0}]
+    second_value = {'points':points2}
+
+    timewindow_value = {'offset':0}
+
+    ret = vobcView.display_figure_trainmove(first_value, second_value, timewindow_value)
+    assert ret is not None
+
+
+def test_displayarea_callback():
+    a_selected_value = {'curveNumber': 12, 'label': 13, 'pointIndex': 3, 'pointNumber': 3, 'value': 13, 'x': 13, 'y': 13}
+    list1 = [a_selected_value]
+    click_value = {'points': list1}
+    ret = vobcView.display_figure_area(3, '2015-01-01T00:00:00', '2015-04-01T00:00:00', click_value)
     assert ret is not None
