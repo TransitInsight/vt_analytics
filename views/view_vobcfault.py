@@ -112,7 +112,7 @@ def create_fig_by_trend(fault_code, start_date, end_date, vobc_id):
     return fig
 
 def create_fig_by_trainmove(vobc_id, op_date, fault_code, offset=0):
-    c = ViewTrainmoveClass(vobc_id, op_date, fault_code)
+    c = ViewTrainmoveClass(vobc_id, op_date, fault_code, offset)
     c.create_fig()
     return c.get_fig()
 
@@ -150,11 +150,11 @@ def create_layout():
 
     fg_div_by_trainmove = html.Div(
             [
+                dcc.Graph(id='fig_by_trainmove', figure=create_fig_by_trainmove(112, '2015-7-3 10:51', 3)),
                 html.Button('<<', id='button_prev_page'),
                 html.Button('<', id='button_prev'),
                 html.Button('>', id='button_next'),
-                html.Button('>>', id='button_next_page'),
-                dcc.Graph(id='fig_by_trainmove', figure=create_fig_by_trainmove(112, '2015-7-3 10:51', 3))
+                html.Button('>>', id='button_next_page')
             ], 
             style={'width':'100%', 'display':'inline-block'}
         )
@@ -324,7 +324,7 @@ def display_figure_trainmove(first_value, second_value, timewindow_value):
     if timewindow_value != None:
         offset = timewindow_value['offset']
 
-    f = create_fig_by_trainmove(vobc_id, op_date, fault_code, offset=timedelta(hours=offset))
+    f = create_fig_by_trainmove(vobc_id, op_date, fault_code, offset=timedelta(hours=offset/2))
     return f
     #return 'timewindow_value : ' + json.dumps(timewindow_value, indent=2)
 

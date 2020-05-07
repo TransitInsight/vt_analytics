@@ -50,7 +50,12 @@ def test_create_fig_by_trainmove_Date_None():
     assert ret != None
 
 def test_trainmove_view_class():
-    c = ViewTrainmoveClass(248, '2015-1-1 10:12', 3)
+    c = ViewTrainmoveClass(248, '2015-1-1 10:12', 3, timedelta(hours=1))
+    c.create_fig()
+    assert c.get_fig() != None
+
+def test_trainmove_view_class_offset():
+    c = ViewTrainmoveClass(248, '2015-1-1 10:12', 3, timedelta(hours=1.5))
     c.create_fig()
     assert c.get_fig() != None
 
@@ -84,3 +89,7 @@ def test_displayarea_callback():
     click_value = {'points': list1}
     ret = vobcView.display_figure_area(3, '2015-01-01T00:00:00', '2015-04-01T00:00:00', click_value)
     assert ret is not None
+
+def test_displayarea_callback_none():
+    ret = vobcView.display_figure_area(3, '2015-01-01T00:00:00', '2015-04-01T00:00:00', None)
+    assert ret is not None    

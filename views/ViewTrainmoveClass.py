@@ -25,47 +25,54 @@ from plotly.subplots import make_subplots
 
 class ViewTrainmoveClass:
 
-    def __init__(self, vobc_id, op_date, fault_code):
+    def __init__(self, vobc_id, op_date, fault_code, offset):
         self.vobc_id = vobc_id
         self.op_date = op_date
         self.fault_code = fault_code
         self.fig = go.Figure()
+        self.offset = offset or timedelta(hours=0)
 
-    def create_fig(self):
-        self.add_data()
-        #self.add_button()
-
-    def add_data(self):
-        if (self.vobc_id is None or self.op_date is None or self.fault_code is None):
-            return 
-
-        op_date = util.str2date1(self.op_date)
+    def read_base_data(self):
+        self.op_date = util.str2date1(self.op_date)
         first_fault_time = vobcfault_m.get_first_fault_time(self.op_date, self.fault_code, self.vobc_id)
 
         if (first_fault_time != None):
-            start = first_fault_time - timedelta(minutes=5)
+            self.start = first_fault_time - timedelta(minutes=5) + self.offset
         else:
-            start = op_date + timedelta(hours=6)
-        end = start + timedelta(hours=1)    
+            self.start = self.op_date + timedelta(hours=6) + self.offset
 
-        df = trainmove_m.get_trainmove(self.vobc_id, start, end)
-        if (df is None or df.empty):
+        self.end = self.start + timedelta(hours=1)    
+
+        self.trainmove_df = trainmove_m.get_trainmove(self.vobc_id, self.start, self.end)
+
+
+    def create_fig(self):
+        self.read_base_data()
+        self.add_data()
+        #self.add_button()
+        self.update_figure_layout()
+
+    def add_data(self):
+
+        if (self.vobc_id is None or self.op_date is None or self.fault_code is None):
             return 
 
-        self.fig.add_trace(go.Scatter(x=df['loggedAt'], y=df['velocity'],
+        if (self.trainmove_df is None or self.trainmove_df.empty):
+            return 
+
+        self.fig.add_trace(go.Scatter(x=self.trainmove_df['loggedAt'], y=self.trainmove_df['velocity'],
                 name = "Actual Velocity",
-                text='Actual Velocity = ' + df['velocity'].astype(str),
+                text='Actual Velocity = ' + self.trainmove_df['velocity'].astype(str),
                 line_color="goldenrod"
                 )) 
 
-        self.fig.add_trace(go.Scatter(x=df['loggedAt'], y=df['maximumVelocity'],
+        self.fig.add_trace(go.Scatter(x=self.trainmove_df['loggedAt'], y=self.trainmove_df['maximumVelocity'],
                 name = "Max Velocity",
-                text='Max Velocity = ' + df['maximumVelocity'].astype(str),
+                text='Max Velocity = ' + self.trainmove_df['maximumVelocity'].astype(str),
                 line_color="green"
                 )) 
-        title = "Velocity (VOBC={})".format(self.vobc_id)
 
-        df_fc = vobcfault_m.get_fault_list(start,end,self.vobc_id)
+        df_fc = vobcfault_m.get_fault_list(self.start,self.end,self.vobc_id)
         if (df_fc.empty):
             return
         self.fig.add_trace(go.Scatter(x=df_fc['loggedAt'], y=df_fc['velocity'], 
@@ -77,8 +84,6 @@ class ViewTrainmoveClass:
                                             color=list(map(cfg.get_fault_color, df_fc['faultCode']))
                                             )
                 ))
-        self.fig.update_yaxes(title_text=title, showspikes=True)
-        self.fig.update_xaxes(showspikes=True)
 
     def add_button(self):
         self.fig.update_layout(
@@ -106,6 +111,11 @@ class ViewTrainmoveClass:
                 )
             ])
 
+    def update_figure_layout(self):
+        title = "Velocity (VOBC={})".format(self.vobc_id)
+        self.fig.update_yaxes(title_text=title, showspikes=True)
+        self.fig.update_xaxes(showspikes=True)
+        self.fig.update_layout(margin=dict(l=20, r=20, t=30, b=20))
 
     def get_fig(self):
         return self.fig

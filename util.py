@@ -25,6 +25,8 @@ def date2str2(start_date, end_date):
     return start_date, end_date
 
 def str2date1(op_date):
+    if op_date is None:
+        op_date = '2015-1-1 10:12'
     if isinstance(op_date, str):
         op_date = dateparser.parse(op_date)
 
@@ -88,6 +90,7 @@ def run_query_in_memory(query):
 
     df = pd.DataFrame()
     
+    id_list = list(range(0,return_size))
     time_list = [np.datetime64(datetime.today() - timedelta(days=x)) for x in range(return_size)]
     date_list = [np.datetime64((datetime.today() - timedelta(days=x)).date()) for x in range(return_size)]
 
@@ -105,7 +108,9 @@ def run_query_in_memory(query):
             df[field] = time_list
         elif 'loggeddate' in field.lower():
             df[field] = date_list
-        elif 'id' in field.lower() or 'code' in field.lower() or 'count' in field.lower():
+        elif 'id' in field.lower() :
+            df[field] = id_list
+        elif 'code' in field.lower() or 'count' in field.lower():
             df[field] = fc_list
         else:
             df[field] = fc_name_list
