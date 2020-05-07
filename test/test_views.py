@@ -34,7 +34,7 @@ def test_create_layout():
     assert ret != None
     assert ret.children != None
     assert ret.children[0] != None
-    assert isinstance(ret.children[0], dbc.Row)
+    assert isinstance(ret.children[1], dbc.Row)
 
 def test_create_fig_by_trainmove():
     ret = vobcView.create_fig_by_trainmove(248, '2015-1-1 10:12', 3)
@@ -53,3 +53,13 @@ def test_trainmove_view_class():
     c = ViewTrainmoveClass(248, '2015-1-1 10:12', 3)
     c.create_fig()
     assert c.get_fig() != None
+
+
+def test_trainmove_offset_callback():
+
+    data = vobcView.update_offset( 1, 2, 0, 0, None)
+    assert data['offset'] == -4
+
+def test_traimove_fig_callback():
+    ret = vobcView.display_figure_trainmove(None, None, None)
+    assert ret is not None

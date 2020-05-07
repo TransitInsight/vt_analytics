@@ -33,7 +33,7 @@ class ViewTrainmoveClass:
 
     def create_fig(self):
         self.add_data()
-        self.add_button()
+        #self.add_button()
 
     def add_data(self):
         if (self.vobc_id is None or self.op_date is None or self.fault_code is None):

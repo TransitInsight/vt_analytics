@@ -9,7 +9,7 @@ import json
 import dash_core_components as dcc
 import dash_html_components as html
 import dash_bootstrap_components as dbc
-from dash.dependencies import Input, Output
+from dash.dependencies import Input, Output, State
 from datetime import datetime
 from datetime import timedelta
 
@@ -147,13 +147,21 @@ def create_layout():
             dcc.Graph(id='fig_by_trend', figure=create_fig_by_trend(-1, filter_start_date, filter_end_date, -1))], 
             style={'width':'100%', 'display':'inline-block'}
         )
-    fg_div_by_trainmove = html.Div([
-            dcc.Graph(id='fig_by_trainmove', figure=create_fig_by_trainmove(112, '2015-7-3 10:51', 3))], 
+
+    fg_div_by_trainmove = html.Div(
+            [
+                html.Button('<<', id='button_prev_page'),
+                html.Button('<', id='button_prev'),
+                html.Button('>', id='button_next'),
+                html.Button('>>', id='button_next_page'),
+                dcc.Graph(id='fig_by_trainmove', figure=create_fig_by_trainmove(112, '2015-7-3 10:51', 3))
+            ], 
             style={'width':'100%', 'display':'inline-block'}
         )
 
     retDiv = html.Div(
         [
+            dcc.Store(id='vt_session_store'),
             dbc.Row(
                 [
                     dbc.Col(html.Div("Date Range : ", style={'margin-top':'12px', 'font-size':'120%'}), width='auto'),
@@ -238,6 +246,28 @@ def display_figure_bar(value, start_date, end_date):
     f = create_fig_by_vobc(value, start_date, end_date)
     return f
 
+@app.callback(Output('vt_session_store', 'data'),
+              [
+                  Input('button_prev_page', 'n_clicks'),
+                  Input('button_prev', 'n_clicks'),
+                  Input('button_next', 'n_clicks'),
+                  Input('button_next_page', 'n_clicks'),
+              ],
+              [State('vt_session_store', 'data')])
+def update_offset_callback( prev_page, prev, next, next_page, data):
+    return update_offset(prev_page, prev, next, next_page, data)
+
+def update_offset(prev_page, prev, next, next_page, data):    
+    prev_page = prev_page or 0
+    prev = prev or 0
+    next = next or 0
+    next_page = next_page or 0
+
+    data = data or {'offset': 0}
+    data['offset'] = -prev_page * 2 - prev + next + 2*next_page
+
+    return data
+
 @app.callback(
     Output('fig_by_trend', 'figure'),
     [
@@ -268,8 +298,12 @@ def display_figure_area(value, start_date, end_date, click_value):
     [
         Input('fig_by_fault', 'clickData'),
         Input('fig_by_trend', 'clickData'),
-        Input('fig_by_trainmove', 'restyleData')
-    ])
+        Input('vt_session_store', 'data')
+    ]
+    )
+def display_figure_trainmove_callback(first_value, second_value, timewindow_value):
+    return display_figure_trainmove(first_value, second_value, timewindow_value)
+
 def display_figure_trainmove(first_value, second_value, timewindow_value):
     vobc_id = None
     fault_code = None
@@ -283,13 +317,13 @@ def display_figure_trainmove(first_value, second_value, timewindow_value):
     if second_value != None:
         op_date = second_value['points'][0]['x']
 
-
     offset = 0
     if timewindow_value != None:
-        offset = timewindow_value[0]['timewindow'][0]        
+        offset = timewindow_value['offset']
 
     f = create_fig_by_trainmove(vobc_id, op_date, fault_code, offset=timedelta(hours=offset))
-    return f#'hover : ' + json.dumps(first_value, indent=2) + '\nclick\n' + json.dumps(click_value, indent=2)
+    return f
+    #return 'timewindow_value : ' + json.dumps(timewindow_value, indent=2)
 
 # @app.callback(
 #     #Output('fig_by_trainmove', 'figure'),
