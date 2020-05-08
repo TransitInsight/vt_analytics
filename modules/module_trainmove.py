@@ -13,7 +13,7 @@ def get_trainmove(vobc_id, start_date, end_date):
     if (vobc_id == None or vobc_id == -1 ):
         return None
 
-    query = ("SELECT activePassiveStatus, loggedAt, loggedDate, loopName, velocity, vobcid, trainId, maximumVelocity"
+    query = ("SELECT activePassiveStatus, loggedAt, loggedDate, loopName, velocity, vobcid, trainId, maximumVelocity, doorCmd, doorStatus, tpDeviation"
              " from dlr_train_move "
              " where vobcid = {} and loggedAt >= '{}' and loggedAt < '{}'"
              " order by loggedAt LIMIT 10000 ").format( vobc_id, start_date, end_date)

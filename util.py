@@ -91,16 +91,19 @@ def run_query_in_memory(query):
     df = pd.DataFrame()
     
     id_list = list(range(0,return_size))
+
     time_list = [np.datetime64(datetime.today() - timedelta(days=x)) for x in range(return_size)]
     date_list = [np.datetime64((datetime.today() - timedelta(days=x)).date()) for x in range(return_size)]
 
     fc_list = [] 
     fc_name_list = []
+    status_list = []
     i = 0
     while i < return_size:
         r = random.randint(1, 15)
         fc_list.append(r)
         fc_name_list.append('fc{}:random text'.format(r))
+        status_list.append(random.randint(0,1))
         i += 1
     
     for field in fields:
@@ -112,9 +115,19 @@ def run_query_in_memory(query):
             df[field] = id_list
         elif 'code' in field.lower() or 'count' in field.lower():
             df[field] = fc_list
+        elif 'doorCmd' in field.lower() or 'doorStatus' in field.lower() or 'activePassiveStatus' in field.lower():
+            df[field] = status_list
         else:
             df[field] = fc_name_list
             df[field] = pd.Series(df[field], dtype=pd.StringDtype())
 
 
     return  df
+
+
+### When run UT on Azure pipeline, this ensures use local in-memory DB
+def IsInMemoryTrue(ret):
+    if cfg.ElasticSearchDS['in_memory']:
+        return True
+    else:
+        return ret

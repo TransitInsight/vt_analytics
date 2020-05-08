@@ -14,6 +14,7 @@ import json
 import pprint
 import dash_core_components as dcc
 import dash_bootstrap_components as dbc
+import plotly
 
 import config as cfg
 
@@ -39,6 +40,14 @@ def test_create_layout():
 def test_create_fig_by_trainmove():
     ret = vobcView.create_fig_by_trainmove(248, '2015-1-1 10:12', 3)
     assert ret != None
+    assert len(ret.data) == 3
+    assert isinstance(ret.data[0], plotly.graph_objs.Scatter)
+    assert (ret.data[0].name == 'Actual Velocity')
+    assert isinstance(ret.data[1], plotly.graph_objs.Scatter)
+    assert (ret.data[1].name == 'Max Velocity')
+    assert isinstance(ret.data[2], plotly.graph_objs.Scatter)
+    assert (ret.data[2].name == 'Vobc Fault')
+
 
 
 def test_create_fig_by_trainmove_Vobc_None():

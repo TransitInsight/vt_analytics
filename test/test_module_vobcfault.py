@@ -20,18 +20,13 @@ import config as cfg
 '2015-01-01T00:00:00'
 
 '2015-01-16'
-def IsLocalTrue(ret):
-    if cfg.ElasticSearchDS['in_memory']:
-        return True
-    else:
-        return ret
 
 def test_get_count_by_fc():
     df_all = vobcDA.get_count_by(-1, '2015-01-01T00:00:00', '2020-04-25T00:13:26.017995')
     df_one = vobcDA.get_count_by(3, '2015-01-01T00:00:00', '2020-04-25T00:13:26.017995')
     assert  df_all['FaultCount'].count() > 0 
     assert  df_one['FaultCount'].count() > 0 
-    assert  IsLocalTrue(df_all['FaultCount'].count() > df_one['FaultCount'].count())
+    assert  util.IsInMemoryTrue(df_all['FaultCount'].count() > df_one['FaultCount'].count())
 
 def test_get_count_by_fc_date():
     end  = datetime(2015,1,1)
@@ -49,7 +44,7 @@ def test_get_count_by_daterange():
     df2 = vobcDA.get_count_by(-1, '2014-01-01T00:00:00', '2014-05-25T00:13:26.017995')
     assert  df1['FaultCount'].count() > 0 
     assert  df2['FaultCount'].count() > 0 
-    assert  IsLocalTrue( df1['FaultCount'].count() < df2['FaultCount'].count() )
+    assert  util.IsInMemoryTrue( df1['FaultCount'].count() < df2['FaultCount'].count() )
 
 def test_get_count_by_fc_one():
     df = vobcDA.get_count_by(3, '2015-01-06', '2020-04-25T00:13:26.017995')
@@ -72,7 +67,7 @@ def test_get_fc_trend():
     assert len(df['faultName'].unique()) == 15
 
     df1 = vobcDA.get_count_trend(3, '2014-01-01T00:00:00', '2015-04-25T00:13:26.017995', -1)
-    assert IsLocalTrue(df['LoggedDate'].count() > df1['LoggedDate'].count())
+    assert util.IsInMemoryTrue(df['LoggedDate'].count() > df1['LoggedDate'].count())
 
 
 def test_get_fc_trend1():
@@ -81,7 +76,7 @@ def test_get_fc_trend1():
     assert len(df['faultName'].unique()) == 15
 
     df1 = vobcDA.get_count_trend(-1, '2014-01-01T00:00:00', '2015-04-25T00:13:26.017995', 2)
-    assert IsLocalTrue(df['LoggedDate'].count() > df1['LoggedDate'].count())
+    assert util.IsInMemoryTrue(df['LoggedDate'].count() > df1['LoggedDate'].count())
 
 
 def test_get_fc_location():
@@ -90,7 +85,7 @@ def test_get_fc_location():
     assert len(df['faultName'].unique()) == 15
 
     df1 = vobcDA.get_count_trend(-1, '2014-01-01T00:00:00', '2015-04-25T00:13:26.017995', 2)
-    assert IsLocalTrue(df['LocationName'].count() > df1['LoggedDate'].count())
+    assert util.IsInMemoryTrue(df['LocationName'].count() > df1['LoggedDate'].count())
 
 def test_color():
     c = cfg.vobc_fault_color_dict[1]
@@ -123,14 +118,9 @@ def test_str2date1():
     assert isinstance(dt, datetime)
     assert dt.year == 2015
 
-def test_trainmove():
-    df = trainmoveDA.get_trainmove(248, '2015-01-03T10:51:30.160Z', '2015-01-13T11:51:30.160Z')
-    assert len(df['loggedAt']) > 100
-    assert len(df['loggedAt']) > 101
-
 def test_get_first_fault_time():
     dt = vobcDA.get_first_fault_time('2015-07-03', 3, 78)
-    assert IsLocalTrue( dt.year == 2015 )
+    assert util.IsInMemoryTrue( dt.year == 2015 )
 
 def test_simple():
     a = 2*2
