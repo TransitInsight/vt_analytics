@@ -61,7 +61,7 @@ def create_fig_by_vobc(fault_code, start_date, end_date):
 
     start_date, end_date = util.date2str2(start_date, end_date)
 
-    fig.update_layout(barmode='stack', height=600, hovermode='closest',
+    fig.update_layout(barmode='stack', height=500, hovermode='closest',
         margin=dict(l=2, r=2, t=30, b=2))
     fig.update_xaxes(row=1,col=1, dtick = 4, title_text='vobc id')#, type='category')
     fig.update_xaxes(row=2,col=1, dtick = 4, title_text='vobc id')#, type='category')
@@ -76,7 +76,7 @@ def create_fig_by_trend(fault_code, start_date, end_date, vobc_id):
 
     title = 'vobc={}, fault={}'.format(vobc_id, fault_code)
 
-    fig = make_subplots(rows=2, cols=1)
+    fig = make_subplots(rows=1, cols=2)
     df = vobcfault_m.get_count_trend(fault_code, start_date, end_date, vobc_id)
     if (not df.empty):
         y_max = df.groupby(['LoggedDate']).max().max() * 1.01
@@ -102,12 +102,12 @@ def create_fig_by_trend(fault_code, start_date, end_date, vobc_id):
                 showlegend = False, 
                 marker=dict(color=cfg.vobc_fault_color_dict[fault_code])
                 ),
-                row=2,col=1) 
-        fig.update_xaxes(row = 2, col = 1, title_text=title)#, type='category')
-        fig.update_yaxes(row = 2, col = 1, range=[0,y_max], title_text='fault count by location')
+                row=1,col=2) 
+        #fig.update_xaxes(row = 1, col = 2, title_text=title)#, type='category')
+        fig.update_yaxes(row = 1, col = 2, range=[0,y_max], title_text='fault count by location')
         
     fig.update_layout(barmode='stack')#, row = 2, col = 1)
-    fig.update_layout(height=600, margin=dict(l=2, r=10, t=30, b=2), hovermode='closest')
+    fig.update_layout(height=300, margin=dict(l=2, r=10, t=30, b=2), hovermode='closest')
 
     return fig
 
@@ -172,61 +172,65 @@ def create_layout():
             ),
             dbc.Row(
                 [
-                    dbc.Col(fg_div_by_fault, width = 8),
-                    dbc.Col(fg_div_by_trend, width = 4)
+                    dbc.Col(fg_div_by_fault, width = 11)
                 ]
             ),
             dbc.Row(
                 [
-                    dbc.Col(fg_div_by_trainmove, width = 12),
+                    dbc.Col(fg_div_by_trend, width = 11)
                 ]
             ),
             dbc.Row(
                 [
-                    dbc.Col(
-                        html.Div([
-                            html.Pre(id='clickoutput_bar', style={'paddingTop':35})
-                            ], style={'paddingTop':35})
-                        ),
-                    dbc.Col(
-                        html.Div([
-                            html.Pre(id='selectoutput_bar', style={'paddingTop':35})
-                            ], style={'paddingTop':35})
-                        ),
-                    dbc.Col(
-                        html.Div([
-                            html.Pre(id='relayoutoutput_bar', style={'paddingTop':35})
-                            ], style={'paddingTop':35})
-                        ),
-                    dbc.Col(
-                        html.Div([
-                            html.Pre(id='restyleoutput_bar', style={'paddingTop':35})
-                            ], style={'paddingTop':35})
-                        ),
-
-
-                    dbc.Col(
-                        html.Div([
-                            html.Pre(id='clickoutput_area', style={'paddingTop':35})
-                            ], style={'paddingTop':35})
-                        ),
-                    dbc.Col(
-                        html.Div([
-                            html.Pre(id='selectoutput_area', style={'paddingTop':35})
-                            ], style={'paddingTop':35})
-                        ),
-                    dbc.Col(
-                        html.Div([
-                            html.Pre(id='relayoutoutput_area', style={'paddingTop':35})
-                            ], style={'paddingTop':35})
-                        ),
-                    dbc.Col(
-                        html.Div([
-                            html.Pre(id='restyleoutput_area', style={'paddingTop':35})
-                            ], style={'paddingTop':35})
-                        )
+                    dbc.Col(fg_div_by_trainmove, width = 11),
                 ]
             )
+            # ,dbc.Row(
+            #     [
+            #         dbc.Col(
+            #             html.Div([
+            #                 html.Pre(id='clickoutput_bar', style={'paddingTop':35})
+            #                 ], style={'paddingTop':35})
+            #             ),
+            #         dbc.Col(
+            #             html.Div([
+            #                 html.Pre(id='selectoutput_bar', style={'paddingTop':35})
+            #                 ], style={'paddingTop':35})
+            #             ),
+            #         dbc.Col(
+            #             html.Div([
+            #                 html.Pre(id='relayoutoutput_bar', style={'paddingTop':35})
+            #                 ], style={'paddingTop':35})
+            #             ),
+            #         dbc.Col(
+            #             html.Div([
+            #                 html.Pre(id='restyleoutput_bar', style={'paddingTop':35})
+            #                 ], style={'paddingTop':35})
+            #             ),
+
+
+            #         dbc.Col(
+            #             html.Div([
+            #                 html.Pre(id='clickoutput_area', style={'paddingTop':35})
+            #                 ], style={'paddingTop':35})
+            #             ),
+            #         dbc.Col(
+            #             html.Div([
+            #                 html.Pre(id='selectoutput_area', style={'paddingTop':35})
+            #                 ], style={'paddingTop':35})
+            #             ),
+            #         dbc.Col(
+            #             html.Div([
+            #                 html.Pre(id='relayoutoutput_area', style={'paddingTop':35})
+            #                 ], style={'paddingTop':35})
+            #             ),
+            #         dbc.Col(
+            #             html.Div([
+            #                 html.Pre(id='restyleoutput_area', style={'paddingTop':35})
+            #                 ], style={'paddingTop':35})
+            #             )
+            #     ]
+            # )
         ]
     )
     return retDiv

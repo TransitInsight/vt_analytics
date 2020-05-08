@@ -63,7 +63,11 @@ class ViewTrainmoveClass:
         self.fig.add_trace(go.Scatter(x=self.trainmove_df['loggedAt'], y=self.trainmove_df['velocity'],
                 name = "Actual Velocity",
                 text='Actual Velocity = ' + self.trainmove_df['velocity'].astype(str),
-                line_color="goldenrod"
+                line_color="goldenrod", mode='lines+markers', 
+                marker=dict(size=4, 
+                            symbol='circle-dot',
+                            color="goldenrod"
+                            )
                 )) 
 
         self.fig.add_trace(go.Scatter(x=self.trainmove_df['loggedAt'], y=self.trainmove_df['maximumVelocity'],
@@ -115,7 +119,8 @@ class ViewTrainmoveClass:
         title = "Velocity (VOBC={})".format(self.vobc_id)
         self.fig.update_yaxes(title_text=title, showspikes=True)
         self.fig.update_xaxes(showspikes=True)
-        self.fig.update_layout(margin=dict(l=20, r=20, t=30, b=20))
+        self.fig.update_layout(height=300, margin=dict(l=20, r=20, t=30, b=20))
+
 
     def get_fig(self):
         return self.fig
