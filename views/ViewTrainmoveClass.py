@@ -31,6 +31,7 @@ class ViewTrainmoveClass:
         self.fault_code = fault_code
         self.fig = go.Figure()
         self.offset = offset or timedelta(hours=0)
+        self.read_base_data()
 
     def read_base_data(self):
         self.op_date = util.str2date1(self.op_date)
@@ -47,18 +48,20 @@ class ViewTrainmoveClass:
 
 
     def create_fig(self):
-        self.read_base_data()
-        self.add_data()
-        #self.add_button()
-        self.update_figure_layout()
-
-    def add_data(self):
-
         if (self.vobc_id is None or self.op_date is None or self.fault_code is None):
             return 
 
         if (self.trainmove_df is None or self.trainmove_df.empty):
             return 
+
+
+        self.add_velocity_data()
+        self.add_vobc_fault()
+        self.add_door_data()
+        #self.add_button()
+        self.update_figure_layout()
+
+    def add_velocity_data(self):
 
         self.fig.add_trace(go.Scatter(x=self.trainmove_df['loggedAt'], y=self.trainmove_df['velocity'],
                 name = "Actual Velocity",
@@ -76,6 +79,25 @@ class ViewTrainmoveClass:
                 line_color="green"
                 )) 
 
+    def add_door_data(self):
+
+        self.fig.add_trace(go.Scatter(x=self.trainmove_df['loggedAt'], y=self.trainmove_df['doorCmd'],
+                name = "Door Cmd",
+                text='Door Cmd = ' + self.trainmove_df['doorCmd'].astype(str),
+                line_color="goldenrod", mode='lines+markers', 
+                marker=dict(size=4, 
+                            symbol='circle-dot',
+                            color="goldenrod"
+                            )
+                )) 
+
+        self.fig.add_trace(go.Scatter(x=self.trainmove_df['loggedAt'], y=self.trainmove_df['doorStatus'],
+                name = "Door Status",
+                text='Door Status = ' + self.trainmove_df['doorStatus'].astype(str),
+                line_color="green"
+                )) 
+
+    def add_vobc_fault(self):
         df_fc = vobcfault_m.get_fault_list(self.start,self.end,self.vobc_id)
         if (df_fc.empty):
             return
@@ -88,6 +110,8 @@ class ViewTrainmoveClass:
                                             color=list(map(cfg.get_fault_color, df_fc['faultCode']))
                                             )
                 ))
+
+
 
     def add_button(self):
         self.fig.update_layout(

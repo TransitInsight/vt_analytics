@@ -5,7 +5,6 @@ parentdir = os.path.dirname(currentdir)
 sys.path.insert(0,parentdir) 
 
 from views import view_vobcfault as vobcView
-from views.ViewTrainmoveClass import ViewTrainmoveClass
 import pandas as pd
 from datetime import datetime
 from datetime import timedelta
@@ -40,13 +39,17 @@ def test_create_layout():
 def test_create_fig_by_trainmove():
     ret = vobcView.create_fig_by_trainmove(248, '2015-1-1 10:12', 3)
     assert ret != None
-    assert len(ret.data) == 3
+    assert len(ret.data) == 5
     assert isinstance(ret.data[0], plotly.graph_objs.Scatter)
     assert (ret.data[0].name == 'Actual Velocity')
     assert isinstance(ret.data[1], plotly.graph_objs.Scatter)
     assert (ret.data[1].name == 'Max Velocity')
     assert isinstance(ret.data[2], plotly.graph_objs.Scatter)
     assert (ret.data[2].name == 'Vobc Fault')
+    assert isinstance(ret.data[3], plotly.graph_objs.Scatter)
+    assert (ret.data[3].name == 'Door Cmd')
+    assert isinstance(ret.data[4], plotly.graph_objs.Scatter)
+    assert (ret.data[4].name == 'Door Status')
 
 
 
@@ -57,17 +60,6 @@ def test_create_fig_by_trainmove_Vobc_None():
 def test_create_fig_by_trainmove_Date_None():
     ret = vobcView.create_fig_by_trainmove(248, None, 3)
     assert ret != None
-
-def test_trainmove_view_class():
-    c = ViewTrainmoveClass(248, '2015-1-1 10:12', 3, timedelta(hours=1))
-    c.create_fig()
-    assert c.get_fig() != None
-
-def test_trainmove_view_class_offset():
-    c = ViewTrainmoveClass(248, '2015-1-1 10:12', 3, timedelta(hours=1.5))
-    c.create_fig()
-    assert c.get_fig() != None
-
 
 def test_trainmove_offset_callback():
 

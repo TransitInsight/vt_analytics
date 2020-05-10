@@ -98,12 +98,14 @@ def run_query_in_memory(query):
     fc_list = [] 
     fc_name_list = []
     status_list = []
+    velocity_list =[]
     i = 0
     while i < return_size:
         r = random.randint(1, 15)
         fc_list.append(r)
         fc_name_list.append('fc{}:random text'.format(r))
         status_list.append(random.randint(0,1))
+        velocity_list.append(random.randint(0, 80))
         i += 1
     
     for field in fields:
@@ -115,8 +117,13 @@ def run_query_in_memory(query):
             df[field] = id_list
         elif 'code' in field.lower() or 'count' in field.lower():
             df[field] = fc_list
-        elif 'doorCmd' in field.lower() or 'doorStatus' in field.lower() or 'activePassiveStatus' in field.lower():
+        elif 'doorcmd' in field.lower() :
             df[field] = status_list
+            df[field] = df[field].apply(lambda x: x+2) #cmd returns 2, & 3
+        elif 'doorstatus' in field.lower() or 'activepassivestatus' in field.lower():
+            df[field] = status_list
+        elif 'velocity' in field.lower():
+            df[field] = velocity_list
         else:
             df[field] = fc_name_list
             df[field] = pd.Series(df[field], dtype=pd.StringDtype())

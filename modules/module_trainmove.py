@@ -19,4 +19,9 @@ def get_trainmove(vobc_id, start_date, end_date):
              " order by loggedAt LIMIT 10000 ").format( vobc_id, start_date, end_date)
     
     df = util.run_query(query)
+
+    if not df.empty:
+        df['doorStatus'] = df['doorStatus'].apply(lambda x: x*10 - 35)
+        df['doorCmd'] = df['doorCmd'].apply(lambda x: x*10 - 35)
+
     return df

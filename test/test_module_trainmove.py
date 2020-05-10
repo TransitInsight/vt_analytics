@@ -27,3 +27,22 @@ def test_trainmove():
     assert len(df['loggedAt']) > 100
     assert len(df['loggedAt']) > 101
 
+
+def test_trainmove_door():
+    df = trainmoveDA.get_trainmove(248, '2015-01-03T10:51:30.160Z', '2015-01-13T11:51:30.160Z')
+
+    assert df.dtypes['doorCmd'] == 'int64'
+    assert df.dtypes['doorStatus'] == 'int64'
+    # assert df['doorCmd'].max() == 3
+    # assert df['doorCmd'].min() == 2
+
+    # assert df['doorStatus'].max() == 1
+    # assert df['doorStatus'].min() == 0
+
+
+
+    assert df['doorCmd'].max() == -5
+    assert df['doorCmd'].min() == -15
+
+    assert df['doorStatus'].max() == -25
+    assert df['doorStatus'].min() == -35
