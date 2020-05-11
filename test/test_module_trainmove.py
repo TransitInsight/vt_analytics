@@ -46,3 +46,6 @@ def test_trainmove_door():
 
     assert df['doorStatus'].max() == -25
     assert df['doorStatus'].min() == -35
+
+    df['Actual Velocity Toop Tips'] = 'Actual Velocity = {}\nLoop = {}'.format(df['velocity'].astype(str), df['loopName'])
+    df['Actual Velocity Toop Tips']

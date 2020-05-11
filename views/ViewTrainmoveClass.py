@@ -45,9 +45,13 @@ class ViewTrainmoveClass:
         self.end = self.start + timedelta(hours=1)    
 
         self.trainmove_df = trainmove_m.get_trainmove(self.vobc_id, self.start, self.end)
-
+        #self.trainmove_df['Actual Velocity Toop Tips'] = 'Actual Velocity = {}\nLoop = {}'.format(self.trainmove_df['velocity'].astype(str), self.trainmove_df['loopName'])
+        if not self.trainmove_df is None and not self.trainmove_df.empty:
+            self.trainmove_df['Actual Velocity Toop Tips'] = 'Actual Velocity = ' + self.trainmove_df['velocity'].astype(str) + ' km/h<br>Loop = ' + self.trainmove_df['loopName']
 
     def create_fig(self):
+
+        self.update_figure_layout()
         if (self.vobc_id is None or self.op_date is None or self.fault_code is None):
             return 
 
@@ -59,13 +63,13 @@ class ViewTrainmoveClass:
         self.add_vobc_fault()
         self.add_door_data()
         #self.add_button()
-        self.update_figure_layout()
+
 
     def add_velocity_data(self):
 
         self.fig.add_trace(go.Scatter(x=self.trainmove_df['loggedAt'], y=self.trainmove_df['velocity'],
                 name = "Actual Velocity",
-                text='Actual Velocity = ' + self.trainmove_df['velocity'].astype(str),
+                text=self.trainmove_df['Actual Velocity Toop Tips'],
                 line_color="goldenrod", mode='lines+markers', 
                 marker=dict(size=4, 
                             symbol='circle-dot',
@@ -142,7 +146,7 @@ class ViewTrainmoveClass:
     def update_figure_layout(self):
         title = "Velocity (VOBC={})".format(self.vobc_id)
         self.fig.update_yaxes(title_text=title, showspikes=True)
-        self.fig.update_xaxes(showspikes=True)
+        self.fig.update_xaxes(showspikes=True, range=[self.start, self.end])
         self.fig.update_layout(height=300, margin=dict(l=20, r=20, t=30, b=20))
 
 
