@@ -49,3 +49,8 @@ def test_trainmove_door():
 
     df['Actual Velocity Toop Tips'] = 'Actual Velocity = {}\nLoop = {}'.format(df['velocity'].astype(str), df['loopName'])
     df['Actual Velocity Toop Tips']
+
+def test_tp_deviation():
+    df = trainmoveDA.get_trainmove(248, '2015-01-03T10:51:30.160Z', '2015-01-13T11:51:30.160Z')
+    tp_dev = df['tpDeviation'].unique()
+    assert tp_dev is not None

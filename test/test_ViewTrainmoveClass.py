@@ -65,6 +65,19 @@ def test_ViewTrainmvoeClass_add_door():
     assert isinstance(fig.data[1], plotly.graph_objs.Scatter)
 
 
+
+def test_ViewTrainmvoeClass_door_cmd_status():
+    c = ViewTrainmoveClass(248, '2015-1-1 10:12', 3, timedelta(hours=1.5))
+    df = c.trainmove_df['Door Status Tips'].unique()
+    assert len(df) == 2
+    assert df[0] in ['Door Status = Closed', 'Door Status = Open']
+    assert df[1] in ['Door Status = Closed', 'Door Status = Open']
+
+    df = c.trainmove_df['Door Cmd Tips'].unique()
+    assert len(df) == 2
+    assert df[0] in ['Door Cmd = Closed', 'Door Cmd = Open']
+    assert df[1] in ['Door Cmd = Closed', 'Door Cmd = Open']
+
 def test_ViewTrainmvoeClass_no_data():
     c = ViewTrainmoveClass(248, '2015-1-1 10:12', 3, timedelta(hours=1.5))
 

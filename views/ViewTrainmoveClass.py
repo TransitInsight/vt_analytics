@@ -23,6 +23,24 @@ import pandas as pd
 import plotly.graph_objs as go
 from plotly.subplots import make_subplots
 
+
+def door_status_tip(row):
+    if (row['doorStatus'] == -25):
+        return 'Door Status = Open'
+    elif (row['doorStatus'] == -35):
+        return 'Door Status = Closed'
+    else:
+        assert False, "door status {} is not valid".format(row['doorStatus'])
+
+
+def door_cmd_tip(row):
+    if (row['doorCmd'] == -5):
+        return 'Door Cmd = Open'
+    elif (row['doorCmd'] == -15):
+        return 'Door Cmd = Closed'
+    else:
+        assert False, "door cmd {} is not valid".format(row['doorCmd'])
+
 class ViewTrainmoveClass:
 
     def __init__(self, vobc_id, op_date, fault_code, offset):
@@ -48,6 +66,8 @@ class ViewTrainmoveClass:
         #self.trainmove_df['Actual Velocity Toop Tips'] = 'Actual Velocity = {}\nLoop = {}'.format(self.trainmove_df['velocity'].astype(str), self.trainmove_df['loopName'])
         if not self.trainmove_df is None and not self.trainmove_df.empty:
             self.trainmove_df['Actual Velocity Toop Tips'] = 'Actual Velocity = ' + self.trainmove_df['velocity'].astype(str) + ' km/h<br>Loop = ' + self.trainmove_df['loopName']
+            self.trainmove_df['Door Status Tips'] = self.trainmove_df.apply(door_status_tip, axis = 1)
+            self.trainmove_df['Door Cmd Tips'] = self.trainmove_df.apply(door_cmd_tip, axis = 1)
 
     def create_fig(self):
 
@@ -87,8 +107,9 @@ class ViewTrainmoveClass:
 
         self.fig.add_trace(go.Scatter(x=self.trainmove_df['loggedAt'], y=self.trainmove_df['doorCmd'],
                 name = "Door Cmd",
-                text='Door Cmd = ' + self.trainmove_df['doorCmd'].astype(str),
+                text=self.trainmove_df['Door Cmd Tips'],
                 line_color="goldenrod", mode='lines+markers', 
+                line_shape='hv',
                 marker=dict(size=4, 
                             symbol='circle-dot',
                             color="goldenrod"
@@ -97,8 +118,9 @@ class ViewTrainmoveClass:
 
         self.fig.add_trace(go.Scatter(x=self.trainmove_df['loggedAt'], y=self.trainmove_df['doorStatus'],
                 name = "Door Status",
-                text='Door Status = ' + self.trainmove_df['doorStatus'].astype(str),
-                line_color="green"
+                text= self.trainmove_df['Door Status Tips'],
+                line_color="green",
+                line_shape='hv'
                 )) 
 
     def add_vobc_fault(self):
