@@ -6,6 +6,7 @@ sys.path.insert(0,parentdir)
 
 #%%
 import json
+import dash
 import dash_core_components as dcc
 import dash_html_components as html
 import dash_bootstrap_components as dbc
@@ -256,19 +257,31 @@ def display_figure_bar(value, start_date, end_date):
                   Input('button_prev', 'n_clicks'),
                   Input('button_next', 'n_clicks'),
                   Input('button_next_page', 'n_clicks'),
+                  Input('fig_by_fault', 'clickData'),
+                  Input('fig_by_trend', 'clickData'),
               ],
               [State('vt_session_store', 'data')])
-def update_offset_callback( prev_page, prev, next, next_page, data):
-    return update_offset(prev_page, prev, next, next_page, data)
+def update_offset_callback( prev_page, prev, next, next_page, first_value, second_value, data):
 
-def update_offset(prev_page, prev, next, next_page, data):    
-    prev_page = prev_page or 0
-    prev = prev or 0
-    next = next or 0
-    next_page = next_page or 0
+    if any ('button' in item['prop_id'] for item in dash.callback_context.triggered): #not triggerred by button, it must be triggerred by others, reset offset
+        return update_offset(dash.callback_context.triggered, data)
+    else:
+        return {'offset': 0}
 
+def update_offset(triggeredItems, data):    
     data = data or {'offset': 0}
-    data['offset'] = -prev_page * 2 - prev + next + 2*next_page
+    offset = 0
+
+    if any ('button_prev_page.n_clicks' == item['prop_id'] for item in triggeredItems):
+        offset = -2
+    elif any ('button_next_page.n_clicks' == item['prop_id'] for item in triggeredItems):
+        offset = 2
+    elif any ('button_prev.n_clicks' == item['prop_id'] for item in triggeredItems):
+        offset = -1
+    elif any ('button_next.n_clicks' == item['prop_id'] for item in triggeredItems):
+        offset = 1
+
+    data['offset'] = data['offset'] + offset #-prev_page * 2 - prev + next + 2*next_page
 
     return data
 
@@ -328,7 +341,8 @@ def display_figure_trainmove(first_value, second_value, timewindow_value):
     if timewindow_value != None:
         offset = timewindow_value['offset']
 
-    f = create_fig_by_trainmove(vobc_id, op_date, fault_code, offset=timedelta(hours=offset/2))
+    delta = timedelta(hours=offset/2)
+    f = create_fig_by_trainmove(vobc_id, op_date, fault_code, delta)
     return f
     #return 'timewindow_value : ' + json.dumps(timewindow_value, indent=2)
 

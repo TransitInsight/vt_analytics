@@ -144,9 +144,12 @@ class ViewTrainmoveClass:
             ])
 
     def update_figure_layout(self):
-        title = "Velocity (VOBC={})".format(self.vobc_id)
-        self.fig.update_yaxes(title_text=title, showspikes=True)
-        self.fig.update_xaxes(showspikes=True, range=[self.start, self.end])
+        ytitle = "Velocity (VOBC={})".format(self.vobc_id)
+
+        xtitle = "date in ({} - {}), offset={}".format(self.start, self.end, self.offset)
+
+        self.fig.update_yaxes(title_text=ytitle, showspikes=True)
+        self.fig.update_xaxes(showspikes=True, range=[self.start, self.end], title_text=xtitle)
         self.fig.update_layout(height=300, margin=dict(l=20, r=20, t=30, b=20))
 
 

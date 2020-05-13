@@ -63,8 +63,31 @@ def test_create_fig_by_trainmove_Date_None():
 
 def test_trainmove_offset_callback():
 
-    data = vobcView.update_offset( 1, 2, 0, 0, None)
-    assert data['offset'] == -4
+    # if any ('button_prev_page.n_clicks' == item['prop_id'] for item in triggeredItems):
+    #     offset = -2
+    # elif any ('button_next_page.n_clicks' == item['prop_id'] for item in triggeredItems):
+    #     offset = 2
+    # elif any ('button_prev.n_clicks' == item['prop_id'] for item in triggeredItems):
+    #     offset = -1
+    # elif any ('button_next.n_clicks' == item['prop_id'] for item in triggeredItems):
+    #     offset = 1
+
+    items = [{'prop_id': 'button_next_page.n_clicks'}]
+    data = vobcView.update_offset( items, None)
+    assert data['offset'] == 2
+
+    items = [{'prop_id': 'button_next.n_clicks'}]
+    data = vobcView.update_offset( items, None)
+    assert data['offset'] == 1
+
+    items = [{'prop_id': 'button_prev_page.n_clicks'}]
+    data = vobcView.update_offset( items, None)
+    assert data['offset'] == -2
+
+    items = [{'prop_id': 'button_prev.n_clicks'}]
+    data = vobcView.update_offset( items, None)
+    assert data['offset'] == -1
+
 
 def test_traimove_fig_callback_none():
     ret = vobcView.display_figure_trainmove(None, None, None)

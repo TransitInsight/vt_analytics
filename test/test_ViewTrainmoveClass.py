@@ -63,3 +63,16 @@ def test_ViewTrainmvoeClass_add_door():
 
     assert (fig.data[1].name == 'Door Status')
     assert isinstance(fig.data[1], plotly.graph_objs.Scatter)
+
+
+def test_ViewTrainmvoeClass_no_data():
+    c = ViewTrainmoveClass(248, '2015-1-1 10:12', 3, timedelta(hours=1.5))
+
+    c.start = datetime(2020, 1,1, 1,0,0)
+    c.end = datetime(2020, 1,1, 2,0,0)
+    c.update_figure_layout()
+    fig = c.get_fig()
+
+    assert fig is not None
+    assert fig.layout.xaxis.range[0] == c.start
+    assert fig.layout.xaxis.range[1] == c.end 
