@@ -46,9 +46,13 @@ def test_ViewTrainmvoeClass_add_vobcfault():
     fig = c.get_fig()
 
     assert fig is not None
-    assert len(fig.data) == 1
+    assert len(fig.data) == 2
     assert (fig.data[0].name == 'Vobc Fault')
     assert isinstance(fig.data[0], plotly.graph_objs.Scatter)
+
+    assert isinstance(fig.data[1], plotly.graph_objs.Scatter)
+    assert (fig.data[1].name == 'Vobc Fault Rectified')
+
 
 def test_ViewTrainmvoeClass_add_door():
     c = ViewTrainmoveClass(248, '2015-1-1 10:12', 3, timedelta(hours=1.5))

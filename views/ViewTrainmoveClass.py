@@ -126,22 +126,37 @@ class ViewTrainmoveClass:
                 line_color="green",
                 line_shape='hv'
                 )) 
-
+    # add VOBC Fault, shows start time and rectified time
+    # regardless actively selected the fault, we already include all fault types
     def add_vobc_fault(self):
         df_fc = vobcfault_m.get_fault_list(self.start,self.end,self.vobc_id)
         if (df_fc.empty):
             return
-        self.fig.add_trace(go.Scatter(x=df_fc['loggedAt'], y=df_fc['velocity'], 
+
+        df_fault = df_fc[df_fc['faultCodeSet'] == 1]    
+        df_rectify = df_fc[df_fc['faultCodeSet'] == 0]    
+
+        self.fig.add_trace(go.Scatter(x=df_fault['loggedAt'], y=df_fault['velocity'], 
                 name="Vobc Fault",
                 #hover_name = "faultCode",
-                text='Fault = ' + df_fc['faultName'],
+                text='Fault = ' + df_fault['faultName'],
                 mode='markers', marker=dict(size=7, 
-                                            line=dict(width=1, color = list(map(cfg.get_fault_color, df_fc['faultCode']))),
+                                            line=dict(width=1, color = list(map(cfg.get_fault_color, df_fault['faultCode']))),
                                             symbol='x',
-                                            color=list(map(cfg.get_fault_color, df_fc['faultCode']))
+                                            color=list(map(cfg.get_fault_color, df_fault['faultCode']))
                                             )
                 ))
 
+        self.fig.add_trace(go.Scatter(x=df_rectify['loggedAt'], y=df_rectify['velocity'], 
+                name="Vobc Fault Rectified",
+                #hover_name = "faultCode",
+                text='Fault = ' + df_rectify['faultName'],
+                mode='markers', marker=dict(size=7, 
+                                            line=dict(width=1, color = 'darkgreen'),
+                                            symbol='circle',
+                                            color='darkgreen'
+                                            )
+                ))
 
 
     def add_button(self):
