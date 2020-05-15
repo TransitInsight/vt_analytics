@@ -35,7 +35,7 @@ def get_all_fault():
 
 def get_fault_list(start_date,end_date, vobc_id):
     start_date,end_date = util.date2str2(start_date,end_date)
-    query = "SELECT faultName, faultCode, loggedAt, velocity from dlr_vobc_fault where loggedAt >= '{}' and loggedAt < '{}' and vobcid = {}".format(start_date,end_date, vobc_id)
+    query = "SELECT faultName, faultCode, loggedAt, velocity, faultCodeSet from dlr_vobc_fault where loggedAt >= '{}' and loggedAt < '{}' and vobcid = {}".format(start_date,end_date, vobc_id)
     df = util.run_query(query)
     return df
 

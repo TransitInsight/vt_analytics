@@ -173,17 +173,17 @@ def create_layout():
             ),
             dbc.Row(
                 [
-                    dbc.Col(fg_div_by_fault, width = 11)
+                    dbc.Col(fg_div_by_fault, width = 12)
                 ]
             ),
             dbc.Row(
                 [
-                    dbc.Col(fg_div_by_trend, width = 11)
+                    dbc.Col(fg_div_by_trend, width = 12)
                 ]
             ),
             dbc.Row(
                 [
-                    dbc.Col(fg_div_by_trainmove, width = 11),
+                    dbc.Col(fg_div_by_trainmove, width = 12),
                 ]
             )
             # ,dbc.Row(

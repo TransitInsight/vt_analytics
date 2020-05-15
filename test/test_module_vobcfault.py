@@ -57,8 +57,10 @@ def test_get_fc():
 
 def test_get_fc_list():
     df = vobcDA.get_fault_list('2015-01-01T10:00','2015-01-01T20:00', 248)
-    assert df['loggedAt'].count() > 0
 
+    assert df['loggedAt'].count() > 0
+    dfSet = df['faultCodeSet'].unique()
+    assert len(dfSet) > 1
 
 def test_get_fc_trend():
     df = vobcDA.get_count_trend(-1, '2014-01-01T00:00:00', '2015-04-25T00:13:26.017995', -1)

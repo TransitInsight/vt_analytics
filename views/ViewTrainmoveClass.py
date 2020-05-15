@@ -91,7 +91,8 @@ class ViewTrainmoveClass:
                 name = "Actual Velocity",
                 text=self.trainmove_df['Actual Velocity Toop Tips'],
                 line_color="goldenrod", mode='lines+markers', 
-                marker=dict(size=4, 
+                line_width=1,
+                marker=dict(size=3, 
                             symbol='circle-dot',
                             color="goldenrod"
                             )
@@ -99,6 +100,7 @@ class ViewTrainmoveClass:
 
         self.fig.add_trace(go.Scatter(x=self.trainmove_df['loggedAt'], y=self.trainmove_df['maximumVelocity'],
                 name = "Max Velocity",
+                line_width=1,
                 text='Max Velocity = ' + self.trainmove_df['maximumVelocity'].astype(str),
                 line_color="green"
                 )) 
@@ -109,8 +111,9 @@ class ViewTrainmoveClass:
                 name = "Door Cmd",
                 text=self.trainmove_df['Door Cmd Tips'],
                 line_color="goldenrod", mode='lines+markers', 
+                line_width=1,
                 line_shape='hv',
-                marker=dict(size=4, 
+                marker=dict(size=3, 
                             symbol='circle-dot',
                             color="goldenrod"
                             )
@@ -118,6 +121,7 @@ class ViewTrainmoveClass:
 
         self.fig.add_trace(go.Scatter(x=self.trainmove_df['loggedAt'], y=self.trainmove_df['doorStatus'],
                 name = "Door Status",
+                line_width=1,
                 text= self.trainmove_df['Door Status Tips'],
                 line_color="green",
                 line_shape='hv'
@@ -131,7 +135,8 @@ class ViewTrainmoveClass:
                 name="Vobc Fault",
                 #hover_name = "faultCode",
                 text='Fault = ' + df_fc['faultName'],
-                mode='markers', marker=dict(size=15, 
+                mode='markers', marker=dict(size=7, 
+                                            line=dict(width=1, color = list(map(cfg.get_fault_color, df_fc['faultCode']))),
                                             symbol='x',
                                             color=list(map(cfg.get_fault_color, df_fc['faultCode']))
                                             )
@@ -172,7 +177,7 @@ class ViewTrainmoveClass:
 
         self.fig.update_yaxes(title_text=ytitle, showspikes=True)
         self.fig.update_xaxes(showspikes=True, range=[self.start, self.end], title_text=xtitle)
-        self.fig.update_layout(height=300, margin=dict(l=20, r=20, t=30, b=20))
+        self.fig.update_layout(height=300, margin=dict(l=20, r=20, t=30, b=20),legend_orientation="h")
 
 
     def get_fig(self):
