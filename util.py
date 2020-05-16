@@ -10,6 +10,7 @@ import json
 import re
 import random
 import numpy as np
+import os
 
 #%%
 def date2str1(op_date):
@@ -37,8 +38,10 @@ def str2date1(op_date):
 
     return op_date
 
+# run elastic search query
+# when running on Azure DevOP pipline (Linux only), ElasticSearch is not available, it uses generated result
 def run_query(query):
-    if cfg.ElasticSearchDS['in_memory']:
+    if cfg.ElasticSearchDS['in_memory'] or os.name != 'nt': # not on windows, must be linux
         df = run_query_in_memory(query)
     else:
         df = run_query_es(query)
