@@ -38,10 +38,13 @@ def str2date1(op_date):
 
     return op_date
 
+def is_in_memory():
+    return cfg.ElasticSearchDS['in_memory'] or os.name != 'nt'# not on windows, must be linux
+
 # run elastic search query
 # when running on Azure DevOP pipline (Linux only), ElasticSearch is not available, it uses generated result
 def run_query(query):
-    if cfg.ElasticSearchDS['in_memory'] or os.name != 'nt': # not on windows, must be linux
+    if is_in_memory():
         df = run_query_in_memory(query)
     else:
         df = run_query_es(query)
@@ -144,7 +147,7 @@ def run_query_in_memory(query):
 
 ### When run UT on Azure pipeline, this ensures use local in-memory DB
 def IsInMemoryTrue(ret):
-    if cfg.ElasticSearchDS['in_memory']:
+    if is_in_memory():
         return True
     else:
         return ret
