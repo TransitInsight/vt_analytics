@@ -13,10 +13,6 @@ def get_trainmove(vobc_id, start_date, end_date):
     if (vobc_id == None or vobc_id == -1 ):
         return None
 
-    if start_date > end_date:
-        raise ValueError("start_date needs to be smaller than end_date")
-
-
     query = ("SELECT activePassiveStatus, loggedAt, loggedDate, loopName, velocity, vobcid, trainId, maximumVelocity, doorCmd, doorStatus"
              " from dlr_train_move "
              " where vobcid = {} and loggedAt >= '{}' and loggedAt < '{}'"

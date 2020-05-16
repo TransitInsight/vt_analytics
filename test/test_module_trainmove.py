@@ -53,5 +53,5 @@ def test_trainmove_door():
 
 def test_trainmove_exception():
     with pytest.raises(ValueError) as exception_info:
-        df = trainmoveDA.get_trainmove(248, '2015-01-03T10:51:30.160Z', '2014-01-13T11:51:30.160Z')
+        trainmoveDA.get_trainmove(248, '2015-01-03T10:51:30.160Z', '2014-01-13T11:51:30.160Z')
     assert "start_date needs to be smaller than end_date" in str(exception_info.value)

@@ -13,6 +13,7 @@ from datetime import timedelta
 import requests
 import json
 import pprint
+import pytest
 
 import util as util
 import config as cfg
@@ -45,6 +46,12 @@ def test_get_count_by_daterange():
     assert  df1['FaultCount'].count() > 0 
     assert  df2['FaultCount'].count() > 0 
     assert  util.IsInMemoryTrue( df1['FaultCount'].count() < df2['FaultCount'].count() )
+
+def test_get_count_exception():
+    with pytest.raises(ValueError) as exception_info:
+        vobcDA.get_count_by(-1, '2017-01-01T00:00:00', '2014-04-25T00:13:26.017995')
+
+    assert "start_date needs to be smaller than end_date" in str(exception_info.value)
 
 def test_get_count_by_fc_one():
     df = vobcDA.get_count_by(3, '2015-01-06', '2020-04-25T00:13:26.017995')

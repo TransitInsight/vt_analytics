@@ -18,9 +18,14 @@ def date2str1(op_date):
 
     return op_date
 
+# Convert two date to two strings using the format works for Elastic Search
+# throw exception if start_date is later than end_date
 def date2str2(start_date, end_date):
     start_date = date2str1(start_date)
     end_date = date2str1(end_date)
+
+    if start_date > end_date:
+        raise ValueError("start_date needs to be smaller than end_date")
 
     return start_date, end_date
 
