@@ -21,7 +21,7 @@ def test_create_fig_by_trend():
     ret = vobcView.create_fig_by_trend(-1, '2014-01-01T00:00:00', '2020-04-25T00:13:26.017995', -1)
     assert ret != None
     assert ret._data_objs != None
-    assert len(ret._data_objs) == 30# two sub plots, and each contain 15 catagories
+    assert len(ret._data_objs) == 15
 
 def test_create_fig_by_vobc():
     ret = vobcView.create_fig_by_vobc(-1, '2014-01-01T00:00:00', '2020-04-25T00:13:26.017995')
@@ -117,9 +117,9 @@ def test_displayarea_callback():
     a_selected_value = {'curveNumber': 12, 'label': 13, 'pointIndex': 3, 'pointNumber': 3, 'value': 13, 'x': 13, 'y': 13}
     list1 = [a_selected_value]
     click_value = {'points': list1}
-    ret = vobcView.display_figure_area(3, '2015-01-01T00:00:00', '2015-04-01T00:00:00', click_value)
+    ret = vobcView.display_fault_trend(3, '2015-01-01T00:00:00', '2015-04-01T00:00:00', click_value)
     assert ret is not None
 
 def test_displayarea_callback_none():
-    ret = vobcView.display_figure_area(3, '2015-01-01T00:00:00', '2015-04-01T00:00:00', None)
+    ret = vobcView.display_fault_trend(3, '2015-01-01T00:00:00', '2015-04-01T00:00:00', None)
     assert ret is not None    

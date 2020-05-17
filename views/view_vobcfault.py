@@ -25,6 +25,7 @@ import plotly.graph_objs as go
 from plotly.subplots import make_subplots
 
 from views.ViewTrainmoveClass import ViewTrainmoveClass
+from views.ViewFaultListClass import ViewFaultListClass
 
 #%%
 
@@ -71,13 +72,18 @@ def create_fig_by_vobc(fault_code, start_date, end_date):
     return fig
 
 
+def create_fig_fault_list(fault_code, start_date, end_date, vobc_id):
+    c = ViewFaultListClass(fault_code, start_date, end_date, vobc_id)
+    c.create_fig()
+    return c.get_fig()
+
 def create_fig_by_trend(fault_code, start_date, end_date, vobc_id):
 
     start_date, end_date = util.date2str2(start_date, end_date)
 
     title = 'vobc={}, fault={}'.format(vobc_id, fault_code)
 
-    fig = make_subplots(rows=1, cols=2)
+    fig = go.Figure()# make_subplots(rows=1, cols=2)
     df = vobcfault_m.get_count_trend(fault_code, start_date, end_date, vobc_id)
     if (not df.empty):
         y_max = df.groupby(['LoggedDate']).max().max() * 1.01
@@ -88,24 +94,23 @@ def create_fig_by_trend(fault_code, start_date, end_date, vobc_id):
                 showlegend = False, 
                 line_color=cfg.vobc_fault_color_dict[fc_code],
                 stackgroup = 'one'
-                ),
-                row=1,col=1) 
-        fig.update_xaxes(row = 1, col = 1, title_text=title)#, type='category')
-        fig.update_yaxes(row = 1, col = 1, range=[0,y_max], title_text='fault count by date')
+                )) 
+        fig.update_xaxes(title_text=title)#, type='category')
+        fig.update_yaxes(range=[0,y_max], title_text='fault count by date')
 
-    df = vobcfault_m.get_count_location(fault_code, start_date, end_date, vobc_id)
-    if (not df.empty):
-        y_max = df.groupby(['LocationName']).max().max() * 1.01
+    # df = vobcfault_m.get_count_location(fault_code, start_date, end_date, vobc_id)
+    # if (not df.empty):
+    #     y_max = df.groupby(['LocationName']).max().max() * 1.01
     
-        for fc_code in sorted(df['faultCode'].unique()):
-            df_fc = df[df['faultCode']==fc_code]
-            fig.add_trace(go.Bar(x=df_fc['LocationName'], y=df_fc['FaultCount'],
-                showlegend = False, 
-                marker=dict(color=cfg.vobc_fault_color_dict[fault_code])
-                ),
-                row=1,col=2) 
-        #fig.update_xaxes(row = 1, col = 2, title_text=title)#, type='category')
-        fig.update_yaxes(row = 1, col = 2, range=[0,y_max], title_text='fault count by location')
+    #     for fc_code in sorted(df['faultCode'].unique()):
+    #         df_fc = df[df['faultCode']==fc_code]
+    #         fig.add_trace(go.Bar(x=df_fc['LocationName'], y=df_fc['FaultCount'],
+    #             showlegend = False, 
+    #             marker=dict(color=cfg.vobc_fault_color_dict[fault_code])
+    #             ),
+    #             row=1,col=2) 
+    #     #fig.update_xaxes(row = 1, col = 2, title_text=title)#, type='category')
+    #     fig.update_yaxes(row = 1, col = 2, range=[0,y_max], title_text='fault count by location')
         
     fig.update_layout(barmode='stack')#, row = 2, col = 1)
     fig.update_layout(height=300, margin=dict(l=2, r=10, t=30, b=2), hovermode='closest')
@@ -149,6 +154,11 @@ def create_layout():
             style={'width':'100%', 'display':'inline-block'}
         )
 
+    fg_div_fault_list = html.Div([
+            dcc.Graph(id='fig_fault_list', figure=create_fig_fault_list(-1, filter_start_date, filter_end_date, -1))], 
+            style={'width':'100%', 'display':'inline-block'}
+        )
+
     fg_div_by_trainmove = html.Div(
             [
                 dcc.Graph(id='fig_by_trainmove', figure=create_fig_by_trainmove(112, '2015-7-3 10:51', 3)),
@@ -178,7 +188,8 @@ def create_layout():
             ),
             dbc.Row(
                 [
-                    dbc.Col(fg_div_by_trend, width = 12)
+                    dbc.Col(fg_div_by_trend, width = 6),
+                    dbc.Col(fg_div_fault_list, width = 6)
                 ]
             ),
             dbc.Row(
@@ -295,9 +306,9 @@ def update_offset(triggeredItems, data):
 
     ])
 def display_figure_area_callback(value, start_date, end_date, click_value):
-    return display_figure_area(value, start_date, end_date, click_value)
+    return display_fault_trend(value, start_date, end_date, click_value)
 
-def display_figure_area(value, start_date, end_date, click_value):    
+def display_fault_trend(value, start_date, end_date, click_value):    
     fault_code = value
     click_fault_code = -1
     click_vobcid = -1

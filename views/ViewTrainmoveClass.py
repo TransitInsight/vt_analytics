@@ -49,9 +49,9 @@ class ViewTrainmoveClass:
         self.fault_code = fault_code
         self.fig = go.Figure()
         self.offset = offset or timedelta(hours=0)
-        self.read_base_data()
+        self.__read_base_data()
 
-    def read_base_data(self):
+    def __read_base_data(self):
         self.op_date = util.str2date1(self.op_date)
         first_fault_time = vobcfault_m.get_first_fault_time(self.op_date, self.fault_code, self.vobc_id)
 

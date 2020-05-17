@@ -17,6 +17,7 @@ import dash_bootstrap_components as dbc
 import plotly
 
 import config as cfg
+import pytest
 
 
 def test_ViewTrainmvoeClass():
@@ -93,3 +94,11 @@ def test_ViewTrainmvoeClass_no_data():
     assert fig is not None
     assert fig.layout.xaxis.range[0] == c.start
     assert fig.layout.xaxis.range[1] == c.end 
+
+
+def test_ViewTrainmvoeClass_private_exception():
+    c = ViewTrainmoveClass(248, '2015-1-1 10:12', 3, timedelta(hours=1.5))
+    with pytest.raises(AttributeError) as exception_info:
+        c.__read_base_data()
+    
+    assert 'has no attribute' in str(exception_info.value)

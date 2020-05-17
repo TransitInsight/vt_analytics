@@ -14,6 +14,10 @@ import os
 
 #%%
 def date2str1(op_date):
+
+    if(type(op_date) is str):
+        op_date = str2date1(op_date)
+
     if (type(op_date) is datetime):
         op_date = op_date.strftime("%Y-%m-%dT%H:%M:%S")
 
