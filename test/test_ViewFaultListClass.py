@@ -36,5 +36,16 @@ def test_ViewFaultListClass_fig():
     assert fig is not None
     assert len(fig.data) == 1
 
+def test_ViewFaultListClass_vobc_none():
+    c = ViewFaultListClass(3, '2015-1-1 10:12', '2015-1-2 10:12', None)
+    c.create_fig()
+    assert c is not None
+
+    fig = c.get_fig()
+    assert fig is not None
+    assert len(fig.data) == 1
+
+
+
 
 

@@ -130,7 +130,7 @@ class ViewTrainmoveClass:
     # regardless actively selected the fault, we already include all fault types
     def add_vobc_fault(self):
         df_fc = vobcfault_m.get_fault_list(self.start,self.end,self.vobc_id)
-        if (df_fc.empty):
+        if (df_fc is None or df_fc.empty):
             return
 
         df_fault = df_fc[df_fc['faultCodeSet'] == 1]    

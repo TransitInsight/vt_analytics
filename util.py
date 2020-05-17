@@ -43,6 +43,7 @@ def str2date1(op_date):
     return op_date
 
 def is_in_memory():
+    #return True
     return cfg.ElasticSearchDS['in_memory'] or os.name != 'nt'# not on windows, must be linux
 
 # run elastic search query

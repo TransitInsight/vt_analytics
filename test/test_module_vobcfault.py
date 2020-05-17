@@ -62,12 +62,48 @@ def test_get_fc():
     assert len(df['faultName'].unique()) == 15
     assert len(df['faultCode'].unique()) == 15
 
-def test_get_fc_list():
+def test_get_fc_list_vobcid():
     df = vobcDA.get_fault_list('2015-01-01T10:00','2015-01-01T20:00', 248)
+    assert df is not None
+    assert df['loggedAt'].count() > 0
+    dfSet = df['faultCodeSet'].unique()
+    assert len(dfSet) > 1
+
+def test_get_fc_list_nullvobc_nullfc():
+    df = vobcDA.get_fault_list('2015-01-01T10:00','2015-01-01T20:00')
 
     assert df['loggedAt'].count() > 0
     dfSet = df['faultCodeSet'].unique()
     assert len(dfSet) > 1
+
+
+def test_get_fc_list_faultcode_nullvobc():
+    df = vobcDA.get_fault_list('2015-01-01T10:00','2015-01-01T20:00', None, 3)
+
+    assert df['loggedAt'].count() > 0
+    dfSet = df['faultCodeSet'].unique()
+    assert util.IsInMemoryTrue(len(dfSet) == 2)
+    dfFC = df['faultCode'].unique()
+    assert util.IsInMemoryTrue(len(dfFC) == 1)
+    assert util.IsInMemoryTrue(dfFC[0] == 3)
+
+    dfVobc = df['vobcid'].unique()
+    assert len(dfVobc) > 1    
+
+def test_get_fc_list_faultcode_vobc():
+    df = vobcDA.get_fault_list('2015-01-01T10:00','2015-01-01T20:00', 248, 3)
+
+    assert df['loggedAt'].count() > 0
+    dfSet = df['faultCodeSet'].unique()
+    assert util.IsInMemoryTrue(len(dfSet) == 2)
+    dfFC = df['faultCode'].unique()
+    assert util.IsInMemoryTrue(len(dfFC) == 1)
+    assert util.IsInMemoryTrue(dfFC[0] == 3)
+
+    dfVobc = df['vobcid'].unique()
+    assert util.IsInMemoryTrue(len(dfVobc) == 1)
+    assert util.IsInMemoryTrue(dfVobc[0] == 248)
+
 
 def test_get_fc_trend():
     df = vobcDA.get_count_trend(-1, '2014-01-01T00:00:00', '2015-04-25T00:13:26.017995', -1)

@@ -296,6 +296,33 @@ def update_offset(triggeredItems, data):
 
     return data
 
+# @app.callback(
+#     Output('fig_fault_list', 'figure'),
+#     [
+#         Input('fault-dropdown', 'value'),
+#         Input('my_date_picker', 'start_date'),
+#         Input('my_date_picker', 'end_date') ,
+#         Input('fig_by_fault', 'clickData')
+
+#     ])
+# def display_figure_fault_list_callback(value, start_date, end_date, click_value):
+#     return display_figure_fault_list_callback(value, start_date, end_date, click_value)
+
+# def display_figure_fault_list_callback(value, start_date, end_date, click_value):    
+#     fault_code = value
+#     click_fault_code = -1
+#     click_vobcid = -1
+#     if (click_value != None):
+#         click_vobcid = click_value['points'][0]['x']
+#         click_fault_code = click_value['points'][0]['curveNumber'] + 1 #click curveNumber is between 0 and 14
+#         if (click_fault_code > 15) :
+#             click_fault_code -= 15
+#         if (fault_code == -1): #if not -1, the dropdown only selected one Fault, so the click must be on the same fault, no need to change
+#             fault_code = click_fault_code
+
+#     f = create_fig_fault_list(fault_code, start_date, end_date, click_vobcid)
+#     return f
+
 @app.callback(
     Output('fig_by_trend', 'figure'),
     [
@@ -307,6 +334,7 @@ def update_offset(triggeredItems, data):
     ])
 def display_figure_area_callback(value, start_date, end_date, click_value):
     return display_fault_trend(value, start_date, end_date, click_value)
+
 
 def display_fault_trend(value, start_date, end_date, click_value):    
     fault_code = value

@@ -30,12 +30,17 @@ def get_all_fault():
     df = util.run_query(query)
     return df
 
-def get_fault_list(start_date,end_date, vobc_id):
+def get_fault_list(start_date,end_date, vobc_id = None, faultCode = None):
     start_date,end_date = util.date2str2(start_date,end_date)
-    query = "SELECT faultName, faultCode, loggedAt, velocity, faultCodeSet from dlr_vobc_fault where loggedAt >= '{}' and loggedAt < '{}' and vobcid = {}".format(start_date,end_date, vobc_id)
+    query = "SELECT vobcid, faultName, faultCode, loggedAt, velocity, faultCodeSet from dlr_vobc_fault where loggedAt >= '{}' and loggedAt < '{}'".format(start_date,end_date)
+
+    if vobc_id is not None and vobc_id != -1:
+        query += " and vobcid = {}".format(vobc_id)
+    if faultCode is not None and faultCode != 0 and faultCode != -1:
+        query += " and faultCode = {}".format(faultCode)
+
     df = util.run_query(query)
     return df
-
 
 def get_count_trend(fault_code, start_date, end_date, vobcid):
     fault_condition = ''

@@ -38,9 +38,6 @@ class ViewFaultListClass:
 
     def create_fig(self):
         self.update_figure_layout()
-        if (self.vobc_id is None):
-            return 
-
         if (self.fc_df is None or self.fc_df.empty):
             return 
         self.add_vobc_fault_list()
