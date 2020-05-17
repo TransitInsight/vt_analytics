@@ -123,3 +123,17 @@ def test_displayarea_callback():
 def test_displayarea_callback_none():
     ret = vobcView.display_fault_trend(3, '2015-01-01T00:00:00', '2015-04-01T00:00:00', None)
     assert ret is not None    
+
+
+def test_display_figure_fault_list_callback():
+    a_selected_value = {'curveNumber': 12, 'label': 13, 'pointIndex': 3, 'pointNumber': 3, 'value': 13, 'x': 280, 'y': 13}#x is VobcID
+    list1 = [a_selected_value]
+    click_value = {'points': list1}
+
+    points2 = [{'curveNumber': 14, 'pointIndex': None, 'pointNumber': None, 'x': '2015-1-28', 'y': 0}]
+    second_value = {'points':points2}
+
+    ret = vobcView.display_figure_fault_list(3, '2015-01-01T00:00:00', '2015-04-01T00:00:00', click_value, second_value)
+    assert ret is not None
+    assert len(ret.data) == 1
+    assert isinstance(ret.data[0], plotly.graph_objs.Table)

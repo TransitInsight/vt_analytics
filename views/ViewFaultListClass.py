@@ -34,7 +34,7 @@ class ViewFaultListClass:
         self.__read_base_data()
 
     def __read_base_data(self):
-        self.fc_df = vobcfault_m.get_fault_list(self.start_date, self.end_date, self.vobc_id)
+        self.fc_df = vobcfault_m.get_fault_list(self.start_date, self.end_date, self.vobc_id, self.fault_code)
 
     def create_fig(self):
         self.update_figure_layout()

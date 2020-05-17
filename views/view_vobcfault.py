@@ -296,32 +296,38 @@ def update_offset(triggeredItems, data):
 
     return data
 
-# @app.callback(
-#     Output('fig_fault_list', 'figure'),
-#     [
-#         Input('fault-dropdown', 'value'),
-#         Input('my_date_picker', 'start_date'),
-#         Input('my_date_picker', 'end_date') ,
-#         Input('fig_by_fault', 'clickData')
+@app.callback(
+    Output('fig_fault_list', 'figure'),
+    [
+        Input('fault-dropdown', 'value'),
+        Input('my_date_picker', 'start_date'),
+        Input('my_date_picker', 'end_date') ,
+        Input('fig_by_fault', 'clickData'),
+        Input('fig_by_trend', 'clickData')
+    ])
+def display_figure_fault_list_callback(value, start_date, end_date, fault_click_value, trend_click_value):
+    return display_figure_fault_list(value, start_date, end_date, fault_click_value, trend_click_value)
 
-#     ])
-# def display_figure_fault_list_callback(value, start_date, end_date, click_value):
-#     return display_figure_fault_list_callback(value, start_date, end_date, click_value)
+def display_figure_fault_list(value, start_date, end_date, fault_click_value, trend_click_value):    
+    fault_code = value
+    click_fault_code = -1
+    click_vobcid = -1
+    if (fault_click_value != None):
+        click_vobcid = fault_click_value['points'][0]['x']
+        click_fault_code = fault_click_value['points'][0]['curveNumber'] + 1 #click curveNumber is between 0 and 14
+        if (click_fault_code > 15) :
+            click_fault_code -= 15
+        if (fault_code == -1): #if not -1, the dropdown only selected one Fault, so the click must be on the same fault, no need to change
+            fault_code = click_fault_code
 
-# def display_figure_fault_list_callback(value, start_date, end_date, click_value):    
-#     fault_code = value
-#     click_fault_code = -1
-#     click_vobcid = -1
-#     if (click_value != None):
-#         click_vobcid = click_value['points'][0]['x']
-#         click_fault_code = click_value['points'][0]['curveNumber'] + 1 #click curveNumber is between 0 and 14
-#         if (click_fault_code > 15) :
-#             click_fault_code -= 15
-#         if (fault_code == -1): #if not -1, the dropdown only selected one Fault, so the click must be on the same fault, no need to change
-#             fault_code = click_fault_code
+    op_date = None
+    if trend_click_value != None:
+        op_date = trend_click_value['points'][0]['x']
+        start_date = util.str2date1(op_date)
+        end_date = start_date + timedelta(days = 1)
 
-#     f = create_fig_fault_list(fault_code, start_date, end_date, click_vobcid)
-#     return f
+    f = create_fig_fault_list(fault_code, start_date, end_date, click_vobcid)
+    return f
 
 @app.callback(
     Output('fig_by_trend', 'figure'),
