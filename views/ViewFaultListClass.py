@@ -64,10 +64,5 @@ class ViewFaultListClass:
     def get_data(self):
         return self.fc_df.to_dict('rows')
 
-    def update_figure_layout(self):
-        ytitle = "Velocity (VOBC={})".format(self.vobc_id)
-        self.__fig.update_yaxes(title_text=ytitle, showspikes=True)
-        self.__fig.update_layout(height=300, margin=dict(l=20, r=20, t=30, b=20),legend_orientation="h")
-
     def get_fig(self):
         return self.__fig
