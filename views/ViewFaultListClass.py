@@ -42,23 +42,27 @@ class ViewFaultListClass:
 
         if (self.fc_df.empty):
             return
+        # display_fc = self.fc_df[['loggedAt', 'vobcid', 'faultName', 'velocity', 'locationName', 'activePassiveStatus']].copy()
 
-        params = [
-            'Weight', 'Torque', 'Width', 'Height',
-            'Efficiency', 'Power', 'Displacement'
-        ]
         self.__fig = dash_table.DataTable(
             id=self.table_id,
+            page_size=7,
             editable=False,
             columns=(
-                [{'id': 'Model', 'name': 'Model'}] +
-                [{'id': p, 'name': p} for p in params]
+                [
+                    {'id': 'loggedAt', 'name': 'Logged At'},
+                    {'id': 'vobcid', 'name': 'VOBC ID'},
+                    {'id': 'faultName', 'name': 'Fault Name'},
+                    {'id': 'velocity', 'name': 'Velocity'},
+                    {'id': 'locationName', 'name': 'Location Name'},
+                    {'id': 'activePassiveStatus', 'name': 'Is Active'}
+                ] 
             ),
-            data=[
-                dict(Model=i, **{param: 0 for param in params})
-                for i in range(1, 5)
-            ]
+            data=self.get_data()
         )
+
+    def get_data(self):
+        return self.fc_df.to_dict('rows')
 
     def update_figure_layout(self):
         ytitle = "Velocity (VOBC={})".format(self.vobc_id)

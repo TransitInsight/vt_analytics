@@ -155,8 +155,8 @@ def create_layout():
             style={'width':'100%', 'display':'inline-block'}
         )
 
-    fg_div_fault_list = html.Div([create_fig_fault_list('fig_fault_list', -1, filter_start_date, filter_end_date, -1)]
-            #style={'width':'100%', 'display':'inline-block'}
+    fg_div_fault_list = html.Div([create_fig_fault_list('fig_fault_list', -1, filter_start_date, filter_end_date, -1)],
+            style={'width':'97%', 'display':'inline-block'}
         )
 
     fg_div_by_trainmove = html.Div(
@@ -297,7 +297,7 @@ def update_offset(triggeredItems, data):
     return data
 
 @app.callback(
-    Output('fig_fault_list', 'figure'),
+    Output('fig_fault_list', 'data'),
     [
         Input('fault-dropdown', 'value'),
         Input('my_date_picker', 'start_date'),
@@ -326,8 +326,10 @@ def display_figure_fault_list(value, start_date, end_date, fault_click_value, tr
         start_date = util.str2date1(op_date)
         end_date = start_date + timedelta(days = 1)
 
-    f = create_fig_fault_list('fig_fault_list', fault_code, start_date, end_date, click_vobcid)
-    return f
+    c = ViewFaultListClass('fig_fault_list', fault_code, start_date, end_date, click_vobcid)
+    d = c.get_data()
+
+    return d
 
 @app.callback(
     Output('fig_by_trend', 'figure'),

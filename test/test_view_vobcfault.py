@@ -136,5 +136,5 @@ def test_display_figure_fault_list_callback():
 
     ret = vobcView.display_figure_fault_list(3, '2015-01-01T00:00:00', '2015-04-01T00:00:00', click_value, second_value)
     assert ret is not None
-    assert isinstance(ret, dash_table.DataTable)
-    assert len(ret.data) > 1
+    assert isinstance(ret, list)
+    assert len(ret) >= 1
