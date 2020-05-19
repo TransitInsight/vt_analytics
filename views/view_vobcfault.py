@@ -13,6 +13,7 @@ import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output, State
 from datetime import datetime
 from datetime import timedelta
+import dash_table
 
 from app import app
 
@@ -72,8 +73,8 @@ def create_fig_by_vobc(fault_code, start_date, end_date):
     return fig
 
 
-def create_fig_fault_list(fault_code, start_date, end_date, vobc_id):
-    c = ViewFaultListClass(fault_code, start_date, end_date, vobc_id)
+def create_fig_fault_list(table_id, fault_code, start_date, end_date, vobc_id):
+    c = ViewFaultListClass(table_id, fault_code, start_date, end_date, vobc_id)
     c.create_fig()
     return c.get_fig()
 
@@ -154,9 +155,8 @@ def create_layout():
             style={'width':'100%', 'display':'inline-block'}
         )
 
-    fg_div_fault_list = html.Div([
-            dcc.Graph(id='fig_fault_list', figure=create_fig_fault_list(-1, filter_start_date, filter_end_date, -1))], 
-            style={'width':'100%', 'display':'inline-block'}
+    fg_div_fault_list = html.Div([create_fig_fault_list('fig_fault_list', -1, filter_start_date, filter_end_date, -1)]
+            #style={'width':'100%', 'display':'inline-block'}
         )
 
     fg_div_by_trainmove = html.Div(
@@ -326,7 +326,7 @@ def display_figure_fault_list(value, start_date, end_date, fault_click_value, tr
         start_date = util.str2date1(op_date)
         end_date = start_date + timedelta(days = 1)
 
-    f = create_fig_fault_list(fault_code, start_date, end_date, click_vobcid)
+    f = create_fig_fault_list('fig_fault_list', fault_code, start_date, end_date, click_vobcid)
     return f
 
 @app.callback(
@@ -363,13 +363,14 @@ def display_fault_trend(value, start_date, end_date, click_value):
     [
         Input('fig_by_fault', 'clickData'),
         Input('fig_by_trend', 'clickData'),
+        Input('fig_fault_list', 'active_cell'),
         Input('vt_session_store', 'data')
     ]
     )
-def display_figure_trainmove_callback(first_value, second_value, timewindow_value):
-    return display_figure_trainmove(first_value, second_value, timewindow_value)
+def display_figure_trainmove_callback(first_value, second_value, third_value, timewindow_value):
+    return display_figure_trainmove(first_value, second_value,third_value, timewindow_value)
 
-def display_figure_trainmove(first_value, second_value, timewindow_value):
+def display_figure_trainmove(first_value, second_value, third_value, timewindow_value):
     vobc_id = None
     fault_code = None
     if first_value != None:

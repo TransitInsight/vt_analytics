@@ -32,7 +32,7 @@ def get_all_fault():
 
 def get_fault_list(start_date,end_date, vobc_id = None, faultCode = None):
     start_date,end_date = util.date2str2(start_date,end_date)
-    query = "SELECT vobcid, faultName, faultCode, loggedAt, velocity, faultCodeSet from dlr_vobc_fault where loggedAt >= '{}' and loggedAt < '{}'".format(start_date,end_date)
+    query = "SELECT vobcid, faultName, faultCode, loggedAt, velocity, faultCodeSet, activePassiveStatus, locationName from dlr_vobc_fault where loggedAt >= '{}' and loggedAt < '{}'".format(start_date,end_date)
 
     if vobc_id is not None and vobc_id != -1:
         query += " and vobcid = {}".format(vobc_id)

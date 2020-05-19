@@ -14,6 +14,7 @@ import pprint
 import dash_core_components as dcc
 import dash_bootstrap_components as dbc
 import plotly
+import dash_table
 
 import config as cfg
 
@@ -96,7 +97,7 @@ def test_trainmove_offset_callback():
 
 
 def test_traimove_fig_callback_none():
-    ret = vobcView.display_figure_trainmove(None, None, None)
+    ret = vobcView.display_figure_trainmove(None, None, None, None)
     assert ret is not None
 
 def test_traimove_fig_callback():
@@ -109,7 +110,7 @@ def test_traimove_fig_callback():
 
     timewindow_value = {'offset':0}
 
-    ret = vobcView.display_figure_trainmove(first_value, second_value, timewindow_value)
+    ret = vobcView.display_figure_trainmove(first_value, second_value, None, timewindow_value)
     assert ret is not None
 
 
@@ -135,5 +136,5 @@ def test_display_figure_fault_list_callback():
 
     ret = vobcView.display_figure_fault_list(3, '2015-01-01T00:00:00', '2015-04-01T00:00:00', click_value, second_value)
     assert ret is not None
-    assert len(ret.data) == 1
-    assert isinstance(ret.data[0], plotly.graph_objs.Table)
+    assert isinstance(ret, dash_table.DataTable)
+    assert len(ret.data) > 1

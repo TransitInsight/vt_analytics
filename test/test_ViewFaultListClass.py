@@ -9,41 +9,39 @@ from views.ViewFaultListClass import ViewFaultListClass
 import pandas as pd
 from datetime import datetime
 from datetime import timedelta
-import requests
-import json
-import pprint
-import dash_core_components as dcc
-import dash_bootstrap_components as dbc
 import plotly
+import dash_table
 
 import config as cfg
 import pytest
 
 
 def test_ViewFaultListClass_data():
-    c = ViewFaultListClass(3, '2015-1-1 10:12', '2015-1-2 10:12', 248)
+    c = ViewFaultListClass('TestTableID', 3, '2015-1-1 10:12', '2015-1-2 10:12', 248)
 
     assert c.fc_df is not None
     df = c.fc_df
     assert len(df.index) > 0
 
 def test_ViewFaultListClass_fig():
-    c = ViewFaultListClass(3, '2015-1-1 10:12', '2015-1-2 10:12', 248)
+    c = ViewFaultListClass('TestTableID', 3, '2015-1-1 10:12', '2015-1-2 10:12', 248)
     c.create_fig()
     assert c is not None
 
     fig = c.get_fig()
     assert fig is not None
-    assert len(fig.data) == 1
+    assert len(fig.data) > 1
+    assert isinstance(fig, dash_table.DataTable)
 
 def test_ViewFaultListClass_vobc_none():
-    c = ViewFaultListClass(3, '2015-1-1 10:12', '2015-1-2 10:12', None)
-    c.create_fig()
+    c = ViewFaultListClass('TestTableID', 3, '2015-1-1 10:12', '2015-1-2 10:12', None)
     assert c is not None
 
+    c.create_fig()
     fig = c.get_fig()
     assert fig is not None
-    assert len(fig.data) == 1
+    assert len(fig.data) > 1
+    assert isinstance(fig, dash_table.DataTable)
 
 
 

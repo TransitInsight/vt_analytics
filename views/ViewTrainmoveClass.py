@@ -53,13 +53,7 @@ class ViewTrainmoveClass:
 
     def __read_base_data(self):
         self.op_date = util.str2date1(self.op_date)
-        first_fault_time = vobcfault_m.get_first_fault_time(self.op_date, self.fault_code, self.vobc_id)
-
-        if (first_fault_time != None):
-            self.start = first_fault_time - timedelta(minutes=5) + self.offset
-        else:
-            self.start = self.op_date + timedelta(hours=6) + self.offset
-
+        self.start = self.op_date + timedelta(hours=6) + self.offset
         self.end = self.start + timedelta(hours=1)    
 
         self.trainmove_df = trainmove_m.get_trainmove(self.vobc_id, self.start, self.end)
