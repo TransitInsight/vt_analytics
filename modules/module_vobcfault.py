@@ -18,7 +18,7 @@ def get_count_by(fault_code, start_date, end_date):
 
     query = ("SELECT faultName, faultCode, vobcid as VOBCID, count(*) as FaultCount"
              " from dlr_vobc_fault "
-             " where vobcid <= 300 and loggedAt >= '{}' and loggedAt < '{}' {} "
+             " where vobcid <= 300 and faultCodeSet = True and loggedAt >= '{}' and loggedAt < '{}' {} "
              " group by faultName, faultCode, vobcid "
              " LIMIT 10000 ").format( start_date, end_date, fault_condition)
     
@@ -54,7 +54,7 @@ def get_count_trend(fault_code, start_date, end_date, vobcid):
 
     query = ("SELECT faultName, faultCode, loggedDate as LoggedDate, count(*) as FaultCount"
             " from dlr_vobc_fault"
-            " where vobcid <=300 and loggedAt >= '{}' and loggedAt < '{}' {} {}" 
+            " where vobcid <=300 and faultCodeSet = True and loggedAt >= '{}' and loggedAt < '{}' {} {}" 
             " group by faultName, faultCode, loggedDate  LIMIT 5000").format(start_date, end_date, fault_condition, vobc_condition)
     df = util.run_query(query)
     return df
