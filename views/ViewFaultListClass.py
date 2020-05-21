@@ -55,7 +55,8 @@ class ViewFaultListClass:
                     {'id': 'faultName', 'name': 'Fault Name'},
                     {'id': 'velocity', 'name': 'Velocity'},
                     {'id': 'locationName', 'name': 'Location Name'},
-                    {'id': 'activePassiveStatus', 'name': 'Is Active'}
+                    {'id': 'activePassiveStatus', 'name': 'VOBC Active'},
+                    {'id': 'faultCodeSet', 'name': 'Fault Active'}
                 ] 
             ),
             data=self.get_data()

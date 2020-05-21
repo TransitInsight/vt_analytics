@@ -53,7 +53,7 @@ class ViewTrainmoveClass:
 
     def __read_base_data(self):
         self.op_date = util.str2date1(self.op_date)
-        self.start = self.op_date + timedelta(hours=6) + self.offset
+        self.start = self.op_date - timedelta(hours=0.5) + self.offset
         self.end = self.start + timedelta(hours=1)    
 
         self.trainmove_df = trainmove_m.get_trainmove(self.vobc_id, self.start, self.end)

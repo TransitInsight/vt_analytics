@@ -97,7 +97,7 @@ def test_trainmove_offset_callback():
 
 
 def test_traimove_fig_callback_none():
-    ret = vobcView.display_figure_trainmove(None, None, None, None)
+    ret = vobcView.display_figure_trainmove(None, None, None, None, None)
     assert ret is not None
 
 def test_traimove_fig_callback():
@@ -110,7 +110,7 @@ def test_traimove_fig_callback():
 
     timewindow_value = {'offset':0}
 
-    ret = vobcView.display_figure_trainmove(first_value, second_value, None, timewindow_value)
+    ret = vobcView.display_figure_trainmove(first_value, second_value, None, None, timewindow_value)
     assert ret is not None
 
 

@@ -270,9 +270,10 @@ def display_figure_bar(value, start_date, end_date):
                   Input('button_next_page', 'n_clicks'),
                   Input('fig_by_fault', 'clickData'),
                   Input('fig_by_trend', 'clickData'),
+                  Input('fig_fault_list', 'active_cell')
               ],
               [State('vt_session_store', 'data')])
-def update_offset_callback( prev_page, prev, next, next_page, first_value, second_value, data):
+def update_offset_callback( prev_page, prev, next, next_page, first_value, second_value, thrid_value, data):
 
     if any ('button' in item['prop_id'] for item in dash.callback_context.triggered): #not triggerred by button, it must be triggerred by others, reset offset
         return update_offset(dash.callback_context.triggered, data)
@@ -366,13 +367,14 @@ def display_fault_trend(value, start_date, end_date, click_value):
         Input('fig_by_fault', 'clickData'),
         Input('fig_by_trend', 'clickData'),
         Input('fig_fault_list', 'active_cell'),
+        Input('fig_fault_list', 'derived_viewport_data'),
         Input('vt_session_store', 'data')
     ]
     )
-def display_figure_trainmove_callback(first_value, second_value, third_value, timewindow_value):
-    return display_figure_trainmove(first_value, second_value,third_value, timewindow_value)
+def display_figure_trainmove_callback(first_value, second_value, table_active_cell, table_data, timewindow_value):
+    return display_figure_trainmove(first_value, second_value, table_active_cell, table_data, timewindow_value)
 
-def display_figure_trainmove(first_value, second_value, third_value, timewindow_value):
+def display_figure_trainmove(first_value, second_value, table_active_cell, table_data, timewindow_value):
     vobc_id = None
     fault_code = None
     if first_value != None:
@@ -390,6 +392,10 @@ def display_figure_trainmove(first_value, second_value, third_value, timewindow_
         offset = timewindow_value['offset']
 
     delta = timedelta(hours=offset/2)
+
+    if table_data is not None and table_active_cell is not None:
+        op_date = table_data[table_active_cell['row']]['loggedAt']
+
     f = create_fig_by_trainmove(vobc_id, op_date, fault_code, delta)
     return f
     #return 'timewindow_value : ' + json.dumps(timewindow_value, indent=2)
