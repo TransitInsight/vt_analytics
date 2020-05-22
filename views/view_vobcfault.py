@@ -393,7 +393,7 @@ def display_figure_trainmove(first_value, second_value, table_active_cell, table
 
     delta = timedelta(hours=offset/2)
 
-    if table_data is not None and len(table_data) != 0 and table_active_cell is not None:
+    if table_data is not None and len(table_data) != 0 and table_active_cell is not None and len(table_data) > table_active_cell['row']:
         op_date = table_data[table_active_cell['row']]['loggedAt']
 
     f = create_fig_by_trainmove(vobc_id, op_date, fault_code, delta)

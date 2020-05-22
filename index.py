@@ -11,7 +11,7 @@ nav = Navbar()
 
 
 app.layout = html.Div([
-    html.Div([nav]),
+    html.Div([nav]),#, style={'margin-right':'30px'}),
     dcc.Location(id='url', refresh=False),
     html.Div(id='page-content')
 ])
