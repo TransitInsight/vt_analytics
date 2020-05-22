@@ -31,7 +31,7 @@ def Navbar():
                 in_navbar=True,
                 label="Wayside Report",
             ),
-            dbc.NavItem(dbc.NavLink("Who We Are", href="http://www.transitinsight.com")),
+            dbc.NavItem(dbc.NavLink("Who We Are", href="http://www.transitinsight.com", target="_blank")),
         ],
         brand="ViewTrac",
         brand_href="#",

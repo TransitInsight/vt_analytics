@@ -9,7 +9,7 @@ from views import view_vobcfault
 
 nav = Navbar()
 
-
+app.title = "ViewTrac"
 app.layout = html.Div([
     html.Div([nav]),#, style={'margin-right':'30px'}),
     dcc.Location(id='url', refresh=False),

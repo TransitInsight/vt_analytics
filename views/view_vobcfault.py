@@ -136,7 +136,7 @@ def create_layout():
                 start_date=filter_start_date,
                 end_date=filter_end_date
             )
-        ], style={'display':'inline-block', 'font_size': '200%', 'width':'300px'})
+        ], style={'display':'inline-block', 'font_size': '100%', 'width':'300px'})
 
     fault_name_div = html.Div([
             dcc.Dropdown(
@@ -144,7 +144,7 @@ def create_layout():
                 options=vobcfault_m.create_dropdown_options(),
                 value=-1
             )
-        ], style={'display':'inline-block', 'font-size':'120%', 'width': '300px', 'margin-top':'8px'})
+        ], style={'display':'inline-block', 'font-size':'110%', 'width': '300px', 'margin-top':'8px'})
 
     fg_div_by_fault = html.Div([
             dcc.Graph(id='fig_by_fault', figure=create_fig_by_vobc(-1, filter_start_date, filter_end_date))], 
@@ -175,9 +175,9 @@ def create_layout():
             dcc.Store(id='vt_session_store'),
             dbc.Row(
                 [
-                    dbc.Col(html.Div("Date Range : ", style={'margin-top':'12px', 'font-size':'120%'}), width='auto'),
+                    dbc.Col(html.Div("Date Range : ", style={'margin-top':'12px', 'font-size':'110%'}), width='auto'),
                     dbc.Col(date_div, width='auto'),
-                    dbc.Col(html.Div("VOBC Fault : ", style={'margin-top':'12px', 'font-size':'120%'}), width='auto'),
+                    dbc.Col(html.Div("VOBC Fault : ", style={'margin-top':'12px', 'font-size':'110%'}), width='auto'),
                     dbc.Col(fault_name_div, width='auto'),
                 ]
             ),
