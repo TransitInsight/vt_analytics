@@ -20,7 +20,7 @@ app.layout = html.Div([
         [
             #dbc.Col(util.get_logo_img(), style={'height':'35px', 'margin-left':'5px', 'margin-top':'5px', 'vertical-align':"middle"}),
             dbc.Col(html.Img(src=TILOGO), style={'height':'35px', 'margin-left':'5px', 'margin-top':'5px', 'vertical-align':"middle"}),
-            dbc.Col(nav, width = 2)
+            dbc.Col(nav, width = 2, style={'backgroundColor':'red'})
         ],
         justify="between",
         style={'backgroundColor':'lightgrey'}

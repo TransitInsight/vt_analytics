@@ -18,6 +18,9 @@ def Navbar():
 
                 ],
                 label="VOBC Report",
+                style={'backgroundColor':'lightgrey', 'color':'blue'},
+                color="lightgrey",
+                toggle_style={"color": "black"},
             ),
             dbc.DropdownMenu(
                 children=[
@@ -26,10 +29,17 @@ def Navbar():
                     dbc.DropdownMenuItem("Page 3", href="/apps/app3"),
                 ],
                 label="Wayside Report",
+                style={'backgroundColor':'lightgrey', 'color':'blue'},
+                color="lightgrey",
+                toggle_style={"color": "black"},
             ),
         ],
-        color="light",
-        dark=False,
+        style={'backgroundColor':'lightgrey'},
+        color="lightgrey",#if remove this line, above doesn't work
+        #backgroundColor="lightgrey",
+
+
+        #dark=False,
     )
 
     return navbar
