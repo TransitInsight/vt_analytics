@@ -11,6 +11,9 @@ import re
 import random
 import numpy as np
 import os
+import base64
+import dash_html_components as html
+
 
 #%%
 def date2str1(op_date):
@@ -156,3 +159,10 @@ def IsInMemoryTrue(ret):
         return True
     else:
         return ret
+
+
+def get_logo_img():
+    encoded_image=base64.b64encode(open('ti_logo.JPG', 'rb').read())
+    logoImg = html.Img(src='data:image/png;base64,{}'.format(encoded_image))
+
+    return logoImg

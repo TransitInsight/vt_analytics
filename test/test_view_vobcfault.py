@@ -12,11 +12,14 @@ import requests
 import json
 import pprint
 import dash_core_components as dcc
+import dash_html_components as html
 import dash_bootstrap_components as dbc
 import plotly
 import dash_table
+import base64
 
 import config as cfg
+import util
 
 def test_create_fig_by_trend():
     ret = vobcView.create_fig_by_trend(-1, '2014-01-01T00:00:00', '2020-04-25T00:13:26.017995', -1)
@@ -138,3 +141,14 @@ def test_display_figure_fault_list_callback():
     assert ret is not None
     assert isinstance(ret, list)
     assert len(ret) >= 1
+
+def test_load_local_img():
+    encoded_image=base64.b64encode(open('ti_logo.JPG', 'rb').read())
+    img = html.Img(src='data:image/png;base64,{}'.format(encoded_image))
+
+    assert encoded_image is not None
+    assert img is not None
+
+
+    img1 = util.get_logo_img()
+    assert img1 is not None
