@@ -5,7 +5,7 @@ from dash.dependencies import Input, Output
 
 from app import app
 from navbar import Navbar
-from views import view_view2 
+from views import view_scatter 
 from views import view_vobcfault
 import util
 
