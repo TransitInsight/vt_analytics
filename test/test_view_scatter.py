@@ -100,4 +100,5 @@ def test_update_Scatter():
 
 def test_get_faultcount_by_vobcid_loc():
     x = module_vobcfault.get_faultcount_by_vobcid_loc(filter_start_date, filter_end_date)
-    assert len(x.index) == 300 
+    assert util.IsInMemoryTrue(len(x.index) == 300 )
+    assert len(x.index) >= 100 
