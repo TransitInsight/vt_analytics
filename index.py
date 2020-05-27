@@ -5,7 +5,7 @@ from dash.dependencies import Input, Output
 
 from app import app
 from navbar import Navbar
-from views import view_view2 
+from views import view_scatter 
 from views import view_vobcfault
 import util
 import flask
@@ -41,7 +41,7 @@ def display_page(pathname):
     if pathname == '/views/vobcfault_v':
         return view_vobcfault.layout
     elif pathname == '/views/view2':
-        return view_view2.layout
+        return view_scatter.layout
     else:
         return '404: missing app = {}'.format(pathname)
 
