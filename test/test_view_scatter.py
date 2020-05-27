@@ -111,3 +111,9 @@ def test__display_click_data():
     b = vv._display_click_data(click_data,filter_end_date, filter_start_date, 3 )
     c = vv._display_click_data(None,filter_start_date, filter_end_date,  None )
     assert a and b and c is not None
+
+def test_datecheck():
+    start_date,end_date = vv.datecheck(filter_start_date, filter_end_date)
+    start_date1,end_date1 = vv.datecheck(filter_end_date,filter_start_date)
+    assert start_date == start_date1
+    assert end_date == end_date1
