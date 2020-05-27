@@ -8,8 +8,10 @@ from navbar import Navbar
 from views import view_scatter 
 from views import view_vobcfault
 import util
+import flask
 
-TILOGO = "https://transitinsight.com/site_media/images/logo-ti.png"
+#TILOGO = "https://transitinsight.com/site_media/images/logo-ti.png"
+TILOGO = "http://localhost:8050/system_icon.png"
 
 nav = Navbar()
 app.title = "ViewTrac"
@@ -18,8 +20,11 @@ app.layout = html.Div([
     dcc.Location(id='url', refresh=False),
     dbc.Row(
         [
+
+            #https://github.com/plotly/dash/issues/71
+            
             #dbc.Col(util.get_logo_img(), style={'height':'35px', 'margin-left':'5px', 'margin-top':'5px', 'vertical-align':"middle"}),
-            dbc.Col(html.Img(src=TILOGO), style={'height':'35px', 'margin-left':'5px', 'margin-top':'5px', 'vertical-align':"middle"}),
+            dbc.Col(html.Img(src=TILOGO), style={'height':'30px', 'margin-left':'5px', 'margin-top':'3px', 'margin-bottom':'3px', 'vertical-align':"middle"}),
             dbc.Col(nav, width = 2, style={'backgroundColor':'red'})
         ],
         justify="between",
@@ -39,6 +44,10 @@ def display_page(pathname):
         return view_scatter.layout
     else:
         return '404: missing app = {}'.format(pathname)
+
+@app.server.route('/system_icon.png')
+def serve_image_system_icon():
+    return flask.send_from_directory(".", "ti_logo_small.png")
 
 if __name__ == '__main__':
     app.run_server(debug=True)
