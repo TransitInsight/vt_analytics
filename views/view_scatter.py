@@ -1,5 +1,6 @@
 import dash_core_components as dcc
 import dash_html_components as html
+import dash_table
 from dash.dependencies import Input, Output
 from app import app
 
@@ -45,12 +46,18 @@ def gen_scatter_graph_data(df, xfield, yfield, size_scale):
     return data
 
 def _update_Scatter(faultcode_, start_date,end_date):
-    
+    if start_date is None:
+        start_date = filter_start_date
+    if end_date is None:
+        end_date = filter_end_date 
+
+    if start_date > end_date:
+        t = end_date
+        end_date = start_date
+        start_date = t
 
     df = module_vobcfault.get_faultcount_by_vobcid_loc(start_date, end_date, faultcode_)
-    
-    # if df is None:
-    #     pass
+  
 
     data_1 = [gen_scatter_graph_data(df,"locationName", "vobcid", 5000)]          
     data_1
@@ -73,6 +80,19 @@ checkboxdict = module_vobcfault.create_dropdown_options()
 
 def _display_click_data( start_date, end_date, vobcid_, location, faultcode_):
     
+    if start_date is None:
+        start_date = filter_start_date
+    
+    if end_date is None:
+        end_date = filter_end_date
+    
+    if start_date > end_date:
+        t = end_date
+        end_date = start_date
+        start_date = t
+    
+    if faultcode_ is None:
+        faultcode_ = -1
     df = module_vobcfault.get_faultcount_by_vobcid_loc_date(start_date, end_date, vobcid_, faultcode_)
     # if df is None:
     #     pass
@@ -132,21 +152,12 @@ layout = html.Div([
     Input('date-range', 'end_date')])
 
 def display_click_data(clickData, faultcode_ , start_date , end_date ):
-    if start_date is None:
-        start_date = filter_start_date
-    
-    if end_date is None:
-        end_date = filter_end_date
-    
     if clickData is None:
         vobcid_ = 240
         location = 'GRE-DEB'
     else:
         vobcid_= clickData['points'][0]['y']
         location = clickData['points'][0]['x']
-    
-    if faultcode_ is None:
-        faultcode_ = -1
 
     return _display_click_data(start_date, end_date, vobcid_, location, faultcode_ )
 
@@ -156,10 +167,7 @@ def display_click_data(clickData, faultcode_ , start_date , end_date ):
                 Input('date-range', 'start_date'),
                 Input('date-range', 'end_date')])
 def update_Scatter(faultcode_,start_date,end_date):
-    if start_date is None:
-        start_date = filter_start_date
-    if end_date is None:
-        end_date = filter_end_date
+    
     return _update_Scatter(faultcode_,start_date,end_date)
     
 
