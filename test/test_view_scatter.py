@@ -45,11 +45,11 @@ def test_generate_scatter():
     assert isinstance(data, plotly.graph_objs.Scatter)
     assert data is not None       
 
-def test_gen_bar():
-    dft = sort_by_VOBCID_Location(df, 240, 'GRE-DEB')
-    data =  vv.gen_bar_data(dft)
-    assert data is not None
-    assert isinstance(data, plotly.graph_objs.Bar)
+# def test_gen_bar():
+#     dft = sort_by_VOBCID_Location(df, 240, 'GRE-DEB')
+#     data =  vv.gen_bar_data(dft)
+#     assert data is not None
+#     assert isinstance(data, plotly.graph_objs.Bar)
 
 def test_gen_bar_exceptions():
     with pytest.raises(Exception):
