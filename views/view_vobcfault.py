@@ -136,7 +136,7 @@ def create_layout():
                 start_date=filter_start_date,
                 end_date=filter_end_date
             )
-        ], style={'display':'inline-block', 'font_size': '100%', 'width':'300px'})
+        ], style={'display':'inline-block', 'font_size': '100%', 'width':'300px', 'margin-top': '2px'})
 
     fault_name_div = html.Div([
             dcc.Dropdown(
