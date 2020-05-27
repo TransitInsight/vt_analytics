@@ -162,7 +162,10 @@ def IsInMemoryTrue(ret):
 
 
 def get_logo_img():
-    encoded_image=base64.b64encode(open('ti_logo.JPG', 'rb').read())
+    encoded_image=base64.b64encode(open('./ti_logo.png', 'rb').read())
+
+    assert encoded_image is not None, "can't load logo image"
+
     logoImg = html.Img(src='data:image/png;base64,{}'.format(encoded_image))
 
     return logoImg

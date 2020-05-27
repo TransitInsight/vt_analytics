@@ -143,12 +143,11 @@ def test_display_figure_fault_list_callback():
     assert len(ret) >= 1
 
 def test_load_local_img():
-    encoded_image=base64.b64encode(open('ti_logo.JPG', 'rb').read())
+    encoded_image=base64.b64encode(open('ti_logo.png', 'rb').read())
     img = html.Img(src='data:image/png;base64,{}'.format(encoded_image))
 
     assert encoded_image is not None
     assert img is not None
-
 
     img1 = util.get_logo_img()
     assert img1 is not None

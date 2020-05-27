@@ -1,9 +1,6 @@
 import dash_bootstrap_components as dbc
 import dash_html_components as html
 
-TILOGO = "https://transitinsight.com/site_media/images/logo-ti.png"
-#TILOGO = "ti_logo.jpg"
-
 def Navbar():
     navbar = dbc.Navbar(
         [
