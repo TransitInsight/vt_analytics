@@ -136,7 +136,7 @@ layout = html.Div([
                 style={ 'float': 'left', "display":"block", "height" : "65vh",'width': "60vw"},
             ),
             dcc.Graph(id = 'BarGraph', 
-                style={ 'float': 'left', "display":"block", "height" : "33vh",'width': "40vw"},  
+                style={ 'float': 'left', "display":"block", "height" : "33vh",'width': "38vw"},  
             ),
         
 

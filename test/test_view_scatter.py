@@ -90,6 +90,9 @@ filter_end_date = dt(2016, 4, 1)
 def test_update_Scatter():
     x = vv._update_Scatter(3,filter_start_date, filter_end_date)
     assert x is not None
+    a = vv._update_Scatter(3,None, None)
+    b = vv._update_Scatter(3, filter_end_date, filter_start_date)
+    assert a and b is not None
 
 def test_get_faultcount_by_vobcid_loc():
     x = module_vobcfault.get_faultcount_by_vobcid_loc(filter_start_date, filter_end_date, 3)
@@ -103,3 +106,7 @@ def test_get_faultcount_by_vobcid_loc_date():
 def test__display_click_data():
     x = vv._display_click_data(filter_start_date, filter_end_date, 240, 'GRE-DEB', 3 )
     assert x is not None
+    a = vv._display_click_data(None, None, 240, 'GRE-DEB', 3 )
+    b = vv._display_click_data(filter_end_date, filter_start_date, 240, 'GRE-DEB', 3 )
+    c = vv._display_click_data(filter_start_date, filter_end_date, 240, 'GRE-DEB', None )
+    assert a and b and c is not None
