@@ -109,5 +109,5 @@ def test__display_click_data():
     assert x is not None
     a = vv._display_click_data(click_data,None, None, 3 )
     b = vv._display_click_data(click_data,filter_end_date, filter_start_date, 3 )
-    c = vv._display_click_data(click_data,filter_start_date, filter_end_date,  None )
+    c = vv._display_click_data(None,filter_start_date, filter_end_date,  None )
     assert a and b and c is not None
