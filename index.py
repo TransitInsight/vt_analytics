@@ -36,7 +36,7 @@ def display_page(pathname):
     if pathname == '/views/vobcfault_v':
         return view_vobcfault.layout
     elif pathname == '/views/view2':
-        return view_view2.layout
+        return view_scatter.layout
     else:
         return '404: missing app = {}'.format(pathname)
 

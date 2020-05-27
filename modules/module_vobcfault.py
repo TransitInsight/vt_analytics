@@ -99,25 +99,39 @@ def get_first_fault_time(op_date, fault_code, vobc_id):
 
     return dateparser.parse(dt_str)
 
-def get_faultcount_by_vobcid_loc(start_date, end_date):
-    filter_start_date = datetime(2014, 1, 1)
-    filter_end_date = datetime(2020, 4, 1)
-    if start_date is None:
-        start_date = filter_start_date
-    if end_date is None:
-        end_date = filter_end_date
+def get_faultcount_by_vobcid_loc(start_date, end_date,fault_code):
     
     start_date,end_date = util.date2str2(start_date,end_date)
+    faults = ''
+    if (fault_code != -1 ):
+        faults = " and faultCode  = {}".format(fault_code)   
+
+    query = ("SELECT vobcid, locationName, count(vobcid) as FaultCount from dlr_vobc_fault"
+                " where loggedAt >= '{}' and loggedAt < '{}' {} " 
+                " group by vobcid, locationName"
+                " order by FaultCount desc"
+                " LIMIT 300").format(start_date, end_date, faults)
     
-    query = ("SELECT vobcid, locationName, count(vobcid) as FaultCount from dlr_vobc_fault where loggedAt >= '{}' and loggedAt < '{}' group by vobcid, locationName order by FaultCount desc LIMIT 300").format(start_date, end_date)
+    df = util.run_query(query)
+
+    return df
+
+def get_faultcount_by_vobcid_loc_date(start_date, end_date, vobcid, fault_code):
     
+    faults = ''
+    vobcs = ''
+    if (fault_code != -1 ):
+        faults = " and faultCode  = {}".format(fault_code)    
+    if (vobcid != -1 ):
+        vobcs = " and vobcid = {}".format(vobcid)    
+
+    start_date,end_date = util.date2str2(start_date,end_date)
     
-        # ("SELECT vobcid, locationName, count(vobcid) as FaultCount"
-        #     "from dlr_vobc_fault"
-        #     #" where loggedAt >= '{}' and loggedAt < '{}'"
-        #     "group by vobcid, locationName" 
-        #     "order by FaultCount desc" 
-        #     "LIMIT 300")  #.format(start_date, end_date)
+    query = ("SELECT HISTOGRAM(loggedAt, INTERVAL 1 DAY) as date, count(loggedAt) as FaultCount" 
+            " from dlr_vobc_fault" 
+            " where loggedAt >= '{}' and loggedAt < '{}' {} {}" 
+            " GROUP BY date").format(start_date, end_date, vobcs, faults)
+    
     df = util.run_query(query)
 
     return df

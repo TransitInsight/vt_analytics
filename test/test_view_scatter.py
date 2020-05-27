@@ -78,11 +78,6 @@ def test_dict_gen_scatterplot1():
     x = module_vobcfault.create_dropdown_options()
     assert x == dictionary
 
-def test_display_click_data():
-    dft = sort_by_VOBCID_Location(df, 240, 'GRE-DEB')
-    x = vv.b_display_click_data(None, [5], dft.index.min(), dft.index.max(), dft)
-    assert x is not None  
-
 def test_import():
     x = util.run_query("SELECT min(loggedAt), max(loggedAt)  from dlr_train_move ")
     assert x is not None
@@ -90,15 +85,21 @@ def test_import():
 filter_start_date = dt(2015, 1, 1)
 filter_end_date = dt(2016, 4, 1)
 
-def test_display_click_data_bar():
-    x = vv.display_click_data_bar(None, 2,filter_start_date ,filter_end_date )
-    assert x is not None 
+
 
 def test_update_Scatter():
     x = vv._update_Scatter(3,filter_start_date, filter_end_date)
     assert x is not None
 
 def test_get_faultcount_by_vobcid_loc():
-    x = module_vobcfault.get_faultcount_by_vobcid_loc(filter_start_date, filter_end_date)
+    x = module_vobcfault.get_faultcount_by_vobcid_loc(filter_start_date, filter_end_date, 3)
     assert util.IsInMemoryTrue(len(x.index) == 300 )
     assert len(x.index) >= 100 
+
+def test_get_faultcount_by_vobcid_loc_date():
+    x = module_vobcfault.get_faultcount_by_vobcid_loc_date(filter_start_date, filter_end_date, 240, 3)
+    assert len(x.index) >= 10
+
+def test__display_click_data():
+    x = vv._display_click_data(filter_start_date, filter_end_date, 240, 'GRE-DEB', 3 )
+    assert x is not None

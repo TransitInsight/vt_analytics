@@ -19,7 +19,7 @@ from modules import module_vobcfault
 import util as util
 
 filter_start_date = dt(2015, 1, 1)
-filter_end_date = dt(2015, 4, 1)
+filter_end_date = dt(2020, 1, 1)
 
 
 def gen_scatter_graph(df, datax, datay, text_field, bubble_size, size_scale):
@@ -45,10 +45,12 @@ def gen_scatter_graph_data(df, xfield, yfield, size_scale):
     return data
 
 def _update_Scatter(faultcode_, start_date,end_date):
-    df = module_vobcfault.get_faultcount_by_vobcid_loc(start_date, end_date)
     
-    if df is None:
-        pass
+
+    df = module_vobcfault.get_faultcount_by_vobcid_loc(start_date, end_date, faultcode_)
+    
+    # if df is None:
+    #     pass
 
     data_1 = [gen_scatter_graph_data(df,"locationName", "vobcid", 5000)]          
     data_1
@@ -60,27 +62,20 @@ def _update_Scatter(faultcode_, start_date,end_date):
                 clickmode =  'event+select')
             }
 
+
 def gen_bar_data(df):
     datax = df.index.tolist()
     datay = df['FaultCount'].tolist()
     fig = go.Bar(x=datax, y=datay)
     return fig
 
-
 checkboxdict = module_vobcfault.create_dropdown_options()
 
-def b_display_click_data(clickData, faultcode_, start_date, end_date, df):
-    #df1 = order_data.sort_Dates(df, start_date, end_date)
-    #df1 = df[df['Fault Code'].isin(faultcode_)]
-    if clickData is None:
-        vobcid_ = 240
-        location = 'GRE-DEB'
-    else:
-        vobcid_= clickData['points'][0]['y']
-        location = clickData['points'][0]['x']
-
-    if df is None:
-        pass
+def _display_click_data( start_date, end_date, vobcid_, location, faultcode_):
+    
+    df = module_vobcfault.get_faultcount_by_vobcid_loc_date(start_date, end_date, vobcid_, faultcode_)
+    # if df is None:
+    #     pass
 
     data_1 = [gen_bar_data(df)]
 
@@ -97,81 +92,74 @@ app.layout = html.Div([
 
 ])
 layout = html.Div([
-    html.Div([  
+
+        html.Div([
         dcc.DatePickerRange(
             id='date-range',
             min_date_allowed=filter_start_date,
             max_date_allowed=filter_end_date,
             initial_visible_month=filter_start_date,
             end_date=filter_end_date,
-        )], className = "six columns"),
-        
-        html.Div([
-            dcc.Graph(id = 'BarGraph', 
-                #style={ 'float': 'left', "display":"block", "height" : "35vh",'width': "75vw"},
-                
-            ),
-        ], className = "six columns"),
-
-    html.Div(id='app-2-display-value'),
-      html.Div([    
-        html.Div([
-            dcc.Graph(id = 'Scatterplot', 
-                style={ 'float': 'left', "display":"block", "height" : "60vh",'width': "75vw"},
-            
-            ),
-        ], className = "six columns"),
-
-        html.Div([
-            html.Br(),
-            html.Br(),
-            html.Br(),
-            html.Br(),
-            html.Br(),
-            html.Br(),
-            dcc.Checklist(
-                id = 'Checklist',
+            style={ 'float': 'left', "display":"block", "height" : "5vh",'width': "25vw"}
+        ),
+        dcc.Dropdown(
+                id = 'fault_code',
                 options= checkboxdict,
-                value=  [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15],
-                style={'float': 'right', "height" : "40vh",'width': "20vw"}, 
-                labelStyle={'display': 'block'}
+                value = -1,
+                style={ 'float': 'right', "display":"block", "height" : "5vh",'width': "50vw"},
             )
-        ], className = "six columns")
-
+        ], ),
+        
+      html.Div([    
+        
+            dcc.Graph(id = 'Scatterplot', 
+                style={ 'float': 'left', "display":"block", "height" : "65vh",'width': "60vw"},
+            ),
+            dcc.Graph(id = 'BarGraph', 
+                style={ 'float': 'left', "display":"block", "height" : "33vh",'width': "40vw"},  
+            ),
         
 
-
-    ],className="row"),
+    ])
 ])
 
-def display_click_data_bar(clickData, faultcode_, start_date, end_date):
-    df = module_vobcfault.get_count_by(faultcode_, start_date, end_date)
-    return b_display_click_data(clickData, faultcode_, start_date, end_date, df)
- 
-
-@app.callback(
-    Output('app-2-display-value', 'children'),
-    [Input('app-2-dropdown', 'value')])
-def display_value(clicked_date):
-    return 'You have selected in app2 "{}"'.format(clicked_date)
 
 @app.callback(
     Output('BarGraph', 'figure'),[
     Input('Scatterplot', 'clickData'),
-    Input('Checklist', 'value'),
+    Input('fault_code', 'value'),
     Input('date-range', 'start_date'),
     Input('date-range', 'end_date')])
-def display_click_data(clickData, faultcode_ = 3, start_date = filter_start_date, end_date = filter_end_date ):
-    # df = module_vobcfault.get_count_by(faultcode_, start_date, end_date)
-    # return b_display_click_data(clickData, faultcode_, start_date, end_date, df)
-    return display_click_data_bar(clickData, faultcode_, start_date, end_date)
+
+def display_click_data(clickData, faultcode_ , start_date , end_date ):
+    if start_date is None:
+        start_date = filter_start_date
+    
+    if end_date is None:
+        end_date = filter_end_date
+    
+    if clickData is None:
+        vobcid_ = 240
+        location = 'GRE-DEB'
+    else:
+        vobcid_= clickData['points'][0]['y']
+        location = clickData['points'][0]['x']
+    
+    if faultcode_ is None:
+        faultcode_ = -1
+
+    return _display_click_data(start_date, end_date, vobcid_, location, faultcode_ )
 
 
 @app.callback(Output('Scatterplot', 'figure'),
-                [Input('Checklist', 'value'),
+                [Input('fault_code', 'value'),
                 Input('date-range', 'start_date'),
                 Input('date-range', 'end_date')])
-def update_Scatter(faultcode_ = 3,start_date = filter_start_date ,end_date = filter_end_date):
+def update_Scatter(faultcode_,start_date,end_date):
+    if start_date is None:
+        start_date = filter_start_date
+    if end_date is None:
+        end_date = filter_end_date
     return _update_Scatter(faultcode_,start_date,end_date)
     
 
