@@ -103,10 +103,11 @@ def test_get_faultcount_by_vobcid_loc_date():
     x = module_vobcfault.get_faultcount_by_vobcid_loc_date(filter_start_date, filter_end_date, 240, 3)
     assert len(x.index) >= 10
 
+click_data = {'points':[{'curveNumber': 0, 'marker.color': 27, 'marker.size': 1310.6796116504854, 'pointIndex': 69, 'pointNumber': 69, 'text': 27, 'x': 'CAW', 'y': 158}]}
 def test__display_click_data():
-    x = vv._display_click_data(filter_start_date, filter_end_date, 240, 'GRE-DEB', 3 )
+    x = vv._display_click_data(click_data,filter_start_date, filter_end_date, 3 )
     assert x is not None
-    a = vv._display_click_data(None, None, 240, 'GRE-DEB', 3 )
-    b = vv._display_click_data(filter_end_date, filter_start_date, 240, 'GRE-DEB', 3 )
-    c = vv._display_click_data(filter_start_date, filter_end_date, 240, 'GRE-DEB', None )
+    a = vv._display_click_data(click_data,None, None, 3 )
+    b = vv._display_click_data(click_data,filter_end_date, filter_start_date, 3 )
+    c = vv._display_click_data(click_data,filter_start_date, filter_end_date,  None )
     assert a and b and c is not None

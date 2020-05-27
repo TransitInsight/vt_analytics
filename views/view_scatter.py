@@ -19,9 +19,10 @@ import re
 from modules import module_vobcfault
 import util as util
 
+
 filter_start_date = dt(2015, 1, 1)
 filter_end_date = dt(2020, 1, 1)
-
+filter_start_date, filter_end_date  = util.date2str2(filter_start_date, filter_end_date )
 
 def gen_scatter_graph(df, datax, datay, text_field, bubble_size, size_scale):
     data = go.Scatter(x = datax, 
@@ -78,8 +79,15 @@ def gen_bar_data(df):
 
 checkboxdict = module_vobcfault.create_dropdown_options()
 
-def _display_click_data( start_date, end_date, vobcid_, location, faultcode_):
-    
+def _display_click_data(clickData, start_date, end_date, faultcode_):
+    if clickData is None:
+        vobcid_ = 240
+        location = 'GRE-DEB'
+    else:
+        vobcid_= clickData['points'][0]['y']
+        location = clickData['points'][0]['x']
+
+
     if start_date is None:
         start_date = filter_start_date
     
@@ -152,14 +160,9 @@ layout = html.Div([
     Input('date-range', 'end_date')])
 
 def display_click_data(clickData, faultcode_ , start_date , end_date ):
-    if clickData is None:
-        vobcid_ = 240
-        location = 'GRE-DEB'
-    else:
-        vobcid_= clickData['points'][0]['y']
-        location = clickData['points'][0]['x']
 
-    return _display_click_data(start_date, end_date, vobcid_, location, faultcode_ )
+
+    return _display_click_data(clickData, start_date, end_date, faultcode_ )
 
 
 @app.callback(Output('Scatterplot', 'figure'),
