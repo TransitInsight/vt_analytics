@@ -229,44 +229,44 @@ def display_figure_fault_list(value, start_date, end_date, fault_click_value, tr
 
     return d
 
-@app.callback(
-    Output('fig_by_trainmove', 'figure'),
-    #Output('clickoutput_bar', 'children'),
-    [
-        Input('fig_by_fault', 'clickData'),
-        Input('fig_by_trend', 'clickData'),
-        Input('fig_fault_list', 'active_cell'),
-        Input('fig_fault_list', 'derived_viewport_data'),
-        Input('vt_session_store', 'data')
-    ]
-    )
-def display_figure_trainmove_callback(first_value, second_value, table_active_cell, table_data, timewindow_value):
-    return display_figure_trainmove(first_value, second_value, table_active_cell, table_data, timewindow_value)
+# @app.callback(
+#     Output('fig_by_trainmove', 'figure'),
+#     #Output('clickoutput_bar', 'children'),
+#     [
+#         Input('fig_by_fault', 'clickData'),
+#         Input('fig_by_trend', 'clickData'),
+#         Input('fig_fault_list', 'active_cell'),
+#         Input('fig_fault_list', 'derived_viewport_data'),
+#         Input('vt_session_store', 'data')
+#     ]
+#     )
+# def display_figure_trainmove_callback(first_value, second_value, table_active_cell, table_data, timewindow_value):
+#     return display_figure_trainmove(first_value, second_value, table_active_cell, table_data, timewindow_value)
 
-def display_figure_trainmove(first_value, second_value, table_active_cell, table_data, timewindow_value):
-    vobc_id = None
-    fault_code = None
-    if first_value != None:
-        vobc_id = first_value['points'][0]['x']
-        fault_code = first_value['points'][0]['curveNumber'] + 1 #click curveNumber is between 0 and 14
-        if (fault_code > 15) :
-            fault_code -= 15
+# def display_figure_trainmove(first_value, second_value, table_active_cell, table_data, timewindow_value):
+#     vobc_id = None
+#     fault_code = None
+#     if first_value != None:
+#         vobc_id = first_value['points'][0]['x']
+#         fault_code = first_value['points'][0]['curveNumber'] + 1 #click curveNumber is between 0 and 14
+#         if (fault_code > 15) :
+#             fault_code -= 15
 
-    op_date = None
-    if second_value != None:
-        op_date = second_value['points'][0]['x']
+#     op_date = None
+#     if second_value != None:
+#         op_date = second_value['points'][0]['x']
 
-    offset = 0
-    if timewindow_value != None:
-        offset = timewindow_value['offset']
+#     offset = 0
+#     if timewindow_value != None:
+#         offset = timewindow_value['offset']
 
-    delta = timedelta(hours=offset/2)
+#     delta = timedelta(hours=offset/2)
 
-    if table_data is not None and len(table_data) != 0 and table_active_cell is not None and len(table_data) > table_active_cell['row']:
-        op_date = table_data[table_active_cell['row']]['loggedAt']
+#     if table_data is not None and len(table_data) != 0 and table_active_cell is not None and len(table_data) > table_active_cell['row']:
+#         op_date = table_data[table_active_cell['row']]['loggedAt']
 
-    f = create_fig_by_trainmove(vobc_id, op_date, fault_code, delta)
-    return f
+#     f = create_fig_by_trainmove(vobc_id, op_date, fault_code, delta)
+#     return f
 
 if __name__ == "__main__":
     app.run_server()
