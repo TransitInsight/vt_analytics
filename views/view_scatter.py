@@ -1,7 +1,7 @@
 import dash_core_components as dcc
 import dash_html_components as html
-import dash_table
-from dash.dependencies import Input, Output
+import dash_bootstrap_components as dbc
+from dash.dependencies import Input, Output, State
 from app import app
 
 import math
@@ -126,12 +126,17 @@ def create_fig_fault_list(table_id, fault_code, start_date, end_date, vobc_id):
     c.create_fig()
     return c.get_fig()
 
+def create_fig_by_trainmove(vobc_id, op_date, fault_code, offset=0):
+    c = ViewTrainmoveClass(vobc_id, op_date, fault_code, offset)
+    c.create_fig()
+    return c.get_fig()
+
 app.layout = html.Div([
 
 ])
 layout = html.Div([
 
-        html.Div([
+    html.Div([
         dcc.DatePickerRange(
             id='date-range',
             min_date_allowed=filter_start_date,
@@ -148,7 +153,7 @@ layout = html.Div([
             )
         ], ),
         
-      html.Div([    
+    html.Div([    
         
             dcc.Graph(id = 'Scatterplot',  
                 style={ 'float': 'left', "display":"block", "height" : "65vh",'width': "60vw"},
@@ -163,10 +168,25 @@ layout = html.Div([
                  
             # )
             html.Div([create_fig_fault_list('fig_list_dates', -1, filter_start_date, filter_end_date, -1)],
-            style={ 'float': 'left', "display":"block", "height" : "33vh",'width': "38vw"}
-        )
+            style={ 'float': 'left', "display":"block", "height" : "33vh",'width': "38vw"} 
+            )
+            ]),
+
+    html.Div([
+                dcc.Graph(id='fig_by_trainmove_vs', figure=create_fig_by_trainmove(112, '2015-7-3 10:51', 3),
+                style={ 'float': 'left', "display":"block", "height" : "30vh",'width': "98vw"} 
+                 ),
+                html.Button('<<', id='vs_button_prev_page'),
+                html.Button('<', id='vs_button_prev'),
+                html.Button('>', id='vs_button_next'),
+                html.Button('>>', id='vs_button_next_page')
+                
+            ],style={'width':'100%', 'display':'inline-block'}, 
+        ),
+
+    dcc.Store(id='vs_session_store')
+           
              
-      ])
         
 
     ])
@@ -207,6 +227,7 @@ def display_figure_fault_list_callback(faultcode_, start_date, end_date, fault_c
     return display_figure_fault_list(faultcode_, start_date, end_date, fault_click_value, trend_click_value)
 
 def display_figure_fault_list(value, start_date, end_date, fault_click_value, trend_click_value):    
+
     fault_code = value
     click_fault_code = -1
     click_vobcid = -1
@@ -229,45 +250,79 @@ def display_figure_fault_list(value, start_date, end_date, fault_click_value, tr
 
     return d
 
-# @app.callback(
-#     Output('fig_by_trainmove', 'figure'),
-#     #Output('clickoutput_bar', 'children'),
-#     [
-#         Input('fig_by_fault', 'clickData'),
-#         Input('fig_by_trend', 'clickData'),
-#         Input('fig_fault_list', 'active_cell'),
-#         Input('fig_fault_list', 'derived_viewport_data'),
-#         Input('vt_session_store', 'data')
-#     ]
-#     )
-# def display_figure_trainmove_callback(first_value, second_value, table_active_cell, table_data, timewindow_value):
-#     return display_figure_trainmove(first_value, second_value, table_active_cell, table_data, timewindow_value)
+@app.callback(Output('vs_session_store', 'data'),
+              [
+                  Input('vs_button_prev_page', 'n_clicks'),
+                  Input('vs_button_prev', 'n_clicks'),
+                  Input('vs_button_next', 'n_clicks'),
+                  Input('vs_button_next_page', 'n_clicks'),
+                  Input('Scatterplot', 'clickData'),
+                  Input('BarGraph', 'clickData'),
+                  Input('fig_list_dates', 'active_cell')
+              ],
+              [State('vs_session_store', 'data')])
+def update_offset_callback( prev_page, prev, next, next_page, first_value, second_value, thrid_value, data):
 
-# def display_figure_trainmove(first_value, second_value, table_active_cell, table_data, timewindow_value):
-#     vobc_id = None
-#     fault_code = None
-#     if first_value != None:
-#         vobc_id = first_value['points'][0]['x']
-#         fault_code = first_value['points'][0]['curveNumber'] + 1 #click curveNumber is between 0 and 14
-#         if (fault_code > 15) :
-#             fault_code -= 15
+    if any ('button' in item['prop_id'] for item in dash.callback_context.triggered): #not triggerred by button, it must be triggerred by others, reset offset
+        return update_offset(dash.callback_context.triggered, data)
+    else:
+        return {'offset': 0}
 
-#     op_date = None
-#     if second_value != None:
-#         op_date = second_value['points'][0]['x']
+def update_offset(triggeredItems, data):    
+    data = data or {'offset': 0}
+    offset = 0
 
-#     offset = 0
-#     if timewindow_value != None:
-#         offset = timewindow_value['offset']
+    if any ('vs_button_prev_page.n_clicks' == item['prop_id'] for item in triggeredItems):
+        offset = -2
+    elif any ('vs_button_next_page.n_clicks' == item['prop_id'] for item in triggeredItems):
+        offset = 2
+    elif any ('vs_button_prev.n_clicks' == item['prop_id'] for item in triggeredItems):
+        offset = -1
+    elif any ('vs_button_next.n_clicks' == item['prop_id'] for item in triggeredItems):
+        offset = 1
 
-#     delta = timedelta(hours=offset/2)
+    data['offset'] = data['offset'] + offset #-prev_page * 2 - prev + next + 2*next_page
 
-#     if table_data is not None and len(table_data) != 0 and table_active_cell is not None and len(table_data) > table_active_cell['row']:
-#         op_date = table_data[table_active_cell['row']]['loggedAt']
+    return data
 
-#     f = create_fig_by_trainmove(vobc_id, op_date, fault_code, delta)
-#     return f
+@app.callback(
+    Output('fig_by_trainmove_vs', 'figure'),
+    #Output('clickoutput_bar', 'children'),
+    [
+        Input('Scatterplot', 'clickData'),
+        Input('BarGraph', 'clickData'),
+        Input('fig_list_dates', 'active_cell'),
+        Input('fig_list_dates', 'derived_viewport_data'),
+        Input('vs_session_store', 'data')
+    ]
+    )
+def display_figure_trainmove_callback(first_value, second_value, table_active_cell, table_data, timewindow_value):
+    return display_figure_trainmove(first_value, second_value, table_active_cell, table_data, timewindow_value)
 
+def display_figure_trainmove(first_value, second_value, table_active_cell, table_data, timewindow_value):
+    vobc_id = None
+    fault_code = None
+    if first_value != None:
+        vobc_id = first_value['points'][0]['y']
+        fault_code = first_value['points'][0]['curveNumber'] + 1 #click curveNumber is between 0 and 14
+        if (fault_code > 15) :
+            fault_code -= 15
+
+    op_date = None
+    if second_value != None:
+        op_date = second_value['points'][0]['x']
+
+    offset = 0
+    if timewindow_value != None:
+        offset = timewindow_value['offset']
+
+    delta = timedelta(hours=offset/2)
+
+    if table_data is not None and len(table_data) != 0 and table_active_cell is not None and len(table_data) > table_active_cell['row']:
+        op_date = table_data[table_active_cell['row']]['loggedAt']
+
+    f = create_fig_by_trainmove(vobc_id, op_date, fault_code, delta)
+    return f
 if __name__ == "__main__":
     app.run_server()
   
