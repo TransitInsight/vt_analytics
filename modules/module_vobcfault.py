@@ -30,7 +30,7 @@ def get_all_fault():
     df = util.run_query(query)
     return df
 
-def get_fault_list(start_date,end_date, vobc_id = None, faultCode = None):
+def get_fault_list(start_date,end_date, vobc_id = None, faultCode = None, location = None):
     start_date,end_date = util.date2str2(start_date,end_date)
     query = "SELECT vobcid, faultName, faultCode, loggedAt, velocity, faultCodeSet, activePassiveStatus, locationName from dlr_vobc_fault where loggedAt >= '{}' and loggedAt < '{}'".format(start_date,end_date)
 
@@ -38,6 +38,9 @@ def get_fault_list(start_date,end_date, vobc_id = None, faultCode = None):
         query += " and vobcid = {}".format(vobc_id)
     if faultCode is not None and faultCode != 0 and faultCode != -1:
         query += " and faultCode = {}".format(faultCode)
+
+    if (location is not None ):
+        query += " and locationName = '{}'".format(location)
 
     df = util.run_query(query)
     return df
@@ -107,7 +110,7 @@ def get_faultcount_by_vobcid_loc(start_date, end_date,fault_code):
         faults = " and faultCode  = {}".format(fault_code)   
 
     query = ("SELECT vobcid, locationName, count(vobcid) as FaultCount from dlr_vobc_fault"
-                " where loggedAt >= '{}' and loggedAt < '{}' {} " 
+                " where loggedAt >= '{}' and loggedAt < '{}' and faultCodeSet = true {} " 
                 " group by vobcid, locationName"
                 " order by FaultCount desc"
                 " LIMIT 300").format(start_date, end_date, faults)
@@ -116,21 +119,25 @@ def get_faultcount_by_vobcid_loc(start_date, end_date,fault_code):
 
     return df
 
-def get_faultcount_by_vobcid_loc_date(start_date, end_date, vobcid, fault_code):
+def get_faultcount_by_vobcid_loc_date(start_date, end_date, vobcid, fault_code, location):
     
     faults = ''
     vobcs = ''
+    loc = ''
     if (fault_code != -1 ):
         faults = " and faultCode  = {}".format(fault_code)    
     if (vobcid != -1 ):
         vobcs = " and vobcid = {}".format(vobcid)    
+    if (location is not None ):
+        loc = " and locationName = '{}'".format(location)    
+
 
     start_date,end_date = util.date2str2(start_date,end_date)
     
     query = ("SELECT HISTOGRAM(loggedAt, INTERVAL 1 DAY) as date, count(loggedAt) as FaultCount" 
             " from dlr_vobc_fault" 
-            " where loggedAt >= '{}' and loggedAt < '{}' {} {}" 
-            " GROUP BY date").format(start_date, end_date, vobcs, faults)
+            " where loggedAt >= '{}' and loggedAt < '{}' and faultCodeSet = true  {} {} {}" 
+            " GROUP BY date").format(start_date, end_date, vobcs, faults, loc)
     
     df = util.run_query(query)
 

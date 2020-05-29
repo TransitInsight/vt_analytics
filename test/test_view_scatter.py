@@ -100,7 +100,7 @@ def test_get_faultcount_by_vobcid_loc():
     assert len(x.index) >= 100 
 
 def test_get_faultcount_by_vobcid_loc_date():
-    x = module_vobcfault.get_faultcount_by_vobcid_loc_date(filter_start_date, filter_end_date, 240, 3)
+    x = module_vobcfault.get_faultcount_by_vobcid_loc_date(filter_start_date, filter_end_date, 240, 3, None)
     assert len(x.index) >= 10
 
 click_data = {'points':[{'curveNumber': 0, 'marker.color': 27, 'marker.size': 1310.6796116504854, 'pointIndex': 69, 'pointNumber': 69, 'text': 27, 'x': 'CAW', 'y': 158}]}
@@ -167,7 +167,7 @@ def test_traimove_fig_callback():
     assert ret is not None
 
 def test_display_figure_fault_list_callback():
-    a_selected_value = {'curveNumber': 12, 'label': 13, 'pointIndex': 3, 'pointNumber': 3, 'value': 13, 'y': 280, 'x': 13}#y is VobcID
+    a_selected_value = {'curveNumber': 12, 'label': 13, 'pointIndex': 3, 'pointNumber': 3, 'value': 13, 'y': 280, 'x': None}#y is VobcID
     list1 = [a_selected_value]
     click_value = {'points': list1}
 

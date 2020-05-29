@@ -23,7 +23,7 @@ import util as util
 
 
 filter_start_date = dt(2015, 1, 1)
-filter_end_date = dt(2020, 1, 1)
+filter_end_date = dt(2016, 1, 1)
 filter_start_date, filter_end_date  = util.date2str2(filter_start_date, filter_end_date )
 
 def datecheck(start_date, end_date):
@@ -87,27 +87,51 @@ def create_fig_by_trainmove(vobc_id, op_date, fault_code, offset=0):
     c.create_fig()
     return c.get_fig()
 
+date = dcc.DatePickerRange(
+            id='date-range',
+            min_date_allowed=filter_start_date,
+            max_date_allowed=dt.today() + timedelta(days=1),
+            initial_visible_month=filter_start_date,
+            end_date=filter_end_date,
+            style={ 'display':'inline-block', 'font_size': '100%', 'width':'300px','margin-top':'2px'}
+        )
+fault_dropdown = dcc.Dropdown(
+                id = 'fault_code',
+                options= checkboxdict,
+                value = -1,
+                style={ 'display':'inline-block', 'font-size':'110%', 'width': '300px', 'margin-top':'2px'},
+            )
+
 app.layout = html.Div([
 
 ])
 layout = html.Div([
 
     html.Div([
-        dcc.DatePickerRange(
-            id='date-range',
-            min_date_allowed=filter_start_date,
-            max_date_allowed=filter_end_date,
-            initial_visible_month=filter_start_date,
-            end_date=filter_end_date,
-            style={ 'display':'inline-block', 'font_size': '100%', 'width':'300px', 'margin-top': '2px'}
-        ),
-        dcc.Dropdown(
-                id = 'fault_code',
-                options= checkboxdict,
-                value = -1,
-                style={ 'display':'inline-block', 'font-size':'110%', 'width': '300px', 'margin-top':'8px'},
-            )
-        ], ),
+        # dcc.DatePickerRange(
+        #     id='date-range',
+        #     min_date_allowed=filter_start_date,
+        #     max_date_allowed=dt.today() + timedelta(days=1),
+        #     initial_visible_month=filter_start_date,
+        #     end_date=filter_end_date,
+        #     style={ 'display':'inline-block', 'font_size': '100%', 'width':'300px'}
+        # ),
+        # dcc.Dropdown(
+        #         id = 'fault_code',
+        #         options= checkboxdict,
+        #         value = -1,
+        #         style={ 'display':'inline-block', 'font-size':'110%', 'width': '300px', 'margin-top':'12px'},
+        #     )
+
+        dbc.Row(
+                [
+                    dbc.Col(html.Div("Date Range : ", style={'margin-top':'12px', 'font-size':'110%'}), width='auto'),
+                    dbc.Col(date, width='auto'),
+                    dbc.Col(html.Div("VOBC Fault : ", style={'margin-top':'12px', 'font-size':'110%'}), width='auto'),
+                    dbc.Col(fault_dropdown, width='auto'),
+                ]
+                )
+        ] ),
         
     html.Div([    
         
@@ -165,7 +189,7 @@ def _display_click_data(clickData, start_date, end_date, faultcode_):
     start_date,end_date = datecheck(start_date, end_date)
     faultcode_ = checkfaultcode(faultcode_)
     
-    df = module_vobcfault.get_faultcount_by_vobcid_loc_date(start_date, end_date, vobcid_, faultcode_)
+    df = module_vobcfault.get_faultcount_by_vobcid_loc_date(start_date, end_date, vobcid_, faultcode_, location)
     
     if len(df.index) == 0:
         data_1 = []
@@ -226,23 +250,20 @@ def display_figure_fault_list_callback(faultcode_, start_date, end_date, fault_c
 def display_figure_fault_list(value, start_date, end_date, fault_click_value, trend_click_value):    
 
     fault_code = value
-    click_fault_code = -1
     click_vobcid = -1
+    click_loc = None
     if (fault_click_value != None):
         click_vobcid = fault_click_value['points'][0]['y']
-        click_fault_code = fault_click_value['points'][0]['curveNumber'] + 1 #click curveNumber is between 0 and 14
-        if (click_fault_code > 15) :
-            click_fault_code -= 15
-        if (fault_code == -1): #if not -1, the dropdown only selected one Fault, so the click must be on the same fault, no need to change
-            fault_code = click_fault_code
+        click_loc = fault_click_value['points'][0]['x']
 
+    
     op_date = None
     if trend_click_value != None:
         op_date = trend_click_value['points'][0]['x']
         start_date = util.str2date1(op_date)
         end_date = start_date + timedelta(days = 1)
 
-    c = ViewFaultListClass('fig_list_dates', -1, start_date, end_date, click_vobcid)
+    c = ViewFaultListClass('fig_list_dates', fault_code, start_date, end_date, click_vobcid, click_loc)
     d = c.get_data()
 
     return d
