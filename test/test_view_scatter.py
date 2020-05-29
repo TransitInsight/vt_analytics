@@ -117,3 +117,82 @@ def test_datecheck():
     start_date1,end_date1 = vv.datecheck(filter_end_date,filter_start_date)
     assert start_date == start_date1
     assert end_date == end_date1
+
+
+def test_create_fig_by_trainmove():
+    ret = vv.create_fig_by_trainmove(248, '2015-1-1 10:12', 3)
+    assert ret != None
+    assert len(ret.data) == 6
+    assert isinstance(ret.data[0], plotly.graph_objs.Scatter)
+    assert (ret.data[0].name == 'Actual Velocity')
+    assert isinstance(ret.data[1], plotly.graph_objs.Scatter)
+    assert (ret.data[1].name == 'Max Velocity')
+    assert isinstance(ret.data[2], plotly.graph_objs.Scatter)
+    assert (ret.data[2].name == 'Vobc Fault')
+
+    assert isinstance(ret.data[3], plotly.graph_objs.Scatter)
+    assert (ret.data[3].name == 'Vobc Fault Rectified')
+
+
+
+    assert isinstance(ret.data[4], plotly.graph_objs.Scatter)
+    assert (ret.data[4].name == 'Door Cmd')
+    assert isinstance(ret.data[5], plotly.graph_objs.Scatter)
+    assert (ret.data[5].name == 'Door Status')
+
+
+def test_create_fig_by_trainmove_Vobc_None():
+    ret = vv.create_fig_by_trainmove(None, '2015-1-1 10:12', 3)
+    assert ret != None
+
+def test_create_fig_by_trainmove_Date_None():
+    ret = vv.create_fig_by_trainmove(248, None, 3)
+    assert ret != None
+
+def test_traimove_fig_callback_none():
+    ret = vv.display_figure_trainmove(None, None, None, None, None)
+    assert ret is not None
+
+def test_traimove_fig_callback():
+
+    points1 = [{'curveNumber': 12, 'label': 13, 'pointIndex': 3, 'pointNumber': 3, 'value': 13, 'x': 13, 'y': 13}]
+    first_value = {'points':points1}
+
+    points2 = [{'curveNumber': 14, 'pointIndex': None, 'pointNumber': None, 'x': '2019-11-28', 'y': 0}]
+    second_value = {'points':points2}
+
+    timewindow_value = {'offset':0}
+
+    ret = vv.display_figure_trainmove(first_value, second_value, None, None, timewindow_value)
+    assert ret is not None
+
+def test_display_figure_fault_list_callback():
+    a_selected_value = {'curveNumber': 12, 'label': 13, 'pointIndex': 3, 'pointNumber': 3, 'value': 13, 'y': 280, 'x': 13}#y is VobcID
+    list1 = [a_selected_value]
+    click_value = {'points': list1}
+
+    points2 = [{'curveNumber': 14, 'pointIndex': None, 'pointNumber': None, 'x': '2015-1-28', 'y': 0}]
+    second_value = {'points':points2}
+
+    ret = vv.display_figure_fault_list(3, '2015-01-01T00:00:00', '2015-04-01T00:00:00', click_value, second_value)
+    assert ret is not None
+    assert isinstance(ret, list)
+    assert len(ret) >= 1
+
+def test_trainmove_offset_callback():
+
+    items = [{'prop_id': 'vs_button_next_page.n_clicks'}]
+    data = vv.update_offset( items, None)
+    assert data['offset'] == 2
+
+    items = [{'prop_id': 'vs_button_next.n_clicks'}]
+    data = vv.update_offset( items, None)
+    assert data['offset'] == 1
+
+    items = [{'prop_id': 'vs_button_prev_page.n_clicks'}]
+    data = vv.update_offset( items, None)
+    assert data['offset'] == -2
+
+    items = [{'prop_id': 'vs_button_prev.n_clicks'}]
+    data = vv.update_offset( items, None)
+    assert data['offset'] == -1

@@ -118,12 +118,7 @@ layout = html.Div([
             dcc.Graph(id = 'BarGraph', 
                 style={ 'float': 'right', "display":"block", "height" : "33vh",'width': "38vw"},  
             ),
-            # dcc.Graph(id = 'fig_list_dates',
-            #     style={ 'float': 'left', "display":"block", "height" : "33vh",'width': "38vw"}
-            # ),
-            # dash_table.DataTable(id='fig_list_dates',
-                 
-            # )
+
             html.Div([create_fig_fault_list('fig_list_dates', -1, filter_start_date, filter_end_date, -1)],
             style={ 'float': 'right', "display":"block", "height" : "33vh",'width': "38vw"} 
             )
