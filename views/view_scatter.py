@@ -58,6 +58,7 @@ def gen_scatter_graph(df, datax, datay, text_field, bubble_size, size_scale):
                         )
     return data
 
+
 def gen_scatter_graph_data(df, xfield, yfield, size_scale):
     datax = df[xfield].tolist()
     datay = df[yfield].tolist()
@@ -65,26 +66,6 @@ def gen_scatter_graph_data(df, xfield, yfield, size_scale):
     FaultCount = np.array(FaultCount)
     data = gen_scatter_graph(df, datax, datay, "FaultCount", FaultCount, size_scale)   
     return data
-
-def _update_Scatter(faultcode_, start_date,end_date):
-    start_date,end_date = datecheck(start_date, end_date)
-    faultcode_ = checkfaultcode(faultcode_)
-
-    df = module_vobcfault.get_faultcount_by_vobcid_loc(start_date, end_date, faultcode_)
-    
-    if len(df.index) == 0:
-        data_1 = []
-    else:
-        data_1 = [gen_scatter_graph_data(df,"locationName", "vobcid", 5000)]          
-   
-    return{'data': data_1,                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
-            'layout' : go.Layout(title = "Faults by VOBCID and LOCATION", 
-                xaxis = {'title': 'Location'},
-                yaxis = {'title': 'VOBCID'}, 
-                dragmode = False, 
-                hovermode="closest",
-                clickmode =  'event+select')
-            }
 
 
 def gen_bar_data(df):
@@ -95,31 +76,6 @@ def gen_bar_data(df):
 
 checkboxdict = module_vobcfault.create_dropdown_options()
 
-def _display_click_data(clickData, start_date, end_date, faultcode_):
-    if clickData is None:
-        vobcid_ = 240
-        location = 'GRE-DEB'
-    else:
-        vobcid_= clickData['points'][0]['y']
-        location = clickData['points'][0]['x']
-
-    start_date,end_date = datecheck(start_date, end_date)
-    faultcode_ = checkfaultcode(faultcode_)
-    
-    df = module_vobcfault.get_faultcount_by_vobcid_loc_date(start_date, end_date, vobcid_, faultcode_)
-    
-    if len(df.index) == 0:
-        data_1 = []
-    else:
-        data_1 = [gen_bar_data(df)]
-
-    return{'data': data_1,                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
-            'layout' : go.Layout(title = "Faults by Date VOBCID: {} Location: {}".format(vobcid_, location), 
-                xaxis = {'title': 'Date' },
-                dragmode = False,
-                yaxis = {'title': 'Faultcount'}, 
-                hovermode="closest")
-            }
 
 def create_fig_fault_list(table_id, fault_code, start_date, end_date, vobc_id):
     c = ViewFaultListClass(table_id, fault_code, start_date, end_date, vobc_id)
@@ -143,13 +99,13 @@ layout = html.Div([
             max_date_allowed=filter_end_date,
             initial_visible_month=filter_start_date,
             end_date=filter_end_date,
-            style={ 'float': 'left', "display":"block", 'height': '3vw', 'width': "20vw"}
+            style={ 'display':'inline-block', 'font_size': '100%', 'width':'300px', 'margin-top': '2px'}
         ),
         dcc.Dropdown(
                 id = 'fault_code',
                 options= checkboxdict,
                 value = -1,
-                style={ 'float': 'left', "display":"block",'height': '3vw','width': "50vw"},
+                style={ 'display':'inline-block', 'font-size':'110%', 'width': '300px', 'margin-top':'8px'},
             )
         ], ),
         
@@ -157,9 +113,10 @@ layout = html.Div([
         
             dcc.Graph(id = 'Scatterplot',  
                 style={ 'float': 'left', "display":"block", "height" : "65vh",'width': "60vw"},
+                
             ),
             dcc.Graph(id = 'BarGraph', 
-                style={ 'float': 'left', "display":"block", "height" : "33vh",'width': "38vw"},  
+                style={ 'float': 'right', "display":"block", "height" : "33vh",'width': "38vw"},  
             ),
             # dcc.Graph(id = 'fig_list_dates',
             #     style={ 'float': 'left', "display":"block", "height" : "33vh",'width': "38vw"}
@@ -168,7 +125,7 @@ layout = html.Div([
                  
             # )
             html.Div([create_fig_fault_list('fig_list_dates', -1, filter_start_date, filter_end_date, -1)],
-            style={ 'float': 'left', "display":"block", "height" : "33vh",'width': "38vw"} 
+            style={ 'float': 'right', "display":"block", "height" : "33vh",'width': "38vw"} 
             )
             ]),
 
@@ -202,6 +159,31 @@ layout = html.Div([
 def display_click_data(clickData, faultcode_ , start_date , end_date ):
     return _display_click_data(clickData, start_date, end_date, faultcode_ )
 
+def _display_click_data(clickData, start_date, end_date, faultcode_):
+    if clickData is None:
+        vobcid_ = 240
+        location = 'GRE-DEB'
+    else:
+        vobcid_= clickData['points'][0]['y']
+        location = clickData['points'][0]['x']
+
+    start_date,end_date = datecheck(start_date, end_date)
+    faultcode_ = checkfaultcode(faultcode_)
+    
+    df = module_vobcfault.get_faultcount_by_vobcid_loc_date(start_date, end_date, vobcid_, faultcode_)
+    
+    if len(df.index) == 0:
+        data_1 = []
+    else:
+        data_1 = [gen_bar_data(df)]
+
+    return{'data': data_1,                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
+            'layout' : go.Layout(title = "Faults by Date VOBCID: {} Location: {}".format(vobcid_, location), 
+                xaxis = {'title': 'Date' },
+                dragmode = False,
+                yaxis = {'title': 'Faultcount'}, 
+                hovermode="closest")
+            }
 
 @app.callback(Output('Scatterplot', 'figure'),
                 [Input('fault_code', 'value'),
@@ -210,6 +192,26 @@ def display_click_data(clickData, faultcode_ , start_date , end_date ):
 def update_Scatter(faultcode_,start_date,end_date):
     
     return _update_Scatter(faultcode_,start_date,end_date)
+
+def _update_Scatter(faultcode_, start_date,end_date):
+    start_date,end_date = datecheck(start_date, end_date)
+    faultcode_ = checkfaultcode(faultcode_)
+
+    df = module_vobcfault.get_faultcount_by_vobcid_loc(start_date, end_date, faultcode_)
+    
+    if len(df.index) == 0:
+        data_1 = []
+    else:
+        data_1 = [gen_scatter_graph_data(df,"locationName", "vobcid", 5000)]          
+   
+    return{'data': data_1,                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
+            'layout' : go.Layout(title = "Faults by VOBCID and LOCATION", 
+                xaxis = {'title': 'Location', 'categoryorder' : 'category ascending'},
+                yaxis = {'title': 'VOBCID'}, 
+                dragmode = False, 
+                hovermode="closest",
+                clickmode =  'event+select')
+            }
     
 @app.callback(
     Output('fig_list_dates', 'data'),
