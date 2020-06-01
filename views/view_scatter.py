@@ -149,21 +149,21 @@ layout = html.Div([
     html.Div([    
         
             dcc.Graph(id = 'Scatterplot',  
-                style={ 'float': 'left', "display":"block", "height" : "65vh",'width': "60vw"},
+                style={ 'float': 'left', "display":"block", "height" : "63vh",'width': "63vw"},
                 
             ),
             dcc.Graph(id = 'BarGraph', 
-                style={ 'float': 'right', "display":"block", "height" : "33vh",'width': "38vw"},  
+                style={ 'float': 'right', "display":"block", "height" : "33vh",'width': "33vw"},  
             ),
 
             html.Div([create_fig_fault_list('fig_list_dates', -1, filter_start_date, filter_end_date, -1)],
-            style={ 'float': 'right', "display":"block", "height" : "33vh",'width': "38vw"} 
+            style={ 'float': 'right', "display":"block", "height" : "33vh",'width': "30vw",'margin-right':'100px'} 
             )
             ]),
 
     html.Div([
                 dcc.Graph(id='fig_by_trainmove_vs', figure=create_fig_by_trainmove(112, '2015-7-3 10:51', 3),
-                style={ 'float': 'left', "display":"block", "height" : "30vh",'width': "98vw"} 
+                style={ 'float': 'right', "display":"block", "height" : "30vh",'width': "98vw"} 
                  ),
                 html.Button('<<', id='vs_button_prev_page'),
                 html.Button('<', id='vs_button_prev'),

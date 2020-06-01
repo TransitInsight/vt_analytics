@@ -9,18 +9,27 @@ import dateparser
 
 #%%
 
-def get_count_by(fault_code, start_date, end_date):
+def get_count_by(fault_code, start_date, end_date, velocity = None, apstatus = None):
     fault_condition = ''
+    apstat =''
+    vel = ''
     if (fault_code != -1):
         fault_condition = " and faultCode = {}".format(fault_code)
-
+    if velocity is 0: 
+        vel += " and velocity = 0"
+    if velocity is 1: 
+        vel += " and NOT(velocity = 0)"
+    if apstatus is 1: 
+        apstat += " and activePassiveStatus = true"
+    if apstatus is 0: 
+        apstat += " and activePassiveStatus = false"
     start_date,end_date = util.date2str2(start_date,end_date)
 
     query = ("SELECT faultName, faultCode, vobcid as VOBCID, count(*) as FaultCount"
              " from dlr_vobc_fault "
-             " where vobcid <= 300 and faultCodeSet = True and loggedAt >= '{}' and loggedAt < '{}' {} "
+             " where vobcid <= 300 and faultCodeSet = True and loggedAt >= '{}' and loggedAt < '{}' {} {} {} "
              " group by faultName, faultCode, vobcid "
-             " LIMIT 10000 ").format( start_date, end_date, fault_condition)
+             " LIMIT 10000 ").format( start_date, end_date, fault_condition, vel, apstat)
     
     df = util.run_query(query)
     return df
@@ -30,7 +39,7 @@ def get_all_fault():
     df = util.run_query(query)
     return df
 
-def get_fault_list(start_date,end_date, vobc_id = None, faultCode = None, location = None, velocity_dropdown = None, apstatus = None):
+def get_fault_list(start_date,end_date, vobc_id = None, faultCode = None, location = None, velocity= None, apstatus = None):
     start_date,end_date = util.date2str2(start_date,end_date)
     query = "SELECT vobcid, faultName, faultCode, loggedAt, velocity, faultCodeSet, activePassiveStatus, locationName from dlr_vobc_fault where loggedAt >= '{}' and loggedAt < '{}'".format(start_date,end_date)
 
@@ -40,9 +49,9 @@ def get_fault_list(start_date,end_date, vobc_id = None, faultCode = None, locati
         query += " and faultCode = {}".format(faultCode)
     if (location is not None ):
         query += " and locationName = '{}'".format(location)
-    if velocity_dropdown is 0: 
+    if velocity is 0: 
         query += " and velocity = 0"
-    if velocity_dropdown is 1: 
+    if velocity is 1: 
         query += " and NOT(velocity = 0)"
     if apstatus is 1: 
         query += " and activePassiveStatus = true"
@@ -53,20 +62,28 @@ def get_fault_list(start_date,end_date, vobc_id = None, faultCode = None, locati
     df = util.run_query(query)
     return df
 
-def get_count_trend(fault_code, start_date, end_date, vobcid):
+def get_count_trend(fault_code, start_date, end_date, vobcid, velocity = None, apstatus = None):
     fault_condition = ''
     vobc_condition = ''
+    veld = ''
+    apstat = ''
     if (fault_code != -1 ):
         fault_condition = " and faultCode  = {}".format(fault_code)    
     if (vobcid != -1 ):
-        vobc_condition = " and vobcid = {}".format(vobcid)    
-
-    start_date,end_date = util.date2str2(start_date,end_date)
+        vobc_condition = " and vobcid = {}".format(vobcid)     
+    if velocity is 0: 
+        veld = " and velocity = 0"
+    if velocity is 1: 
+        veld = " and NOT(velocity = 0)"
+    if apstatus is 1: 
+        apstat = " and activePassiveStatus = true"
+    if apstatus is 0: 
+        apstat = " and activePassiveStatus = false"
 
     query = ("SELECT faultName, faultCode, loggedDate as LoggedDate, count(*) as FaultCount"
             " from dlr_vobc_fault"
-            " where vobcid <=300 and faultCodeSet = True and loggedAt >= '{}' and loggedAt < '{}' {} {}" 
-            " group by faultName, faultCode, loggedDate  LIMIT 5000").format(start_date, end_date, fault_condition, vobc_condition)
+            " where vobcid <=300 and faultCodeSet = True and loggedAt >= '{}' and loggedAt < '{}' {} {} {} {}" 
+            " group by faultName, faultCode, loggedDate  LIMIT 5000").format(start_date, end_date, fault_condition, vobc_condition, veld, apstat)
     df = util.run_query(query)
     return df
 
