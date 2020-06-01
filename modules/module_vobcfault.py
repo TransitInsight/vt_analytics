@@ -30,7 +30,7 @@ def get_all_fault():
     df = util.run_query(query)
     return df
 
-def get_fault_list(start_date,end_date, vobc_id = None, faultCode = None, location = None, velocity_dropdown = None):
+def get_fault_list(start_date,end_date, vobc_id = None, faultCode = None, location = None, velocity_dropdown = None, apstatus = None):
     start_date,end_date = util.date2str2(start_date,end_date)
     query = "SELECT vobcid, faultName, faultCode, loggedAt, velocity, faultCodeSet, activePassiveStatus, locationName from dlr_vobc_fault where loggedAt >= '{}' and loggedAt < '{}'".format(start_date,end_date)
 
@@ -44,6 +44,10 @@ def get_fault_list(start_date,end_date, vobc_id = None, faultCode = None, locati
         query += " and velocity = 0"
     if velocity_dropdown is 1: 
         query += " and NOT(velocity = 0)"
+    if apstatus is 1: 
+        query += " and activePassiveStatus = true"
+    if apstatus is 0: 
+        query += " and activePassiveStatus = false"
 
 
     df = util.run_query(query)
@@ -106,35 +110,40 @@ def get_first_fault_time(op_date, fault_code, vobc_id):
 
     return dateparser.parse(dt_str)
 
-def get_faultcount_by_vobcid_loc(start_date, end_date,fault_code, velocity_dropdown = None):
+def get_faultcount_by_vobcid_loc(start_date, end_date,fault_code, velocity_dropdown = None, apstatus = None ):
     
     start_date,end_date = util.date2str2(start_date,end_date)
     faults = ''
     veld = ''
+    apstat = ''
     if (fault_code != -1 ):
         faults = " and faultCode  = {}".format(fault_code)   
     if velocity_dropdown is 0: 
         veld = " and velocity = 0"
     if velocity_dropdown is 1: 
         veld = " and NOT(velocity = 0)"
-
+    if apstatus is 1: 
+        apstat = " and activePassiveStatus = true"
+    if apstatus is 0: 
+        apstat = " and activePassiveStatus = false"
 
     query = ("SELECT vobcid, locationName, count(vobcid) as FaultCount from dlr_vobc_fault"
-                " where loggedAt >= '{}' and loggedAt < '{}' and faultCodeSet = true {} {}" 
+                " where loggedAt >= '{}' and loggedAt < '{}' and faultCodeSet = true {} {} {}" 
                 " group by vobcid, locationName"
                 " order by FaultCount desc"
-                " LIMIT 300").format(start_date, end_date, faults, veld)
+                " LIMIT 300").format(start_date, end_date, faults, veld, apstat)
     
     df = util.run_query(query)
 
     return df
 
-def get_faultcount_by_vobcid_loc_date(start_date, end_date, vobcid, fault_code, location, velocity_dropdown = None):
+def get_faultcount_by_vobcid_loc_date(start_date, end_date, vobcid, fault_code, location, velocity_dropdown = None, apstatus = None):
     
     faults = ''
     vobcs = ''
     loc = ''
     veld = ''
+    apstat = ''
     if (fault_code != -1 ):
         faults = " and faultCode  = {}".format(fault_code)    
     if (vobcid != -1 ):
@@ -145,13 +154,17 @@ def get_faultcount_by_vobcid_loc_date(start_date, end_date, vobcid, fault_code, 
         veld = " and velocity = 0"
     if velocity_dropdown is 1: 
         veld = " and NOT(velocity = 0)"
+    if apstatus is 1: 
+        apstat = " and activePassiveStatus = true"
+    if apstatus is 0: 
+        apstat = " and activePassiveStatus = false"
 
     start_date,end_date = util.date2str2(start_date,end_date)
     
     query = ("SELECT HISTOGRAM(loggedAt, INTERVAL 1 DAY) as date, count(loggedAt) as FaultCount" 
             " from dlr_vobc_fault" 
-            " where loggedAt >= '{}' and loggedAt < '{}' and faultCodeSet = true  {} {} {} {}" 
-            " GROUP BY date").format(start_date, end_date, vobcs, faults, loc, veld)
+            " where loggedAt >= '{}' and loggedAt < '{}' and faultCodeSet = true  {} {} {} {} {}" 
+            " GROUP BY date").format(start_date, end_date, vobcs, faults, loc, veld, apstat)
     
     df = util.run_query(query)
 
