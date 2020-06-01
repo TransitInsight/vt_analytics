@@ -96,11 +96,23 @@ date = dcc.DatePickerRange(
             style={ 'display':'inline-block', 'font_size': '100%', 'width':'300px','margin-top':'2px'}
         )
 fault_dropdown = dcc.Dropdown(
-                id = 'fault_code',
+                id = 'fault_code_dropdown',
                 options= checkboxdict,
                 value = -1,
                 style={ 'display':'inline-block', 'font-size':'110%', 'width': '300px', 'margin-top':'2px'},
             )
+
+velocity_dropdown = dcc.Dropdown(
+        id='velocity_dropdown',
+        options=[
+            {'label': 'Zero_Velocity', 'value': 0},
+            {'label': 'nonZero_Velocity', 'value': 1},
+            {'label': 'Both', 'value': -1}
+        ],
+        value=0,
+        style={ 'display':'inline-block', 'font-size':'110%', 'width': '300px', 'margin-top':'2px'},
+    )
+
 
 app.layout = html.Div([
 
@@ -108,27 +120,15 @@ app.layout = html.Div([
 layout = html.Div([
 
     html.Div([
-        # dcc.DatePickerRange(
-        #     id='date-range',
-        #     min_date_allowed=filter_start_date,
-        #     max_date_allowed=dt.today() + timedelta(days=1),
-        #     initial_visible_month=filter_start_date,
-        #     end_date=filter_end_date,
-        #     style={ 'display':'inline-block', 'font_size': '100%', 'width':'300px'}
-        # ),
-        # dcc.Dropdown(
-        #         id = 'fault_code',
-        #         options= checkboxdict,
-        #         value = -1,
-        #         style={ 'display':'inline-block', 'font-size':'110%', 'width': '300px', 'margin-top':'12px'},
-        #     )
-
+       
         dbc.Row(
                 [
                     dbc.Col(html.Div("Date Range : ", style={'margin-top':'12px', 'font-size':'110%'}), width='auto'),
                     dbc.Col(date, width='auto'),
                     dbc.Col(html.Div("VOBC Fault : ", style={'margin-top':'12px', 'font-size':'110%'}), width='auto'),
                     dbc.Col(fault_dropdown, width='auto'),
+                    dbc.Col(html.Div("Velocity Choice : ", style={'margin-top':'12px', 'font-size':'110%'}), width='auto'),
+                    dbc.Col(velocity_dropdown, width='auto'),
                 ]
                 )
         ] ),
@@ -172,13 +172,14 @@ layout = html.Div([
 @app.callback(
     Output('BarGraph', 'figure'),[
     Input('Scatterplot', 'clickData'),
-    Input('fault_code', 'value'),
+    Input('fault_code_dropdown', 'value'),
     Input('date-range', 'start_date'),
-    Input('date-range', 'end_date')])
-def display_click_data(clickData, faultcode_ , start_date , end_date ):
-    return _display_click_data(clickData, start_date, end_date, faultcode_ )
+    Input('date-range', 'end_date'),
+    Input('velocity_dropdown', 'value')])
+def display_click_data(clickData, faultcode_, start_date, end_date, velocity_dropdown ):
+    return _display_click_data(clickData, start_date, end_date, faultcode_, velocity_dropdown  )
 
-def _display_click_data(clickData, start_date, end_date, faultcode_):
+def _display_click_data(clickData, start_date, end_date, faultcode_, velocity_dropdown):
     if clickData is None:
         vobcid_ = 240
         location = 'GRE-DEB'
@@ -189,7 +190,7 @@ def _display_click_data(clickData, start_date, end_date, faultcode_):
     start_date,end_date = datecheck(start_date, end_date)
     faultcode_ = checkfaultcode(faultcode_)
     
-    df = module_vobcfault.get_faultcount_by_vobcid_loc_date(start_date, end_date, vobcid_, faultcode_, location)
+    df = module_vobcfault.get_faultcount_by_vobcid_loc_date(start_date, end_date, vobcid_, faultcode_, location, velocity_dropdown)
     
     if len(df.index) == 0:
         data_1 = []
@@ -205,18 +206,19 @@ def _display_click_data(clickData, start_date, end_date, faultcode_):
             }
 
 @app.callback(Output('Scatterplot', 'figure'),
-                [Input('fault_code', 'value'),
+                [Input('fault_code_dropdown', 'value'),
                 Input('date-range', 'start_date'),
-                Input('date-range', 'end_date')])
-def update_Scatter(faultcode_,start_date,end_date):
+                Input('date-range', 'end_date'),
+                Input('velocity_dropdown', 'value')])
+def update_Scatter(faultcode_,start_date,end_date, velocity_dropdown):
     
-    return _update_Scatter(faultcode_,start_date,end_date)
+    return _update_Scatter(faultcode_,start_date,end_date, velocity_dropdown)
 
-def _update_Scatter(faultcode_, start_date,end_date):
+def _update_Scatter(faultcode_, start_date,end_date, velocity_dropdown):
     start_date,end_date = datecheck(start_date, end_date)
     faultcode_ = checkfaultcode(faultcode_)
 
-    df = module_vobcfault.get_faultcount_by_vobcid_loc(start_date, end_date, faultcode_)
+    df = module_vobcfault.get_faultcount_by_vobcid_loc(start_date, end_date, faultcode_, velocity_dropdown)
     
     if len(df.index) == 0:
         data_1 = []
@@ -235,19 +237,20 @@ def _update_Scatter(faultcode_, start_date,end_date):
 @app.callback(
     Output('fig_list_dates', 'data'),
     [
-        Input('fault_code', 'value'),
+        Input('fault_code_dropdown', 'value'),
         Input('date-range', 'start_date'),
         Input('date-range', 'end_date') ,
         Input('Scatterplot', 'clickData'),
-        Input('BarGraph', 'clickData')
+        Input('BarGraph', 'clickData'),
+        Input('velocity_dropdown', 'value')
         
     ])
-def display_figure_fault_list_callback(faultcode_, start_date, end_date, fault_click_value, trend_click_value):
+def display_figure_fault_list_callback(faultcode_, start_date, end_date, fault_click_value, trend_click_value, velocity_dropdown):
     start_date,end_date = datecheck(start_date, end_date)
     faultcode_ = checkfaultcode(faultcode_)
-    return display_figure_fault_list(faultcode_, start_date, end_date, fault_click_value, trend_click_value)
+    return display_figure_fault_list(faultcode_, start_date, end_date, fault_click_value, trend_click_value, velocity_dropdown)
 
-def display_figure_fault_list(value, start_date, end_date, fault_click_value, trend_click_value):    
+def display_figure_fault_list(value, start_date, end_date, fault_click_value, trend_click_value, velocity_dropdown):    
 
     fault_code = value
     click_vobcid = -1
@@ -263,7 +266,7 @@ def display_figure_fault_list(value, start_date, end_date, fault_click_value, tr
         start_date = util.str2date1(op_date)
         end_date = start_date + timedelta(days = 1)
 
-    c = ViewFaultListClass('fig_list_dates', fault_code, start_date, end_date, click_vobcid, click_loc)
+    c = ViewFaultListClass('fig_list_dates', fault_code, start_date, end_date, click_vobcid, click_loc, velocity_dropdown)
     d = c.get_data()
 
     return d
@@ -345,3 +348,5 @@ if __name__ == "__main__":
     app.run_server()
   
 
+#zero velocity nonzero velocity both
+#active vobc passive vobc both

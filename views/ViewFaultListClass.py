@@ -22,18 +22,19 @@ import plotly.graph_objs as go
 
 
 class ViewFaultListClass:
-    def __init__(self, table_id, fault_code, start_date, end_date, vobc_id, location = None):
+    def __init__(self, table_id, fault_code, start_date, end_date, vobc_id, location = None, velcocity_dropdown = None):
         self.table_id = table_id
         self.vobc_id = vobc_id
         self.start_date = start_date
         self.end_date = end_date
         self.fault_code = fault_code
         self.location = location
+        self.velocity_dropdown = velcocity_dropdown
         self.__read_base_data()
         
 
     def __read_base_data(self):
-        df = vobcfault_m.get_fault_list(self.start_date, self.end_date, self.vobc_id, self.fault_code, self.location)
+        df = vobcfault_m.get_fault_list(self.start_date, self.end_date, self.vobc_id, self.fault_code, self.location, self.velocity_dropdown)
         if len(df.index) != 0:
             self.fc_df = df[df['faultCodeSet'] == 1]
         else:

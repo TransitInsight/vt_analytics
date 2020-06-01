@@ -88,10 +88,10 @@ filter_end_date = dt(2016, 4, 1)
 
 
 def test_update_Scatter():
-    x = vv._update_Scatter(3,filter_start_date, filter_end_date)
+    x = vv._update_Scatter(3,filter_start_date, filter_end_date, -1)
     assert x is not None
-    a = vv._update_Scatter(3,None, None)
-    b = vv._update_Scatter(3, filter_end_date, filter_start_date)
+    a = vv._update_Scatter(3,None, None, -1)
+    b = vv._update_Scatter(3, filter_end_date, filter_start_date, -1)
     assert a and b is not None
 
 def test_get_faultcount_by_vobcid_loc():
@@ -105,11 +105,11 @@ def test_get_faultcount_by_vobcid_loc_date():
 
 click_data = {'points':[{'curveNumber': 0, 'marker.color': 27, 'marker.size': 1310.6796116504854, 'pointIndex': 69, 'pointNumber': 69, 'text': 27, 'x': 'CAW', 'y': 158}]}
 def test__display_click_data():
-    x = vv._display_click_data(click_data,filter_start_date, filter_end_date, 3 )
+    x = vv._display_click_data(click_data,filter_start_date, filter_end_date, 3, -1 )
     assert x is not None
-    a = vv._display_click_data(click_data,None, None, 3 )
-    b = vv._display_click_data(click_data,filter_end_date, filter_start_date, 3 )
-    c = vv._display_click_data(None,filter_start_date, filter_end_date,  None )
+    a = vv._display_click_data(click_data,None, None, 3, -1 )
+    b = vv._display_click_data(click_data,filter_end_date, filter_start_date, 3, -1 )
+    c = vv._display_click_data(None,filter_start_date, filter_end_date,  None, -1 )
     assert a and b and c is not None
 
 def test_datecheck():
@@ -174,7 +174,7 @@ def test_display_figure_fault_list_callback():
     points2 = [{'curveNumber': 14, 'pointIndex': None, 'pointNumber': None, 'x': '2015-1-28', 'y': 0}]
     second_value = {'points':points2}
 
-    ret = vv.display_figure_fault_list(3, '2015-01-01T00:00:00', '2015-04-01T00:00:00', click_value, second_value)
+    ret = vv.display_figure_fault_list(3, '2015-01-01T00:00:00', '2015-04-01T00:00:00', click_value, second_value, -1)
     assert ret is not None
     assert isinstance(ret, list)
     assert len(ret) >= 1
