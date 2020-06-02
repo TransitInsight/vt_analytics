@@ -77,7 +77,7 @@ class ViewTrainmoveClass:
         self.add_vobc_fault()
         self.add_door_data()
         #self.add_button()
-
+    
 
     def add_velocity_data(self):
 

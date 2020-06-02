@@ -206,7 +206,7 @@ def _display_click_data(clickData, start_date, end_date, faultcode_, velocity_dr
     
         df = module_vobcfault.get_faultcount_by_vobcid_loc_date(start_date, end_date, vobcid_, faultcode_, location, velocity_dropdown, apstatus)
 
-        if len(df.index) == 0:
+        if len(df.index) == 0 or df is None:
             data_1 = []
         else:
             data_1 = [gen_bar_data(df)]
@@ -235,7 +235,7 @@ def _update_Scatter(faultcode_, start_date,end_date, velocity_dropdown, apstatus
 
     df = module_vobcfault.get_faultcount_by_vobcid_loc(start_date, end_date, faultcode_, velocity_dropdown, apstatus)
     
-    if len(df.index) == 0:
+    if len(df.index) == 0 or df is None:
         data_1 = []
     else:
         data_1 = [gen_scatter_graph_data(df,"locationName", "vobcid", 5000)]          
@@ -321,7 +321,6 @@ def update_offset(triggeredItems, data):
 
 @app.callback(
     Output('fig_by_trainmove_vs', 'figure'),
-    #Output('clickoutput_bar', 'children'),
     [
         Input('Scatterplot', 'clickData'),
         Input('BarGraph', 'clickData'),

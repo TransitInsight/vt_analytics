@@ -25,3 +25,13 @@ def get_trainmove(vobc_id, start_date, end_date):
         df['doorCmd'] = df['doorCmd'].apply(lambda x: x*10 - 35)
 
     return df
+
+def get_unique_vobcid_list(start_date, end_date, trainId):
+    if trainId == None or end_date == None or start_date == None:
+        return []
+    query =("SELECT vobcid from dlr_train_move"
+    " where trainId = '{}' and loggedAt >= '{}' and loggedAt < '{}'" 
+    " group by vobcid").format(trainId, start_date, end_date)
+
+    df = util.run_query(query)
+    return df["vobcid"].to_list()
