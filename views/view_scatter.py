@@ -58,7 +58,6 @@ def gen_scatter_graph(df, datax, datay, text_field, bubble_size, size_scale):
                         )
     return data
 
-
 def gen_scatter_graph_data(df, xfield, yfield, size_scale):
     datax = df[xfield].tolist()
     datay = df[yfield].tolist()
@@ -91,7 +90,7 @@ date = dcc.DatePickerRange(
             id='date-range',
             min_date_allowed=filter_start_date,
             max_date_allowed=dt.today() + timedelta(days=1),
-            initial_visible_month=filter_start_date,
+            start_date=filter_start_date,
             end_date=filter_end_date,
             style={ 'display':'inline-block', 'font_size': '100%', 'width':'300px','margin-top':'2px'}
         )
@@ -153,7 +152,7 @@ layout = html.Div([
                 
             ),
             dcc.Graph(id = 'BarGraph', 
-                style={ 'float': 'right', "display":"block", "height" : "33vh",'width': "33vw"},  
+                style={ 'float': 'right', "display":"block", "height" : "33vh",'width': "36vw"},  
             ),
 
             html.Div([create_fig_fault_list('fig_list_dates', -1, filter_start_date, filter_end_date, -1)],
@@ -195,26 +194,27 @@ def display_click_data(clickData, faultcode_, start_date, end_date, velocity_dro
 
 def _display_click_data(clickData, start_date, end_date, faultcode_, velocity_dropdown, apstatus):
     if clickData is None:
-        vobcid_ = 240
-        location = 'GRE-DEB'
+        data_1 = []
+        vobcid_= "None"
+        location = "None"
     else:
         vobcid_= clickData['points'][0]['y']
         location = clickData['points'][0]['x']
 
-    start_date,end_date = datecheck(start_date, end_date)
-    faultcode_ = checkfaultcode(faultcode_)
+        start_date,end_date = datecheck(start_date, end_date)
+        faultcode_ = checkfaultcode(faultcode_)
     
-    df = module_vobcfault.get_faultcount_by_vobcid_loc_date(start_date, end_date, vobcid_, faultcode_, location, velocity_dropdown, apstatus)
-    
-    if len(df.index) == 0:
-        data_1 = []
-    else:
-        data_1 = [gen_bar_data(df)]
+        df = module_vobcfault.get_faultcount_by_vobcid_loc_date(start_date, end_date, vobcid_, faultcode_, location, velocity_dropdown, apstatus)
+
+        if len(df.index) == 0:
+            data_1 = []
+        else:
+            data_1 = [gen_bar_data(df)]
 
     return{'data': data_1,                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
             'layout' : go.Layout(title = "Faults by Date VOBCID: {} Location: {}".format(vobcid_, location), 
                 xaxis = {'title': 'Date' },
-                dragmode = False,
+                #dragmode = False,
                 yaxis = {'title': 'Faultcount'}, 
                 hovermode="closest")
             }
@@ -244,7 +244,7 @@ def _update_Scatter(faultcode_, start_date,end_date, velocity_dropdown, apstatus
             'layout' : go.Layout(title = "Faults by VOBCID and LOCATION", 
                 xaxis = {'title': 'Location', 'categoryorder' : 'category ascending'},
                 yaxis = {'title': 'VOBCID'}, 
-                dragmode = False, 
+                #dragmode = False, 
                 hovermode="closest",
                 clickmode =  'event+select')
             }
@@ -268,19 +268,16 @@ def display_figure_fault_list_callback(faultcode_, start_date, end_date, fault_c
 
 def display_figure_fault_list(value, start_date, end_date, fault_click_value, trend_click_value, velocity_dropdown, apstatus):    
 
-    fault_code = value
-    click_vobcid = -1
-    click_loc = None
-    if (fault_click_value != None):
-        click_vobcid = fault_click_value['points'][0]['y']
-        click_loc = fault_click_value['points'][0]['x']
+    if fault_click_value == None or trend_click_value == None:
+         return []
 
-    
-    op_date = None
-    if trend_click_value != None:
-        op_date = trend_click_value['points'][0]['x']
-        start_date = util.str2date1(op_date)
-        end_date = start_date + timedelta(days = 1)
+    fault_code = value
+    click_vobcid = fault_click_value['points'][0]['y']
+    click_loc = fault_click_value['points'][0]['x']
+
+    op_date = trend_click_value['points'][0]['x']
+    start_date = util.str2date1(op_date)
+    end_date = start_date + timedelta(days = 1)
 
     c = ViewFaultListClass('fig_list_dates', fault_code, start_date, end_date, click_vobcid, click_loc, velocity_dropdown, apstatus)
     d = c.get_data()
@@ -360,6 +357,8 @@ def display_figure_trainmove(first_value, second_value, table_active_cell, table
 
     f = create_fig_by_trainmove(vobc_id, op_date, fault_code, delta)
     return f
+
+
 if __name__ == "__main__":
     app.run_server()
   

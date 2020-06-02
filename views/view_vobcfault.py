@@ -64,7 +64,7 @@ def create_fig_by_vobc(fault_code, start_date, end_date, velocity = None, apstat
 
     start_date, end_date = util.date2str2(start_date, end_date)
 
-    fig.update_layout(barmode='stack', height=500, hovermode='closest', dragmode = False, 
+    fig.update_layout(barmode='stack', height=500, hovermode='closest', 
         margin=dict(l=2, r=2, t=30, b=2))
     fig.update_xaxes(row=1,col=1, dtick = 4, title_text='vobc id')#, type='category')
     fig.update_xaxes(row=2,col=1, dtick = 4, title_text='vobc id')#, type='category')
@@ -114,7 +114,7 @@ def create_fig_by_trend(fault_code, start_date, end_date, vobc_id, velocity = No
     #     fig.update_yaxes(row = 1, col = 2, range=[0,y_max], title_text='fault count by location')
         
     fig.update_layout(barmode='stack')#, row = 2, col = 1)
-    fig.update_layout(height=300, margin=dict(l=2, r=10, t=30, b=2), hovermode='closest',dragmode = False )
+    fig.update_layout(height=300, margin=dict(l=2, r=10, t=30, b=2), hovermode='closest' )
 
     return fig
 

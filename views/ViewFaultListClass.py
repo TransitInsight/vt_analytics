@@ -61,11 +61,12 @@ class ViewFaultListClass:
                 [
                     {'id': 'loggedAt', 'name': 'Logged At'},
                     {'id': 'vobcid', 'name': 'VOBC'},
+                    {'id': 'parentTrainId', 'name': 'PVOBC'},
                     {'id': 'faultName', 'name': 'Fault Name'},
                     {'id': 'velocity', 'name': 'Vel'},
                     {'id': 'locationName', 'name': 'Location'},
-                    {'id': 'activePassiveStatus', 'name': 'VOBC Active'},
-                    {'id': 'faultCodeSet', 'name': 'Fault Active'}
+                    {'id': 'activePassiveStatus', 'name': 'VOBC Act'},
+                    {'id': 'faultCodeSet', 'name': 'Fault Act'}
                 ] 
             ),
             data=self.get_data()

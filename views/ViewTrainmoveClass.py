@@ -186,7 +186,7 @@ class ViewTrainmoveClass:
 
         self.fig.update_yaxes(title_text=ytitle, showspikes=True)
         self.fig.update_xaxes(showspikes=True, range=[self.start, self.end], title_text=xtitle)
-        self.fig.update_layout(height=300, margin=dict(l=20, r=20, t=30, b=20),legend_orientation="h",dragmode = False)
+        self.fig.update_layout(height=300, margin=dict(l=20, r=20, t=30, b=20),legend_orientation="h")
 
 
     def get_fig(self):
