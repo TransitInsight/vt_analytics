@@ -333,14 +333,12 @@ def display_figure_trainmove_callback(first_value, second_value, table_active_ce
     return display_figure_trainmove(first_value, second_value, table_active_cell, table_data, timewindow_value)
 
 def display_figure_trainmove(first_value, second_value, table_active_cell, table_data, timewindow_value):
-    vobc_id = None
     fault_code = None
     if first_value != None:
-        vobc_id = first_value['points'][0]['y']
         fault_code = first_value['points'][0]['curveNumber'] + 1 #click curveNumber is between 0 and 14
         if (fault_code > 15) :
             fault_code -= 15
-
+    p_train_id = None
     op_date = None
     if second_value != None:
         op_date = second_value['points'][0]['x']
@@ -353,8 +351,9 @@ def display_figure_trainmove(first_value, second_value, table_active_cell, table
 
     if table_data is not None and len(table_data) != 0 and table_active_cell is not None and len(table_data) > table_active_cell['row']:
         op_date = table_data[table_active_cell['row']]['loggedAt']
+        p_train_id = table_data[table_active_cell['row']]['parentTrainId']
 
-    f = create_fig_by_trainmove(vobc_id, op_date, fault_code, delta)
+    f = create_fig_by_trainmove(p_train_id, op_date, fault_code, delta)
     return f
 
 
