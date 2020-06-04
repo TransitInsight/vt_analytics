@@ -128,10 +128,10 @@ def test_create_fig_by_trainmove():
     assert isinstance(ret.data[1], plotly.graph_objs.Scatter)
     assert (ret.data[1].name == 'Max Velocity')
     assert isinstance(ret.data[2], plotly.graph_objs.Scatter)
-    assert (ret.data[2].name == 'Door Cmd')
+    assert util.IsInMemoryTrue(ret.data[2].name == 'Door Cmd')
 
-    assert isinstance(ret.data[3], plotly.graph_objs.Scatter)
-    assert (ret.data[3].name == 'Door Status')
+    assert util.IsInMemoryTrue(isinstance(ret.data[3], plotly.graph_objs.Scatter))
+    assert util.IsInMemoryTrue((ret.data[3].name == 'Door Status'))
 
 
 

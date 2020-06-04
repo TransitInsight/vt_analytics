@@ -162,7 +162,7 @@ layout = html.Div([
 
     html.Div([
                 dcc.Graph(id='fig_by_trainmove_vs', figure=create_fig_by_trainmove(112, '2015-7-3 10:51', 3),
-                style={ 'float': 'right', "display":"block", "height" : "30vh",'width': "98vw"} 
+                style={ 'float': 'right', "display":"block", "height" : "60vh",'width': "98vw"} 
                  ),
                 html.Button('<<', id='vs_button_prev_page'),
                 html.Button('<', id='vs_button_prev'),
