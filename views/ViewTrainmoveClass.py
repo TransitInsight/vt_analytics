@@ -51,9 +51,9 @@ class ViewTrainmoveClass:
         self.get_unique_vobcid_list()
         x = len(self.vobc_id)
         if x > 0:
-            self.fig = make_subplots(rows = x, cols=1, shared_xaxes=True,shared_yaxes=True,vertical_spacing=0.02)
+            self.fig = make_subplots(rows = x, cols=1, shared_xaxes=True,vertical_spacing=0.02)
         else:
-            self.fig = make_subplots(rows = 1, cols=1, shared_xaxes=True,shared_yaxes=True,vertical_spacing=0.02)
+            self.fig = make_subplots(rows = 1, cols=1, shared_xaxes=True,vertical_spacing=0.02)
         self.__read_base_data()
 
     def __read_base_data(self):
