@@ -36,7 +36,7 @@ def test_ViewTrainmoveClass_add_velocity():
     fig = c.get_fig()
 
     assert fig is not None
-    assert len(fig.data) == 2
+    assert len(fig.data) >= 2 #At least should have 2 elements: one Max, one Actual. When more active/passive exist, will have more trace
     assert (fig.data[0].name == 'Actual Velocity')
     assert isinstance(fig.data[1], plotly.graph_objs.Scatter)
     assert (fig.data[1].name == 'Max Velocity')

@@ -41,7 +41,7 @@ def get_unique_vobcid_list(start_date, end_date, trainId):
         df = pd.DataFrame() 
         return df  
     
-    df = df['vobcid'].to_list() 
+    df = df['vobcid'].unique() 
     return df 
     
 

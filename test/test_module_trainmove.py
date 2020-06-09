@@ -67,6 +67,7 @@ def test_os_name():
 def test_get_unique_vobcid_list():
     x = trainmoveDA.get_unique_vobcid_list(filter_start_date,filter_end_date,153)
     assert x is not None
+    assert len(x) < 300 # total vobic ID control by this train over the many years should still be lower than 300
 
 
 def test_split_df():

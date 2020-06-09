@@ -51,6 +51,7 @@ class ViewTrainmoveClass:
         self.get_unique_vobcid_list()
         x = len(self.vobc_id)
         if x > 0:
+            assert x < 20
             self.fig = make_subplots(rows = x, cols=1, shared_xaxes=True,vertical_spacing=0.02)
         else:
             self.fig = make_subplots(rows = 1, cols=1, shared_xaxes=True,vertical_spacing=0.02)

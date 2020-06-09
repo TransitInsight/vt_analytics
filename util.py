@@ -118,10 +118,12 @@ def run_query_in_memory(query):
     fc_name_list = []
     status_list = []
     velocity_list =[]
+    vobc_list =[]
     i = 0
     while i < return_size:
         r = random.randint(1, 15)
         fc_list.append(r)
+        vobc_list.append(r)
         fc_name_list.append('fc{}:random text'.format(r))
         status_list.append(random.randint(0,1))
         velocity_list.append(random.randint(0, 80))
@@ -132,6 +134,8 @@ def run_query_in_memory(query):
             df[field] = time_list
         elif 'loggeddate' in field.lower():
             df[field] = date_list
+        elif 'vobcid' in field.lower():
+            df[field] = vobc_list
         elif 'id' in field.lower() :
             df[field] = id_list
         elif 'code' in field.lower() or 'count' in field.lower():
