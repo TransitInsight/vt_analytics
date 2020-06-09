@@ -35,8 +35,8 @@ filter_start_date = datetime(2015, 1, 1)
 filter_end_date = datetime(2015, 4, 1)
 
 #%%
-def create_fig_by_vobc(fault_code, start_date, end_date):
-    df_res = vobcfault_m.get_count_by(fault_code, start_date, end_date)
+def create_fig_by_vobc(fault_code, start_date, end_date, velocity = None, apstatus = None):
+    df_res = vobcfault_m.get_count_by(fault_code, start_date, end_date, velocity, apstatus)
     
     df_list = []
     df_list.append(df_res[(df_res['VOBCID']<=150)].sort_values(by=['VOBCID']) )
@@ -64,7 +64,7 @@ def create_fig_by_vobc(fault_code, start_date, end_date):
 
     start_date, end_date = util.date2str2(start_date, end_date)
 
-    fig.update_layout(barmode='stack', height=500, hovermode='closest',
+    fig.update_layout(barmode='stack', height=500, hovermode='closest', 
         margin=dict(l=2, r=2, t=30, b=2))
     fig.update_xaxes(row=1,col=1, dtick = 4, title_text='vobc id')#, type='category')
     fig.update_xaxes(row=2,col=1, dtick = 4, title_text='vobc id')#, type='category')
@@ -78,14 +78,14 @@ def create_fig_fault_list(table_id, fault_code, start_date, end_date, vobc_id):
     c.create_fig()
     return c.get_fig()
 
-def create_fig_by_trend(fault_code, start_date, end_date, vobc_id):
+def create_fig_by_trend(fault_code, start_date, end_date, vobc_id, velocity = None, apstatus = None):
 
     start_date, end_date = util.date2str2(start_date, end_date)
 
     title = 'vobc={}, fault={}'.format(vobc_id, fault_code)
 
     fig = go.Figure()# make_subplots(rows=1, cols=2)
-    df = vobcfault_m.get_count_trend(fault_code, start_date, end_date, vobc_id)
+    df = vobcfault_m.get_count_trend(fault_code, start_date, end_date, vobc_id, velocity, apstatus)
     if (not df.empty):
         y_max = df.groupby(['LoggedDate']).max().max() * 1.01
     
@@ -114,7 +114,7 @@ def create_fig_by_trend(fault_code, start_date, end_date, vobc_id):
     #     fig.update_yaxes(row = 1, col = 2, range=[0,y_max], title_text='fault count by location')
         
     fig.update_layout(barmode='stack')#, row = 2, col = 1)
-    fig.update_layout(height=300, margin=dict(l=2, r=10, t=30, b=2), hovermode='closest')
+    fig.update_layout(height=300, margin=dict(l=2, r=10, t=30, b=2), hovermode='closest' )
 
     return fig
 
@@ -145,6 +145,28 @@ def create_layout():
                 value=-1
             )
         ], style={'display':'inline-block', 'font-size':'110%', 'width': '300px', 'margin-top':'8px'})
+    
+    velocity_dropdown_div = html.Div([ dcc.Dropdown(
+        id='velocity_dropdown_vv',
+        options=[
+            {'label': 'Zero_Velocity', 'value': 0},
+            {'label': 'nonZero_Velocity', 'value': 1},
+            {'label': 'Both', 'value': -1}
+        ],
+        value=-1,
+        style={ 'display':'inline-block', 'font-size':'100%', 'width': '250px', 'margin-top':'2px'},
+    ) ])
+
+    apstatus_dropdown_div = dcc.Dropdown(
+        id='apstatus_dropdown_vv',
+        options=[
+            {'label': 'Active', 'value': 1},
+            {'label': 'Passive', 'value': 0},
+            {'label': 'Both', 'value': -1}
+        ],
+        value=-1,
+        style={ 'display':'inline-block', 'font-size':'100%', 'width': '250px', 'margin-top':'2px'},
+    )
 
     fg_div_by_fault = html.Div([
             dcc.Graph(id='fig_by_fault', figure=create_fig_by_vobc(-1, filter_start_date, filter_end_date))], 
@@ -175,10 +197,14 @@ def create_layout():
             dcc.Store(id='vt_session_store'),
             dbc.Row(
                 [
-                    dbc.Col(html.Div("Date Range : ", style={'margin-top':'12px', 'font-size':'110%'}), width='auto'),
+                    dbc.Col(html.Div("Date Range : ", style={'margin-top':'11px', 'font-size':'100%'}), width='auto'),
                     dbc.Col(date_div, width='auto'),
-                    dbc.Col(html.Div("VOBC Fault : ", style={'margin-top':'12px', 'font-size':'110%'}), width='auto'),
+                    dbc.Col(html.Div("VOBC Fault : ", style={'margin-top':'11px', 'font-size':'100%'}), width='auto'),
                     dbc.Col(fault_name_div, width='auto'),
+                    dbc.Col(html.Div("Velocity Choice : ", style={'margin-top':'11px', 'font-size':'100%'}), width='auto'),
+                    dbc.Col(velocity_dropdown_div, width='auto'),
+                    dbc.Col(html.Div("Active Passive State : ", style={'margin-top':'11px', 'font-size':'100%'}), width='auto'),
+                    dbc.Col(apstatus_dropdown_div, width='auto'),
                 ]
             ),
             dbc.Row(
@@ -256,10 +282,12 @@ layout = create_layout()
     [
         Input('fault-dropdown', 'value'),
         Input('my_date_picker', 'start_date'),
-        Input('my_date_picker', 'end_date') 
+        Input('my_date_picker', 'end_date'),
+        Input('velocity_dropdown_vv', 'value'),
+        Input('apstatus_dropdown_vv', 'value')
     ])
-def display_figure_bar(value, start_date, end_date):
-    f = create_fig_by_vobc(value, start_date, end_date)
+def display_figure_bar(value, start_date, end_date, velocity, apstatus):
+    f = create_fig_by_vobc(value, start_date, end_date,velocity, apstatus)
     return f
 
 @app.callback(Output('vt_session_store', 'data'),
@@ -304,12 +332,14 @@ def update_offset(triggeredItems, data):
         Input('my_date_picker', 'start_date'),
         Input('my_date_picker', 'end_date') ,
         Input('fig_by_fault', 'clickData'),
-        Input('fig_by_trend', 'clickData')
+        Input('fig_by_trend', 'clickData'),
+        Input('velocity_dropdown_vv', 'value'),
+        Input('apstatus_dropdown_vv', 'value')
     ])
-def display_figure_fault_list_callback(value, start_date, end_date, fault_click_value, trend_click_value):
-    return display_figure_fault_list(value, start_date, end_date, fault_click_value, trend_click_value)
+def display_figure_fault_list_callback(value, start_date, end_date, fault_click_value, trend_click_value, velocity, apstatus):
+    return display_figure_fault_list(value, start_date, end_date, fault_click_value, trend_click_value, velocity, apstatus)
 
-def display_figure_fault_list(value, start_date, end_date, fault_click_value, trend_click_value):    
+def display_figure_fault_list(value, start_date, end_date, fault_click_value, trend_click_value, velocity = None, apstatus = None):    
     fault_code = value
     click_fault_code = -1
     click_vobcid = -1
@@ -327,7 +357,7 @@ def display_figure_fault_list(value, start_date, end_date, fault_click_value, tr
         start_date = util.str2date1(op_date)
         end_date = start_date + timedelta(days = 1)
 
-    c = ViewFaultListClass('fig_fault_list', fault_code, start_date, end_date, click_vobcid)
+    c = ViewFaultListClass('fig_fault_list', fault_code, start_date, end_date, click_vobcid, None, velocity, apstatus)
     d = c.get_data()
 
     return d
@@ -338,14 +368,16 @@ def display_figure_fault_list(value, start_date, end_date, fault_click_value, tr
         Input('fault-dropdown', 'value'),
         Input('my_date_picker', 'start_date'),
         Input('my_date_picker', 'end_date') ,
-        Input('fig_by_fault', 'clickData')
+        Input('fig_by_fault', 'clickData'),
+        Input('velocity_dropdown_vv', 'value'),
+        Input('apstatus_dropdown_vv', 'value')
 
     ])
-def display_figure_area_callback(value, start_date, end_date, click_value):
-    return display_fault_trend(value, start_date, end_date, click_value)
+def display_figure_area_callback(value, start_date, end_date, click_value, velocity, apstatus):
+    return display_fault_trend(value, start_date, end_date, click_value, velocity, apstatus)
 
 
-def display_fault_trend(value, start_date, end_date, click_value):    
+def display_fault_trend(value, start_date, end_date, click_value, velocity = None, apstatus = None):    
     fault_code = value
     click_fault_code = -1
     click_vobcid = -1
@@ -357,7 +389,7 @@ def display_fault_trend(value, start_date, end_date, click_value):
         if (fault_code == -1): #if not -1, the dropdown only selected one Fault, so the click must be on the same fault, no need to change
             fault_code = click_fault_code
 
-    f = create_fig_by_trend(fault_code, start_date, end_date, click_vobcid)
+    f = create_fig_by_trend(fault_code, start_date, end_date, click_vobcid,)
     return f
 
 @app.callback(

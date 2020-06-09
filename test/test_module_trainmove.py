@@ -18,8 +18,11 @@ import util as util
 import config as cfg
 import pytest
 
+filter_start_date = '2014-01-01T00:00:00'
+filter_end_date =  '2018-04-25T00:13:26.017995'
+
 def test_trainmove():
-    df = trainmoveDA.get_trainmove(248, '2015-01-03T10:51:30.160Z', '2015-01-13T11:51:30.160Z')
+    df = trainmoveDA.get_trainmove(135, '2015-01-03T10:51:30.160Z', '2015-01-13T11:51:30.160Z')
 
     assert len(df['activePassiveStatus'].unique() == 2)
     assert len(df['doorCmd'].unique() == 2)
@@ -30,7 +33,7 @@ def test_trainmove():
 
 
 def test_trainmove_door():
-    df = trainmoveDA.get_trainmove(248, '2015-01-03T10:51:30.160Z', '2015-01-13T11:51:30.160Z')
+    df = trainmoveDA.get_trainmove(135, '2015-01-03T10:51:30.160Z', '2015-01-13T11:51:30.160Z')
 
     assert df.dtypes['doorCmd'] == 'int64'
     assert df.dtypes['doorStatus'] == 'int64'
@@ -60,3 +63,7 @@ def test_trainmove_exception():
 def test_os_name():
     assert len(os.name) > 0
     
+
+def test_get_unique_vobcid_list():
+    x = trainmoveDA.get_unique_vobcid_list(filter_start_date,filter_end_date,153)
+    assert x is not None
