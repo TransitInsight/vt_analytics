@@ -165,7 +165,9 @@ def test_traimove_fig_callback():
 
     ret = vv.display_figure_trainmove(first_value, second_value, None, None, timewindow_value)
     assert ret is not None
-
+    ret1 = vv.display_figure_trainmove(first_value, second_value, None, None, timewindow_value)
+    assert ret1 is not None
+    
 def test_display_figure_fault_list_callback():
     a_selected_value = {'curveNumber': 12, 'label': 13, 'pointIndex': 3, 'pointNumber': 3, 'value': 13, 'y': 280, 'x': None}#y is VobcID
     list1 = [a_selected_value]

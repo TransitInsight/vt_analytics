@@ -336,8 +336,7 @@ def display_figure_trainmove(first_value, second_value, table_active_cell, table
     fault_code = None
     if first_value != None:
         fault_code = first_value['points'][0]['curveNumber'] + 1 #click curveNumber is between 0 and 14
-        if (fault_code > 15) :
-            fault_code -= 15
+        
     p_train_id = None
     op_date = None
     if second_value != None:
