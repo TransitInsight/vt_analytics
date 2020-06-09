@@ -67,3 +67,16 @@ def test_os_name():
 def test_get_unique_vobcid_list():
     x = trainmoveDA.get_unique_vobcid_list(filter_start_date,filter_end_date,153)
     assert x is not None
+
+
+def test_split_df():
+    df = pd.DataFrame({'Active': [0,0,0,0, 1, 1, 0, 0, 0]},
+                    index=[0,1,2,3,4,5,6,7,8])
+
+    df1 = df.assign(new=df.Active.diff().ne(0).cumsum())
+
+    for g in df1.new.unique():
+        g_df = df1[df1.new == g]
+        print (g_df)
+
+    assert len(df1.new.unique()) == 3
