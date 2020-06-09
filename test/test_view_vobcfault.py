@@ -43,7 +43,7 @@ def test_create_layout():
 def test_create_fig_by_trainmove():
     ret = vobcView.create_fig_by_trainmove(135, '2015-1-12 00:07', 3)
     assert ret != None
-    assert util.IsInMemoryTrue(len(ret.data) == 12)
+    assert util.IsInMemoryTrue(len(ret.data) == 22)
     assert isinstance(ret.data[0], plotly.graph_objs.Scatter)
     assert (ret.data[0].name == 'Actual Velocity')
     assert isinstance(ret.data[1], plotly.graph_objs.Scatter)

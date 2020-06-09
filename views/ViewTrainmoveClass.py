@@ -100,7 +100,7 @@ class ViewTrainmoveClass:
         self.update_figure_layout()
 
     def create_act_vel(self, df, color, i):
-        self.fig.add_trace(go.Scatter(x=df.index, y=df['velocity'],
+        self.fig.add_trace(go.Scatter(x=df["loggedAt"], y=df['velocity'],
                 name = "Actual Velocity",
                 #text=df['Actual Velocity Toop Tips'],
                 line_color=color, mode='lines+markers', 
@@ -113,7 +113,7 @@ class ViewTrainmoveClass:
                 ),row=i+1, col=1) 
 
     def create_max_vel(self,df,color,i):
-        self.fig.add_trace(go.Scatter(x=df.index, y=df['maximumVelocity'],
+        self.fig.add_trace(go.Scatter(x=df["loggedAt"], y=df['maximumVelocity'],
                 name = "Max Velocity",
                 line_width=1,
                 #text='Max Velocity = ' + df['maximumVelocity'].astype(str),
@@ -121,32 +121,30 @@ class ViewTrainmoveClass:
                 connectgaps=False,
                 ),row=i+1, col=1) 
 
-    def add_index_spaces(self, df, S):
-        #idx = pd.date_range(df.index.min(), df.index.max(), freq= 'S')
-        #df = df.reindex(idx)
-        # df = df.resample(S).max()
-        return df
-
+   
 
     def add_velocity_data(self, i):
         df = self.trainmove_df_list[i].copy()
-        df['loggedAt'] = df['loggedAt'].astype("datetime64[s]")
-        df = df.set_index('loggedAt')
-        dff = df[df["activePassiveStatus"] == False]
-        dff = self.add_index_spaces(dff, '20S')
-        df = df[df["activePassiveStatus"] == True]
-        df = self.add_index_spaces(df, '20S')
-
+        df1 = df.assign(new=df["activePassiveStatus"].diff().ne(0).cumsum())
+        dfList = [df1[df1.new == g] for g in df1.new.unique()]
         
-        if isinstance(df, pd.DataFrame):
+        # dff = df[df["activePassiveStatus"] == False]
+       
+        # df = df[df["activePassiveStatus"] == True]
+        
+        #if isinstance(df, pd.DataFrame):
             #if len(df) > 10:
-                self.create_act_vel(df,"goldenrod",i)
-                self.create_max_vel(df,"green",i)
-           
-        if isinstance(dff, pd.DataFrame):
-            #if len(dff) > 10:
-                self.create_act_vel(dff,"grey",i)
-                self.create_max_vel(dff,"grey",i)
+        if dfList is None:
+            return 
+
+        for j in dfList: 
+            if j is not None or not j.empty:
+                if j.iloc[0]["activePassiveStatus"] == True:
+                    self.create_act_vel(j,"goldenrod",i)
+                    self.create_max_vel(j,"green",i)
+                else:
+                    self.create_act_vel(j,"grey",i)
+                    self.create_max_vel(j,"grey",i)
        
 
     def add_door_data(self, i):
