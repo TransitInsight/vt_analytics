@@ -74,9 +74,14 @@ def test_split_df():
                     index=[0,1,2,3,4,5,6,7,8])
 
     df1 = df.assign(new=df.Active.diff().ne(0).cumsum())
+   
 
     for g in df1.new.unique():
         g_df = df1[df1.new == g]
         print (g_df)
 
     assert len(df1.new.unique()) == 3
+
+    # same as above, but more elegant
+    dfList = [df1[df1.new == g] for g in df1.new.unique()]
+    assert len(dfList) == 3
