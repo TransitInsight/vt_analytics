@@ -23,6 +23,8 @@ def get_trainmove(parent_id, start_date, end_date):
     if df is not None and not df.empty:
         df['doorStatus'] = df['doorStatus'].apply(lambda x: x*10 - 35)
         df['doorCmd'] = df['doorCmd'].apply(lambda x: x*10 - 35)
+        df['loggedAt'] = pd.to_datetime(df['loggedAt'])
+
 
     return df
 
@@ -42,3 +44,5 @@ def get_unique_vobcid_list(start_date, end_date, trainId):
     df = df['vobcid'].to_list() 
     return df 
     
+
+# %%

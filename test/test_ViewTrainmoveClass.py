@@ -32,7 +32,7 @@ def test_ViewTrainmoveClass_offset():
 
 def test_ViewTrainmoveClass_add_velocity():
     c = ViewTrainmoveClass(135, '2015-1-12 00:07', 0, timedelta(hours=0))
-    c.add_velocity_data(0)
+    c.add_velocity_data(0) 
     fig = c.get_fig()
 
     assert fig is not None

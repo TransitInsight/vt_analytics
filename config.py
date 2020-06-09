@@ -43,6 +43,12 @@ vobc_fault_color_dict = {
 def get_fault_color(faultCode):
     return vobc_fault_color_dict[faultCode]
 
+vobc_fault_marker_color_dict = {
+    False: "grey", 
+    True: "green" 
+}
+def get_fault_marker_color(apstat):
+    return vobc_fault_marker_color_dict[apstat]
 
 vobc_fault_name_dict = {
     -1: '00. All',
