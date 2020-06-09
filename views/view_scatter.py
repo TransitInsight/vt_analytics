@@ -262,12 +262,12 @@ def _update_Scatter(faultcode_, start_date,end_date, velocity_dropdown, apstatus
         
     ])
 def display_figure_fault_list_callback(faultcode_, start_date, end_date, fault_click_value, trend_click_value, velocity_dropdown, apstatus):
-    start_date,end_date = datecheck(start_date, end_date)
-    faultcode_ = checkfaultcode(faultcode_)
+    
     return display_figure_fault_list(faultcode_, start_date, end_date, fault_click_value, trend_click_value, velocity_dropdown, apstatus)
 
 def display_figure_fault_list(value, start_date, end_date, fault_click_value, trend_click_value, velocity_dropdown, apstatus):    
-
+    start_date,end_date = datecheck(start_date, end_date)
+    value = checkfaultcode(value)
     if fault_click_value == None or trend_click_value == None:
          return []
 
