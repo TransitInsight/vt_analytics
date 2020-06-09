@@ -160,12 +160,14 @@ def test_traimove_fig_callback():
 
     points2 = [{'curveNumber': 14, 'pointIndex': None, 'pointNumber': None, 'x': '2019-11-28', 'y': 0}]
     second_value = {'points':points2}
-
+    
+    points3 = [{'curveNumber': 18, 'label': 13, 'pointIndex': 3, 'pointNumber': 3, 'value': 13, 'x': 13, 'y': 13}]
+    third_value = {'points':points3}
     timewindow_value = {'offset':0}
 
     ret = vv.display_figure_trainmove(first_value, second_value, None, None, timewindow_value)
     assert ret is not None
-    ret1 = vv.display_figure_trainmove(first_value, second_value, None, None, timewindow_value)
+    ret1 = vv.display_figure_trainmove(third_value, second_value, None, None, timewindow_value)
     assert ret1 is not None
     
 def test_display_figure_fault_list_callback():
