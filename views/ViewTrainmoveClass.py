@@ -88,67 +88,64 @@ class ViewTrainmoveClass:
 
         if (self.trainmove_df is None or self.trainmove_df.empty):
             return 
-        
+        L = True
         for i in range(len(self.vobc_id)):            
-            self.add_velocity_data(i)
-            self.add_vobc_fault(i)
-            self.add_door_data(i)
+            self.add_velocity_data(i,L)
+            self.add_vobc_fault(i,L)
+            self.add_door_data(i,L)
             ytitle = "VOBC={}".format(self.vobc_id[i])
             self.fig.update_yaxes(title_text=ytitle, row=i+1, col=1, showspikes=True)
+            L = False
 
 
     def create_subplot_fig(self):
         self.update_figure_layout()
 
-    def create_act_vel(self, df, color, i):
+    def create_act_vel(self, df, color, i, L = False):
         self.fig.add_trace(go.Scatter(x=df["loggedAt"], y=df['velocity'],
                 name = "Actual Velocity",
                 #text=df['Actual Velocity Toop Tips'],
                 line_color=color, mode='lines+markers', 
                 line_width=1,
                 connectgaps=False,
+                showlegend=L,
                 marker=dict(size=3, 
                             symbol='circle-dot',
                             color= color
                             )
                 ),row=i+1, col=1) 
 
-    def create_max_vel(self,df,color,i):
+    def create_max_vel(self,df,color,i,L = False):
         self.fig.add_trace(go.Scatter(x=df["loggedAt"], y=df['maximumVelocity'],
                 name = "Max Velocity",
                 line_width=1,
                 #text='Max Velocity = ' + df['maximumVelocity'].astype(str),
                 line_color=color,
                 connectgaps=False,
+                showlegend=L
                 ),row=i+1, col=1) 
 
    
 
-    def add_velocity_data(self, i):
+    def add_velocity_data(self, i, L = False):
         df = self.trainmove_df_list[i].copy()
         df1 = df.assign(new=df["activePassiveStatus"].diff().ne(0).cumsum())
         dfList = [df1[df1.new == g] for g in df1.new.unique()]
         
-        # dff = df[df["activePassiveStatus"] == False]
-       
-        # df = df[df["activePassiveStatus"] == True]
-        
-        #if isinstance(df, pd.DataFrame):
-            #if len(df) > 10:
         if dfList is None:
             return 
-
-        for j in dfList: 
-            if j is not None or not j.empty:
-                if j.iloc[0]["activePassiveStatus"] == True:
-                    self.create_act_vel(j,"goldenrod",i)
-                    self.create_max_vel(j,"green",i)
+        
+        for j in range(len(dfList)):
+            if dfList[j] is not None or not dfList[j].empty:
+                if dfList[j].iloc[0]["activePassiveStatus"] == True:
+                    self.create_act_vel(dfList[j],"goldenrod",i,L)
+                    self.create_max_vel(dfList[j],"green",i,L)
                 else:
-                    self.create_act_vel(j,"grey",i)
-                    self.create_max_vel(j,"grey",i)
-       
+                    self.create_act_vel(dfList[j],"grey",i,L)
+                    self.create_max_vel(dfList[j],"grey",i,L)
+            L = False       
 
-    def add_door_data(self, i):
+    def add_door_data(self, i, L = False):
         df = self.trainmove_df_list[i]
         self.fig.add_trace(go.Scatter(x=df['loggedAt'], y=df['doorCmd'],
                 name = "Door Cmd",
@@ -156,6 +153,7 @@ class ViewTrainmoveClass:
                 line_color="goldenrod", mode='lines+markers', 
                 line_width=1,
                 line_shape='hv',
+                showlegend=L, 
                 marker=dict(size=3, 
                             symbol='circle-dot',
                             color="goldenrod"
@@ -167,11 +165,12 @@ class ViewTrainmoveClass:
                 line_width=1,
                 text= df['Door Status Tips'],
                 line_color="green",
-                line_shape='hv'
+                line_shape='hv',
+                showlegend=L
                 ),row=i+1, col=1) 
     # add VOBC Fault, shows start time and rectified time
     # regardless actively selected the fault, we already include all fault types
-    def add_vobc_fault(self, i):
+    def add_vobc_fault(self, i, L = False):
         df_fc = vobcfault_m.get_fault_list(self.start,self.end,self.vobc_id[i])
         if (df_fc is None or df_fc.empty):
             return
@@ -183,6 +182,7 @@ class ViewTrainmoveClass:
                 name="Vobc Fault",
                 #hover_name = "faultCode",
                 text='Fault = ' + df_fault['faultName'],
+                showlegend=L, 
                 mode='markers', marker=dict(size=7, 
                                             line=dict(width=1, color = list(map(cfg.get_fault_color, df_fault['faultCode']))),
                                             symbol='x',
@@ -194,6 +194,7 @@ class ViewTrainmoveClass:
                 name="Vobc Fault Rectified",
                 #hover_name = "faultCode",
                 text='Fault = ' + df_rectify['faultName'],
+                showlegend=L, 
                 mode='markers', marker=dict(size=7, 
                                             line=dict(width=1, color = 'darkgreen'),
                                             symbol='circle',
