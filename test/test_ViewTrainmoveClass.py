@@ -65,6 +65,19 @@ def test_ViewTrainmoveClass_add_door():
     assert (fig.data[1].name == 'Door Status')
     assert isinstance(fig.data[1], plotly.graph_objs.Scatter)
 
+def test_ViewTrainmoveClass_add_commLoss():
+    c = ViewTrainmoveClass(135, '2015-1-12 00:07', 0, timedelta(hours=0))
+    c.add_commLoss(0)
+    fig = c.get_fig()
+
+    assert fig is not None
+    assert len(fig.data) >= 0
+    assert (fig.data[0].name == 'Vobc Comm Loss')
+    assert isinstance(fig.data[0], plotly.graph_objs.Scatter)
+
+
+
+
 
 
 def test_ViewTrainmoveClass_door_cmd_status():

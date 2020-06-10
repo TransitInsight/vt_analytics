@@ -93,6 +93,7 @@ class ViewTrainmoveClass:
             self.add_velocity_data(i,L)
             self.add_vobc_fault(i,L)
             self.add_door_data(i,L)
+            self.add_commLoss(i, L)
             ytitle = "VOBC={}".format(self.vobc_id[i])
             self.fig.update_yaxes(title_text=ytitle, row=i+1, col=1, showspikes=True)
             L = False
@@ -202,6 +203,21 @@ class ViewTrainmoveClass:
                                             )
                 ),row=i+1, col=1)
 
+    def add_commLoss(self, i, L = False):
+        df = trainmove_m.get_commLoss(self.start,self.end,self.vobc_id[i])
+        df = df[df['commLossCount'] >= 1]    
+        self.fig.add_trace(go.Scatter(x=df['loggedAt'], y=df['velocity'], 
+                name="Vobc Comm Loss",
+                #hover_name = "faultCode",
+                #text='Fault = ' + df['faultName'],
+                showlegend=L, 
+                mode='markers', marker=dict(size=6, 
+                                            line=dict(width=1, color = "red"),
+                                            symbol='asterisk',
+                                            color="red"
+                                            )
+                ),row=i+1, col=1)
+
     def add_button(self):
         self.fig.update_layout(
             updatemenus=[
@@ -233,7 +249,7 @@ class ViewTrainmoveClass:
         if h is 0:
             h = 250
         self.fig.update_xaxes(showspikes=True, range=[self.start, self.end])
-        self.fig.update_layout(height= h, margin = dict(l = 20 , r = 20),legend_orientation="h", dragmode = False )
+        self.fig.update_layout(height= h, margin = dict(l = 20 , r = 20, t = 0),legend_orientation="h", dragmode = False )
 
 
     def get_fig(self):
