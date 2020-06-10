@@ -107,7 +107,7 @@ def test_get_fc_list_faultcode_vobc():
 
 def test_get_fc_trend():
     df = vobcDA.get_count_trend(-1, '2014-01-01T00:00:00', '2015-04-25T00:13:26.017995', -1)
-    y_max = df.groupby(['LoggedDate']).max().max() * 1.01
+    #y_max = df.groupby(['LoggedDate']).max().max() * 1.01
     assert df['LoggedDate'].count() > 100
     assert len(df['faultName'].unique()) == 15
 

@@ -11,7 +11,8 @@ def Navbar():
                     dbc.DropdownMenuItem("VOBC Fault Correlation", href="/views/view2"),
                     dbc.DropdownMenuItem("Page 3", href="/views/view3"),
                     #dbc.DropdownMenuItem("Communication", header=True),
-                    dbc.DropdownMenuItem("Comm Loss Correlation", href="/views/view2"),
+                    dbc.DropdownMenuItem("Comm Loss Correlation", href="/views/commLoss"),
+
 
                 ],
                 label="VOBC Report",

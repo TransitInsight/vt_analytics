@@ -58,4 +58,3 @@ def get_commLoss(start_date, end_date, vobcid):
         df = pd.DataFrame() 
     
     return df 
-# %%
