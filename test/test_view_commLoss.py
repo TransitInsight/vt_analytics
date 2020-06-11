@@ -85,3 +85,19 @@ def test_trainmove_offset_callback():
     items = [{'prop_id': 'cL_button_prev.n_clicks'}]
     data = vc.update_offset( items, None)
     assert data['offset'] == -1
+
+def test_traimove_fig_callback_none():
+    ret = vc.display_figure_trainmove(None, None,  None, None)
+    assert ret is not None
+
+def test_traimove_fig_callback():
+
+    points2 = [{'curveNumber': 14, 'pointIndex': None, 'pointNumber': None, 'x': '2019-11-28', 'y': 0}]
+    second_value = {'points':points2}
+    
+    timewindow_value = {'offset':0}
+
+    ret = vc.display_figure_trainmove( second_value, None, None, timewindow_value)
+    assert ret is not None
+    ret1 = vc.display_figure_trainmove( second_value, None, None,  timewindow_value)
+    assert ret1 is not None

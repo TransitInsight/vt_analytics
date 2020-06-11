@@ -38,9 +38,22 @@ def test_get_faultcount_by_vobcid_loc_date():
     assert len(z.index) >= 10
 
 
-def test_get_fc_list_faultcode_vobc():
+def test_get_fc_list_faultcode_vobc_1():
     df = module_commLoss.get_commLoss_list('2015-01-01T10:00','2015-01-01T20:00', 248)
     assert df['loggedAt'].count() > 0
     dfVobc = df['vobcid'].unique()
     assert util.IsInMemoryTrue(len(dfVobc) == 1)
     assert util.IsInMemoryTrue(dfVobc[0] == 248)
+
+def test_get_fc_list_faultcode_vobc_2():
+    df = module_commLoss.get_commLoss_list('2015-01-01T10:00','2015-01-01T20:00', 248 , None, 1, 1, 1)
+    assert df['loggedAt'].count() > 0
+    dfVobc = df['vobcid'].unique()
+    assert util.IsInMemoryTrue(len(dfVobc) == 1)
+    assert util.IsInMemoryTrue(dfVobc[0] == 248)
+
+def test_get_fc_list_faultcode_vobc_3():
+    df = module_commLoss.get_commLoss_list('2015-01-01T10:00','2015-01-01T20:00', 248, None, 0, 0, 0)
+    assert df.empty
+
+    

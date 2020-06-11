@@ -23,10 +23,12 @@ import config as cfg
 '2015-01-16'
 
 def test_get_count_by_fc():
-    df_all = vobcDA.get_count_by(-1, '2015-01-01T00:00:00', '2020-04-25T00:13:26.017995')
-    df_one = vobcDA.get_count_by(3, '2015-01-01T00:00:00', '2020-04-25T00:13:26.017995')
+    df_all = vobcDA.get_count_by(-1, '2015-01-01T00:00:00', '2020-04-25T00:13:26.017995', 1, 1)
+    df_one = vobcDA.get_count_by(3, '2015-01-01T00:00:00', '2020-04-25T00:13:26.017995', 0, 0)
+    df_ = vobcDA.get_count_by(3, '2015-01-01T00:00:00', '2020-04-25T00:13:26.017995')
     assert  df_all['FaultCount'].count() > 0 
     assert  df_one['FaultCount'].count() > 0 
+    assert  df_['FaultCount'].count() > 0 
     assert  util.IsInMemoryTrue(df_all['FaultCount'].count() > df_one['FaultCount'].count())
 
 def test_get_count_by_fc_date():
@@ -62,8 +64,20 @@ def test_get_fc():
     assert len(df['faultName'].unique()) == 15
     assert len(df['faultCode'].unique()) == 15
 
-def test_get_fc_list_vobcid():
+def test_get_fc_list_vobcid_1():
     df = vobcDA.get_fault_list('2015-01-01T10:00','2015-01-01T20:00', 248)
+    assert df is not None
+    assert df['loggedAt'].count() > 0
+    dfSet = df['faultCodeSet'].unique()
+    assert len(dfSet) > 1
+
+def test_get_fc_list_vobcid_2():
+    df = vobcDA.get_fault_list('2015-01-01T10:00','2015-01-01T20:00', 248, -1, None, 0, 0 )
+    assert df is not None
+
+
+def test_get_fc_list_vobcid_3():
+    df = vobcDA.get_fault_list('2015-01-01T10:00','2015-01-01T20:00', 248, -1, None, 1, 1)
     assert df is not None
     assert df['loggedAt'].count() > 0
     dfSet = df['faultCodeSet'].unique()
@@ -116,11 +130,11 @@ def test_get_fc_trend():
 
 
 def test_get_fc_trend1():
-    df = vobcDA.get_count_trend(-1, '2014-01-01T00:00:00', '2015-04-25T00:13:26.017995', -1)
+    df = vobcDA.get_count_trend(-1, '2014-01-01T00:00:00', '2015-04-25T00:13:26.017995', -1 , 1, 1)
     assert df['LoggedDate'].count() > 100
-    assert len(df['faultName'].unique()) == 15
+    assert len(df['faultName'].unique()) == 13
 
-    df1 = vobcDA.get_count_trend(-1, '2014-01-01T00:00:00', '2015-04-25T00:13:26.017995', 2)
+    df1 = vobcDA.get_count_trend(-1, '2014-01-01T00:00:00', '2015-04-25T00:13:26.017995', 2 , 0 , 0)
     assert util.IsInMemoryTrue(df['LoggedDate'].count() > df1['LoggedDate'].count())
 
 
