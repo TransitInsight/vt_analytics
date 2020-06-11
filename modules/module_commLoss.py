@@ -60,3 +60,26 @@ def get_commLoss_by_vobcid_loc_date(start_date, end_date, vobcid, location, velo
     df = util.run_query(query)
 
     return df
+
+def get_commLoss_list(start_date,end_date, vobc_id = None, location = None, velocity= None, apstatus = None):
+    start_date,end_date = util.date2str2(start_date,end_date)
+    query = "SELECT vobcid, parentTrainId, loggedAt, velocity, activePassiveStatus, locationName, commType from dlr_vobc_comloss where loggedAt >= '{}' and loggedAt < '{}'".format(start_date,end_date)
+
+    if vobc_id is not None and vobc_id != -1:
+        query += " and vobcid = {}".format(vobc_id)
+    if (location is not None ):
+        query += " and locationName = '{}'".format(location)
+    if velocity is 0: 
+        query += " and velocity = 0"
+    if velocity is 1: 
+        query += " and NOT(velocity = 0)"
+    if apstatus is 1: 
+        query += " and activePassiveStatus = true"
+    if apstatus is 0: 
+        query += " and activePassiveStatus = false"
+    df = util.run_query(query)
+    
+    if df is None:
+        df = pd.DataFrame() 
+
+    return df
