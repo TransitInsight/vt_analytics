@@ -132,7 +132,7 @@ def test_get_fc_trend():
 def test_get_fc_trend1():
     df = vobcDA.get_count_trend(-1, '2014-01-01T00:00:00', '2015-04-25T00:13:26.017995', -1 , 1, 1)
     assert df['LoggedDate'].count() > 100
-    assert len(df['faultName'].unique()) == 13
+    assert len(df['faultName'].unique()) >= 10
 
     df1 = vobcDA.get_count_trend(-1, '2014-01-01T00:00:00', '2015-04-25T00:13:26.017995', 2 , 0 , 0)
     assert util.IsInMemoryTrue(df['LoggedDate'].count() > df1['LoggedDate'].count())
