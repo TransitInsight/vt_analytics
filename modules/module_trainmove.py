@@ -46,10 +46,12 @@ def get_unique_vobcid_list(start_date, end_date, trainId):
     
 
 def get_commLoss(start_date, end_date, vobcid):
-    start_date, end_date = util.date2str2(start_date,end_date)
+    
     if vobcid == None or end_date == None or start_date == None:
         return pd.DataFrame() 
 
+    start_date, end_date = util.date2str2(start_date,end_date)
+    
     query =("SELECT commLossCount, loggedAt, velocity from dlr_train_move"
     " where vobcid = '{}' and loggedAt >= '{}' and loggedAt < '{}'").format(vobcid, start_date, end_date)
 

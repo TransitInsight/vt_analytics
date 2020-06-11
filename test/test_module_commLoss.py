@@ -56,4 +56,3 @@ def test_get_fc_list_faultcode_vobc_3():
     df = module_commLoss.get_commLoss_list('2015-01-01T10:00','2015-01-01T20:00', 248, None, 0, 0, 0)
     assert util.IsInMemoryTrue(len(df) >= 0)
 
-    

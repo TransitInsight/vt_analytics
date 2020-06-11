@@ -72,7 +72,7 @@ def test_get_unique_vobcid_list():
 
 def test_split_df():
     df = pd.DataFrame({'Active': [0,0,0,0, 1, 1, 0, 0, 0]},
-                    index=[0,1,2,3,4,5,6,7,8])
+                    index=[0,1,2,3,4,5,6,7,8]) 
 
     df1 = df.assign(new=df.Active.diff().ne(0).cumsum())
    
@@ -86,3 +86,7 @@ def test_split_df():
     # same as above, but more elegant
     dfList = [df1[df1.new == g] for g in df1.new.unique()]
     assert len(dfList) == 3
+
+def test_get_commLoss():
+    df = trainmoveDA.get_commLoss(None, None, None)
+    assert df.empty 
