@@ -253,20 +253,19 @@ def _update_Scatter(faultcode_, start_date,end_date, velocity_dropdown, apstatus
     Output('fig_list_dates', 'data'),
     [
         Input('fault_code_dropdown', 'value'),
-        Input('date-range', 'start_date'),
-        Input('date-range', 'end_date') ,
+        #Input('date-range', 'start_date'),
+        #Input('date-range', 'end_date') ,
         Input('Scatterplot', 'clickData'),
         Input('BarGraph', 'clickData'),
         Input('velocity_dropdown', 'value'),
         Input('apstatus_dropdown', 'value')
         
     ])
-def display_figure_fault_list_callback(faultcode_, start_date, end_date, fault_click_value, trend_click_value, velocity_dropdown, apstatus):
+def display_figure_fault_list_callback(faultcode_, fault_click_value, trend_click_value, velocity_dropdown, apstatus):
     
-    return display_figure_fault_list(faultcode_, start_date, end_date, fault_click_value, trend_click_value, velocity_dropdown, apstatus)
+    return display_figure_fault_list(faultcode_, fault_click_value, trend_click_value, velocity_dropdown, apstatus)
 
-def display_figure_fault_list(value, start_date, end_date, fault_click_value, trend_click_value, velocity_dropdown, apstatus):    
-    start_date,end_date = datecheck(start_date, end_date)
+def display_figure_fault_list(value, fault_click_value, trend_click_value, velocity_dropdown, apstatus):    
     value = checkfaultcode(value)
     if fault_click_value == None or trend_click_value == None:
          return []

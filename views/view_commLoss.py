@@ -20,7 +20,8 @@ import re
 from modules import module_vobcfault
 from modules import module_commLoss
 from views.ViewTrainmoveClass import ViewTrainmoveClass
-from views.ViewFaultListClass import ViewFaultListClass
+from views.view_commLossListClass import ViewCommLossListClass
+
 
 import util as util
 
@@ -70,6 +71,11 @@ def gen_bar_data(df):
     datay = df['commLossCount'].tolist()
     fig = go.Bar(x=datax, y=datay)
     return fig
+
+def create_fig_commLoss_list(table_id, start_date, end_date, vobc_id):
+    c = ViewCommLossListClass(table_id, start_date, end_date, vobc_id)
+    c.create_fig()
+    return c.get_fig()
 
 date = dcc.DatePickerRange(
             id='date-range_cL',
@@ -129,7 +135,9 @@ layout = html.Div([
             dcc.Graph(id = 'BarGraph_cL', 
                 style={ 'float': 'right', "display":"block", "height" : "33vh",'width': "36vw"},  
             ),
-            
+             html.Div([create_fig_commLoss_list('fig_list_dates_cL', filter_start_date, filter_end_date, -1)],
+            style={ 'float': 'right', "display":"block", "height" : "33vh",'width': "30vw",'margin-right':'100px'} 
+            )
             ]),
               
         
@@ -193,3 +201,30 @@ def _display_click_data(clickData, start_date, end_date, velocity_dropdown, apst
                 yaxis = {'title': 'CommLoss Count'}, 
                 hovermode="closest")
             }
+
+@app.callback(
+    Output('fig_list_dates_cL', 'data'),
+    [
+        Input('Scatterplot_cL', 'clickData'),
+        Input('BarGraph_cL', 'clickData'),
+        Input('velocity_dropdown_cL', 'value'),
+        Input('apstatus_dropdown_cL', 'value')
+        
+    ])
+def display_figure_fault_list_callback( commLoss_click_value, trend_click_value, velocity_dropdown, apstatus):
+    return display_figure_fault_list( commLoss_click_value, trend_click_value, velocity_dropdown, apstatus)
+
+def display_figure_fault_list(commLoss_click_value, trend_click_value, velocity_dropdown, apstatus):    
+    if commLoss_click_value == None or trend_click_value == None:
+         return []
+
+    click_vobcid = commLoss_click_value['points'][0]['y']
+    click_loc = commLoss_click_value['points'][0]['x']
+    op_date = trend_click_value['points'][0]['x']
+    start_date = util.str2date1(op_date)
+    end_date = start_date + timedelta(days = 1)
+
+    c = ViewCommLossListClass('fig_list_dates_cL', start_date, end_date, click_vobcid, click_loc, velocity_dropdown, apstatus)
+    d = c.get_data()
+
+    return d

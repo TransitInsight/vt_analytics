@@ -178,7 +178,7 @@ def test_display_figure_fault_list_callback():
     points2 = [{'curveNumber': 14, 'pointIndex': None, 'pointNumber': None, 'x': '2015-1-28', 'y': 0}]
     second_value = {'points':points2}
 
-    ret = vv.display_figure_fault_list(3, '2015-01-01T00:00:00', '2015-04-01T00:00:00', click_value, second_value, -1, -1)
+    ret = vv.display_figure_fault_list(3, click_value, second_value, -1, -1)
     assert ret is not None
     assert isinstance(ret, list)
     assert len(ret) >= 1

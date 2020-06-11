@@ -40,3 +40,15 @@ def test__display_click_data():
     c = vc._display_click_data(None,filter_start_date, filter_end_date, -1 , -1)
     assert a and b and c is not None
 
+def test_display_figure_fault_list_callback():
+    a_selected_value = {'curveNumber': 12, 'label': 13, 'pointIndex': 3, 'pointNumber': 3, 'value': 13, 'y': 280, 'x': None}#y is VobcID
+    list1 = [a_selected_value]
+    click_value = {'points': list1}
+
+    points2 = [{'curveNumber': 14, 'pointIndex': None, 'pointNumber': None, 'x':  '2015-01-01T00:00:00', 'y': 0}]
+    second_value = {'points':points2}
+
+    ret = vc.display_figure_fault_list( click_value, second_value, -1, -1)
+    assert ret is not None
+    assert isinstance(ret, list)
+    assert len(ret) >= 1
