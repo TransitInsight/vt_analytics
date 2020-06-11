@@ -19,11 +19,20 @@ filter_start_date = dt(2015, 1, 1)
 filter_end_date = dt(2016, 4, 1)
 
 def test_get_commLoss_by_vobcid_loc():
-    x = module_commLoss.get_commLoss_by_vobcid_loc(filter_start_date, filter_end_date)
+    x = module_commLoss.get_commLoss_by_vobcid_loc(filter_start_date, filter_end_date) 
+    y = module_commLoss.get_commLoss_by_vobcid_loc(filter_start_date, filter_end_date,0,0)
+    z = module_commLoss.get_commLoss_by_vobcid_loc(filter_start_date, filter_end_date,1,1)
     assert util.IsInMemoryTrue(len(x.index) == 300)
     assert len(x.index) >= 100 
-
+    assert util.IsInMemoryTrue(len(y.index) == 300)
+    assert len(y.index) >= 100 
+    assert util.IsInMemoryTrue(len(z.index) == 300)
+    assert len(z.index) >= 100 
 
 def test_get_faultcount_by_vobcid_loc_date():
     x = module_commLoss.get_commLoss_by_vobcid_loc_date(filter_start_date, filter_end_date, 240, None)
+    y = module_commLoss.get_commLoss_by_vobcid_loc_date(filter_start_date, filter_end_date, 240, None, 0, 0)
+    z = module_commLoss.get_commLoss_by_vobcid_loc_date(filter_start_date, filter_end_date, 240, None, 1, 1)
     assert len(x.index) >= 10
+    assert len(y.index) >= 10
+    assert len(z.index) >= 10
