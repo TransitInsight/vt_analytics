@@ -30,3 +30,12 @@ def test_update_Scatter():
     a = vc._update_Scatter(None, None, -1, -1)
     b = vc._update_Scatter(filter_end_date, filter_start_date, -1, -1)
     assert a and b is not None
+
+click_data = {'points':[{'curveNumber': 0, 'marker.color': 27, 'marker.size': 1310.6796116504854, 'pointIndex': 69, 'pointNumber': 69, 'text': 27, 'x': 'CAW', 'y': 158}]}
+def test__display_click_data():
+    x = vc._display_click_data(click_data,filter_start_date, filter_end_date, -1, -1 )
+    assert x is not None
+    a = vc._display_click_data(click_data,None, None, -1, -1 )
+    b = vc._display_click_data(click_data,filter_end_date, filter_start_date, -1 , -1)
+    c = vc._display_click_data(None,filter_start_date, filter_end_date, -1 , -1)
+    assert a and b and c is not None
