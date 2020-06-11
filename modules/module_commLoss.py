@@ -5,11 +5,12 @@ import requests
 import json
 import util as util
 
-def get_commLoss_by_vobcid_loc(start_date, end_date, velocity_dropdown = None, apstatus = None ):
+def get_commLoss_by_vobcid_loc(start_date, end_date, velocity_dropdown = None, apstatus = None, commtype = None):
     
     start_date,end_date = util.date2str2(start_date,end_date)
     veld = ''
     apstat = ''
+    commT = ''
     if velocity_dropdown is 0: 
         veld = " and velocity = 0"
     if velocity_dropdown is 1: 
@@ -18,12 +19,15 @@ def get_commLoss_by_vobcid_loc(start_date, end_date, velocity_dropdown = None, a
         apstat = " and activePassiveStatus = true"
     if apstatus is 0: 
         apstat = " and activePassiveStatus = false"
+    if commtype is not None and commtype != -1:
+        commT = " and commType = {}".format(commtype)
+ 
 
     query = ("SELECT vobcid, locationName, count(commType) as commLossCount from dlr_vobc_comloss"
-                " where commType > 0 and loggedAt >= '{}' and loggedAt < '{}' {} {}" 
+                " where commType > 0 and commType < 6 and loggedAt >= '{}' and loggedAt < '{}' {} {} {}" 
                 " group by vobcid, locationName"
                 " order by commLossCount desc"
-                " LIMIT 300").format(start_date, end_date, veld, apstat)
+                " LIMIT 300").format(start_date, end_date, veld, apstat, commT)
 
     
     df = util.run_query(query)
@@ -31,12 +35,13 @@ def get_commLoss_by_vobcid_loc(start_date, end_date, velocity_dropdown = None, a
         df = pd.DataFrame() 
     return df
 
-def get_commLoss_by_vobcid_loc_date(start_date, end_date, vobcid, location, velocity_dropdown = None, apstatus = None):
+def get_commLoss_by_vobcid_loc_date(start_date, end_date, vobcid, location, velocity_dropdown = None, apstatus = None, commtype = None):
     
     vobcs = ''
     loc = ''
     veld = ''
     apstat = ''
+    commT = ''
     if (vobcid != -1 ):
         vobcs = " and vobcid = {}".format(vobcid)    
     if (location is not None ):
@@ -49,21 +54,23 @@ def get_commLoss_by_vobcid_loc_date(start_date, end_date, vobcid, location, velo
         apstat = " and activePassiveStatus = true"
     if apstatus is 0: 
         apstat = " and activePassiveStatus = false"
+    if commtype is not None and commtype != -1: 
+        commT = " and commType = {}".format(commtype)
 
     start_date,end_date = util.date2str2(start_date,end_date)
     
     query = ("SELECT HISTOGRAM(loggedAt, INTERVAL 1 DAY) as date, count(*) as commLossCount" 
             " from dlr_vobc_comloss" 
-            " where loggedAt >= '{}' and loggedAt < '{}' {} {} {} {}" 
-            " GROUP BY date").format(start_date, end_date, vobcs, loc, veld, apstat)
+            " where commType > 0 and commType < 6 and loggedAt >= '{}' and loggedAt < '{}' {} {} {} {} {}" 
+            " GROUP BY date").format(start_date, end_date, vobcs, loc, veld, apstat, commT)
     
     df = util.run_query(query)
 
     return df
 
-def get_commLoss_list(start_date,end_date, vobc_id = None, location = None, velocity= None, apstatus = None):
+def get_commLoss_list(start_date,end_date, vobc_id = None, location = None, velocity= None, apstatus = None, commtype = None):
     start_date,end_date = util.date2str2(start_date,end_date)
-    query = "SELECT vobcid, parentTrainId, loggedAt, velocity, activePassiveStatus, locationName, commType from dlr_vobc_comloss where loggedAt >= '{}' and loggedAt < '{}'".format(start_date,end_date)
+    query = "SELECT vobcid, parentTrainId, loggedAt, velocity, activePassiveStatus, locationName, commType from dlr_vobc_comloss where commType > 0 and commType < 6 and loggedAt >= '{}' and loggedAt < '{}'".format(start_date,end_date)
 
     if vobc_id is not None and vobc_id != -1:
         query += " and vobcid = {}".format(vobc_id)
@@ -77,6 +84,9 @@ def get_commLoss_list(start_date,end_date, vobc_id = None, location = None, velo
         query += " and activePassiveStatus = true"
     if apstatus is 0: 
         query += " and activePassiveStatus = false"
+    if commtype is not None and commtype != -1: 
+        query += " and commType = {}".format(commtype)
+
     df = util.run_query(query)
     
     if df is None:

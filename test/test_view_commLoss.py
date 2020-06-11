@@ -52,3 +52,36 @@ def test_display_figure_fault_list_callback():
     assert ret is not None
     assert isinstance(ret, list)
     assert len(ret) >= 1
+
+
+def test_create_fig_by_trainmove():
+    ret = vc.create_fig_by_trainmove(153, '2015-1-1 10:12')
+    assert ret != None
+    assert util.IsInMemoryTrue(len(ret.data) >= 18)
+    assert isinstance(ret.data[0], plotly.graph_objs.Scatter)
+    assert (ret.data[0].name == 'Actual Velocity')
+    assert isinstance(ret.data[1], plotly.graph_objs.Scatter)
+    assert (ret.data[1].name == 'Max Velocity')
+    assert isinstance(ret.data[2], plotly.graph_objs.Scatter)
+    assert util.IsInMemoryTrue(ret.data[2].name == 'Door Cmd')
+
+    assert util.IsInMemoryTrue(isinstance(ret.data[3], plotly.graph_objs.Scatter))
+    assert util.IsInMemoryTrue((ret.data[3].name == 'Door Status'))
+
+def test_trainmove_offset_callback():
+
+    items = [{'prop_id': 'cL_button_next_page.n_clicks'}]
+    data = vc.update_offset( items, None)
+    assert data['offset'] == 2
+
+    items = [{'prop_id': 'cL_button_next.n_clicks'}]
+    data = vc.update_offset( items, None)
+    assert data['offset'] == 1
+
+    items = [{'prop_id': 'cL_button_prev_page.n_clicks'}]
+    data = vc.update_offset( items, None)
+    assert data['offset'] == -2
+
+    items = [{'prop_id': 'cL_button_prev.n_clicks'}]
+    data = vc.update_offset( items, None)
+    assert data['offset'] == -1

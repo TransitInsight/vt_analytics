@@ -22,7 +22,7 @@ import plotly.graph_objs as go
 
 
 class ViewCommLossListClass:
-    def __init__(self, table_id, start_date, end_date, vobc_id, location = None, velcocity_dropdown = None, apstatus = None):
+    def __init__(self, table_id, start_date, end_date, vobc_id, location = None, velcocity_dropdown = None, apstatus = None, commLoss = None):
         self.table_id = table_id
         self.vobc_id = vobc_id
         self.start_date = start_date
@@ -30,11 +30,11 @@ class ViewCommLossListClass:
         self.location = location
         self.velocity_dropdown = velcocity_dropdown
         self.apstatus = apstatus
+        self.commLoss = commLoss
         self.__read_base_data()
         
-
     def __read_base_data(self):
-        df = module_commLoss.get_commLoss_list(self.start_date, self.end_date, self.vobc_id, self.location, self.velocity_dropdown, self.apstatus)
+        df = module_commLoss.get_commLoss_list(self.start_date, self.end_date, self.vobc_id, self.location, self.velocity_dropdown, self.apstatus, self.commLoss)
 
         self.df = df
 

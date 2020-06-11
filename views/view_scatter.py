@@ -123,10 +123,6 @@ apstatus_dropdown = dcc.Dropdown(
         style={ 'display':'inline-block', 'font-size':'100%', 'width': '250px', 'margin-top':'2px'},
     )
 
-
-app.layout = html.Div([
-
-])
 layout = html.Div([
 
     html.Div([
@@ -253,8 +249,6 @@ def _update_Scatter(faultcode_, start_date,end_date, velocity_dropdown, apstatus
     Output('fig_list_dates', 'data'),
     [
         Input('fault_code_dropdown', 'value'),
-        #Input('date-range', 'start_date'),
-        #Input('date-range', 'end_date') ,
         Input('Scatterplot', 'clickData'),
         Input('BarGraph', 'clickData'),
         Input('velocity_dropdown', 'value'),
@@ -355,8 +349,4 @@ def display_figure_trainmove(first_value, second_value, table_active_cell, table
     f = create_fig_by_trainmove(p_train_id, op_date, fault_code, delta)
     return f
 
-
-if __name__ == "__main__":
-    app.run_server()
-  
 
