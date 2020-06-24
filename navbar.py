@@ -12,7 +12,7 @@ def Navbar():
                     dbc.DropdownMenuItem("Page 3", href="/views/view3"),
                     #dbc.DropdownMenuItem("Communication", header=True),
                     dbc.DropdownMenuItem("Comm Loss Correlation", href="/views/commLoss"),
-
+                    dbc.DropdownMenuItem("Switch Correlation", href="/views/view_switch"),
 
                 ],
                 label="VOBC Report",

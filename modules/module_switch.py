@@ -27,35 +27,21 @@ def get_switch_count(start_date, end_date):
 
 def get_switch_filter_val(start_date, end_date, switchId, Limit):
     start_date, end_date = util.date2str2(start_date,end_date)
-    Limit = int(Limit)
+    if Limit != -1 and Limit != 0:
+        Limit = int(Limit)
+        Limit = 'LIMIT {}'.format(Limit)
+    else:
+        Limit = ''
     query = ("SELECT interval, switchId from dlr_switch_move"
             " where interval > 0 and intervalDesc in ('Moving Time to Left' , 'Moving Time to Right' )"
             " and switchId = '{}' and loggedAt >= '{}' and loggedAt < '{}'" 
-            " order by interval desc LIMIT {}").format(switchId, start_date, end_date, Limit)
+            " order by interval desc {}").format(switchId, start_date, end_date, Limit)
     
     L = util.run_query(query)
     if L is None or L.empty:
         return 0
     return L["interval"].min()
 
-# start_date = dt(2012, 1, 1)
-# end_date = dt(2020, 1, 1)
-# start_date, end_date  = util.date2str2(start_date, end_date )
-
-# def get_switch_filter_val( row, start_date = start_date, end_date = end_date):
-#     switchId = row[1]
-#     Limit = row[2]
-#     start_date, end_date = util.date2str2(start_date,end_date)
-#     Limit = int(Limit)
-#     query = ("SELECT interval, switchId from dlr_switch_move"
-#             " where interval > 0 and intervalDesc in ('Moving Time to Left' , 'Moving Time to Right' )"
-#             " and switchId = '{}' and loggedAt >= '{}' and loggedAt < '{}'" 
-#             " order by interval desc LIMIT {}").format(switchId, start_date, end_date, Limit)
-    
-#     L = util.run_query(query)
-#     if L is None or L.empty:
-#         return 0
-#     return L["interval"].min()
 
 def get_avg(start_date, end_date, switchId, interval_max):
     start_date, end_date = util.date2str2(start_date,end_date) 
@@ -107,51 +93,50 @@ def get_d1(start_date, end_date, switchId, avg, interval_max):
         return 0
     return L["int_Avg"].max()
 
-def get_df(start_date, end_date, filterout): 
+
+
+# def get_df(pool, start_date, end_date,filterout): 
+#     df = get_switch_count(start_date, end_date)
+#     df["amt"] = df["amt"]*filterout
+#     df['max'] = pool.starmap(get_switch_filter_val, [(start_date, end_date, df["switchId"][ind], df["amt"][ind]) for ind in df.index])
+#     return df
+
+
+# def update_val_s(df, ind, start_date, end_date):
+#     swid = df["switchId"][ind]
+#     mx = df["max"][ind]
+#     avg = get_avg(start_date, end_date, swid, mx) 
+#     L = get_min(start_date, end_date, swid, mx)  
+#     d0 = get_d0(start_date,end_date, swid, avg)  
+
+#     d1 = get_d1(start_date,end_date, swid, avg, mx)  
+#     return [avg, L, d0, d1]
+  
+
+# def update_val(pool, df, start_date, end_date):
+
+#     data = pool.starmap(update_val_s, [(df, ind, start_date, end_date) for ind in df.index])
+#     df1 = pd.DataFrame(data, columns = ["avg", 'min', "d0", 'd1'])
+#     df["avg"] = df1["avg"] 
+#     df["min"] = df1["min"] 
+#     df["d0"] = df1["d0"] 
+#     df["d1"] = df1["d1"] 
+#     return df
+
+
+def get_df(p, start_date, end_date, filterout): 
     df = get_switch_count(start_date, end_date)
     df["amt"] = df["amt"]*filterout
     df['max'] = df.apply(lambda row: get_switch_filter_val(start_date, end_date, row["switchId"], row["amt"]), axis=1)
     return df
 
-def get_df_2(pool, start_date, end_date,filterout): 
-    df = get_switch_count(start_date, end_date)
-    df["amt"] = df["amt"]*filterout
-    df['max'] = pool.starmap(get_switch_filter_val, [(start_date, end_date, df["switchId"][ind], df["amt"][ind]) for ind in df.index])
-    return df
- 
-
-def update_val(df,start_date, end_date):
+def update_val(p, df,start_date, end_date):
     df["avg"] = df.apply(lambda row: get_avg(start_date, end_date, row["switchId"], row["max"]), axis=1)
     df["min"] = df.apply(lambda row: get_min(start_date, end_date, row["switchId"], row["max"]), axis=1)
     df["d0"] = df.apply(lambda row: get_d0(start_date,end_date, row["switchId"], row["avg"]), axis=1)
     df["d1"] = df.apply(lambda row: get_d1(start_date,end_date, row["switchId"], row["avg"], row["max"]), axis=1)
     
     return df
-
-
-def update_val_s(df, ind, start_date, end_date):
-    swid = df["switchId"][ind]
-    mx = df["max"][ind]
-    avg = get_avg(start_date, end_date, swid, mx) 
-    L = get_min(start_date, end_date, swid, mx)  
-    d0 = get_d0(start_date,end_date, swid, avg)  
-
-    d1 = get_d1(start_date,end_date, swid, avg, mx)  
-    return [avg, L, d0, d1]
-  
-
-def update_val_2(df, pool, start_date, end_date):
-
-    data = pool.starmap(update_val_s, [(df, ind, start_date, end_date) for ind in df.index])
-    df1 = pd.DataFrame(data, columns = ["avg", 'min', "d0", 'd1'])
-    df["avg"] = df1["avg"] 
-    df["min"] = df1["min"] 
-    df["d0"] = df1["d0"] 
-    df["d1"] = df1["d1"] 
-    return df
-
-
-
 
 def gen_graph(df):
     Lof = df['min'].tolist()
@@ -171,32 +156,18 @@ def gen_graph(df):
                     ))
     return fig 
 
-if __name__ == "__main__":
-    start_date = dt(2014, 1, 1)
-    end_date = dt(2020, 1, 1)
-    start_date, end_date  = util.date2str2(start_date, end_date )
+
+
+#def get_df(start_date, end_date, filterout): 
+#     df = get_switch_count(start_date, end_date)
+#     df["amt"] = df["amt"]*filterout
+#     df['max'] = df.apply(lambda row: get_switch_filter_val(start_date, end_date, row["switchId"], row["amt"]), axis=1)
+#     return df
+
+# def update_val(df,start_date, end_date):
+#     df["avg"] = df.apply(lambda row: get_avg(start_date, end_date, row["switchId"], row["max"]), axis=1)
+#     df["min"] = df.apply(lambda row: get_min(start_date, end_date, row["switchId"], row["max"]), axis=1)
+#     df["d0"] = df.apply(lambda row: get_d0(start_date,end_date, row["switchId"], row["avg"]), axis=1)
+#     df["d1"] = df.apply(lambda row: get_d1(start_date,end_date, row["switchId"], row["avg"], row["max"]), axis=1)
     
-      
-    #time.sleep(10)
-
-    start = time.time()
-    df = get_df(start_date, end_date, 0.01)
-    df = update_val(df, start_date, end_date)
-    print(df)
-    end = time.time()
-    print(end - start)
-
-      
-    
-
-    start = time.time()
-    pool = mp.Pool(4)
-    df2 = get_df_2(pool, start_date, end_date, 0.01)
-    df2 = update_val_2(df2, pool, start_date, end_date)
-    print(df2)
-    end = time.time()
-    print(end - start)
-    pool.close()
-    #df = update_val(df,start_date, end_date)
-    #fig = gen_graph(df)
-    #fig.show()
+#     return df

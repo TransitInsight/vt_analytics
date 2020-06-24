@@ -8,6 +8,7 @@ from navbar import Navbar
 from views import view_scatter 
 from views import view_vobcfault
 from views import view_commLoss
+from views import view_switch
 import util
 import flask
 
@@ -45,6 +46,8 @@ def display_page(pathname):
         return view_scatter.layout
     elif pathname == '/views/commLoss':
         return view_commLoss.layout
+    elif pathname == '/views/view_switch':
+        return view_switch.layout
     else:
         return '404: missing app = {}'.format(pathname)
 
