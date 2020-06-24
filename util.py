@@ -149,6 +149,8 @@ def run_query_in_memory(query):
             df[field] = velocity_list
         elif 'faultcodeset' in field.lower():
             df[field] = status_list
+        elif 'amt' in field.lower() or 'interval' in field.lower() or 'int_avg' in field.lower() :
+            df[field] = velocity_list
         else:
             df[field] = fc_name_list
             df[field] = pd.Series(df[field], dtype=pd.StringDtype())
