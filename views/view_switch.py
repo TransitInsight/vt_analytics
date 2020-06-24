@@ -11,6 +11,7 @@ import plotly.offline as pyo
 import plotly.express as px
 import plotly.graph_objs as go
 import dash as dash
+#import index 
 
 from datetime import datetime as dt
 from datetime import timedelta
@@ -51,16 +52,19 @@ date_sw = dcc.DatePickerRange(
         )
 
 
-checkboxdict = [{'label':"All", "value": -1},
+checkboxdict = [{'label':"All", "value": 0},
                 {'label':"0.01%", "value":0.0001},
                 {'label':"0.05%", "value":0.0005},
                 {'label':"0.1%", "value":0.001},
                 {'label':"0.5%", "value":.005},
-                {'label':"1%", "value":0.01}]
+                {'label':"1%", "value":0.01},
+                {'label':"1.5%", "value":0.015},
+                {'label':"2%", "value":0.02},
+                ]
 filter_dropdown_sw = dcc.Dropdown(
                 id = 'filter_out_dropdown',
                 options= checkboxdict,
-                value = 0.0001,
+                value = 0.015,
                 style={ 'display':'inline-block', 'font-size':'100%', 'width': '200px', 'margin-top':'2px'},
             )
 
@@ -81,8 +85,8 @@ layout = html.Div([
     html.Div([    
         
           
-            dcc.Graph(id = 'BoxGraph_sw', 
-                  
+            dcc.Graph(id = 'BoxGraph_sw' 
+                
             ),
             
             ]),
@@ -102,22 +106,17 @@ def update_switchid_boxplot(start_date,end_date, filter_out_dropdown):
 
 def _switchid_boxplot(start_date,end_date, filter_out_dropdown):
     start_date,end_date = datecheck(start_date, end_date)
-    pool = None
-    #pool = mp.Pool(4)
-    df = ms.get_df(pool, start_date, end_date, filter_out_dropdown)
-    df = ms.update_val(pool, df, start_date, end_date)
-    #pool.close()
+    pool = index.get_pool
+    df = ms.gen_graph(pool, start_date, end_date, filter_out_dropdown)
     
-    if len(df.index) == 0 or df is None:
-        data_1 = []
-    else:
-        data_1 = [ms.gen_graph(df)]          
-   
-    return{'data': data_1,                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
-            'layout' : go.Layout(title = "SwitchId_boxplot", 
-                xaxis = {'title': 'SwitchId', 'categoryorder' : 'category ascending'},
-                yaxis = {'title': 'Time to switch'},  
-                hovermode="closest",
-                clickmode =  'event+select')
-            }
+
+    return df
+
+    # return{'data': data_1,                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
+    #         'layout' : go.Layout(title = "SwitchId_boxplot")
+    #             #xaxis = {'title': 'SwitchId', 'categoryorder' : 'category ascending'},
+    #             #yaxis = {'title': 'Time to switch'},  
+    #             #hovermode="closest",
+    #             #clickmode =  'event+select')
+    #         }
 

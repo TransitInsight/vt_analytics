@@ -11,12 +11,17 @@ from views import view_commLoss
 from views import view_switch
 import util
 import flask
+import multiprocessing as mp
 
 #TILOGO = "https://transitinsight.com/site_media/images/logo-ti.png"
 TILOGO = "http://localhost:8050/system_icon.png"
 
 nav = Navbar()
 app.title = "ViewTrac"
+# pool_sw = mp.Pool(4)
+
+# def get_pool():
+#     return pool_sw
 
 app.layout = html.Div([
     dcc.Location(id='url', refresh=False),
