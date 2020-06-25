@@ -36,14 +36,14 @@ def test_get_switch_filter_val():
 
 def test_get_df():
     t1 = time.time()
-    pool = mp.Pool(12)
+    pool = mp.Pool(4)
     t2 = time.time()
     delta = t2 - t1
     print ("pool init time = {}".format(delta))
 
     #time.sleep(10)
     t2 = time.time()
-    x= ms.get_df(pool, start_date, end_date,0 )
+    x= ms.get_df(pool, start_date, end_date, 0 )
     t3 = time.time()
     delta = t3 - t2
     print ("get_df time = {}".format(delta))

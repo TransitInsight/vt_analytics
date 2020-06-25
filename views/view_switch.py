@@ -106,8 +106,8 @@ def update_switchid_boxplot(start_date,end_date, filter_out_dropdown):
 
 def _switchid_boxplot(start_date,end_date, filter_out_dropdown):
     start_date,end_date = datecheck(start_date, end_date)
-    pool = index.get_pool
-    df = ms.gen_graph(pool, start_date, end_date, filter_out_dropdown)
+    
+    df = ms.gen_graph(None, start_date, end_date, filter_out_dropdown)
     
 
     return df
