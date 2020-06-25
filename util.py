@@ -13,6 +13,7 @@ import numpy as np
 import os
 import base64
 import dash_html_components as html
+from elasticsearch import Elasticsearch
 
 
 #%%
@@ -58,6 +59,11 @@ def run_query(query):
         df = run_query_es(query)
     return df
 
+def run_query_es_native(index_name, query_body):
+    elastic_client = Elasticsearch(cfg.ElasticSearchDS['host'], timeout=30)
+    result = elastic_client.search(index=index_name, body = query_body)
+
+    return result
 
 def run_query_es(query):
     headers = {'Content-Type': 'application/json'}

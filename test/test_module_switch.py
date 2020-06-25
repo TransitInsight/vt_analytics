@@ -140,3 +140,96 @@ def test_multithread_mapstar_longrun():
     t6 = time.time()
     delta = t6 - t5
     print ("starmap  = {}".format(delta))
+
+
+
+def test_switch_interval_es_native_query():
+
+    if util.is_in_memory():
+        return
+    query_body = {
+        "size": 0,
+        "query" :  {
+            "bool" : {
+            "must" : [
+                {
+                "bool" : {
+                    "must" : [
+                    {
+                        "terms" : {
+                        "intervalDesc.keyword" : [
+                            "Moving Time to Right",
+                            "Moving Time to Left"
+                        ],
+                        "boost" : 1.0
+                        }
+                    },
+                    {
+                        "range" : {
+                        "interval" : {
+                            "from" : 0,
+                            "to" : 2000,
+                            "include_lower" : True,
+                            "include_upper" : False,
+                            "boost" : 1.0
+                        }
+                        }
+                    }
+                    ],
+                    "adjust_pure_negative" : True,
+                    "boost" : 1.0
+                }
+                },
+                {
+                "range" : {
+                    "loggedAt" : {
+                    "from" : "2014-04-25T00:13:26.017995",
+                    "to" : None,
+                    "include_lower" : False,
+                    "include_upper" : False,
+                    "boost" : 1.0
+                    }
+                }
+                }
+            ],
+            "adjust_pure_negative" : True,
+            "boost" : 1.0
+            }
+        },
+
+        "aggs": {
+            "switchId": {
+            "terms": {
+                "field": "switchId",
+                "size": 1000
+            },
+
+            "aggs": {
+                "box_interval":{ 
+                "percentiles": {
+                    "field":"interval",
+                    "percents": [
+                    1,
+                    25,
+                    50,
+                    75,
+                    99,
+                    99.9,
+                    100
+                    ]
+                } 
+                }
+            }
+            }
+        }
+    }    
+
+    result = util.run_query_es_native('dlr_switch_move',  query_body)
+
+    switch_1pct = result['aggregations']['switchId']['buckets'][0]['box_interval']['values']['1.0']
+    switch_999pct = result['aggregations']['switchId']['buckets'][0]['box_interval']['values']['99.9']
+    switch_990pct = result['aggregations']['switchId']['buckets'][0]['box_interval']['values']['99.0']
+
+    assert(switch_999pct > switch_990pct)
+    assert(switch_990pct > switch_1pct)
+    assert(switch_1pct > 0)
