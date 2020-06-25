@@ -60,83 +60,31 @@ def test_get_df():
     assert len(x) > 10
     pool.close()
 
+def test_get_d0():
+    x = ms.get_d0(start_date,end_date, 101, 4)
+    assert x is not None
 
-def f(x):
-    time.sleep(5)
-    return x*x
+def test_get_avg():
+    x = ms.get_avg(start_date,end_date, 101, 4)
+    assert x is not None
 
-def is_prime(num):
-    if num > 1:
-        for i in range(2,num):
-            if (num % i) == 0:
-                return False
-        else:
-            return True
-    else:
-        return False 
+def test_get_min():
+    x = ms.get_min(start_date,end_date, 101, 4)
+    assert x is not None
 
-def sum_prime1(x):
-    total = 0
-    for i in range (2,x):
-        if is_prime(i):
-            total += i
-    print ("sum prime {}  = {}".format(x, total))            
-    return total
+def test_gen_graph():
+    x = ms.gen_graph(None, start_date,end_date, 0)
+    assert x is not None
 
-def sum_prime(x):
-    # print('.', end=' ')
-    # sys.stdout.flush()
-    r = sum_prime1(x)
-    #time.sleep(5)
-    return r
+def test_gen_graph_1():
+    x = ms.gen_graph(None, start_date,end_date, 0.0001)
+    assert x is not None
 
+def test_get_switch_filter_val_2():
+    x = ms.get_switch_filter_val(start_date, end_date, 101, 0)
+    assert x is not None
 
-def test_single_thread_longrun():
-    t1 = time.time()
-    sum_prime(60000)
-    sum_prime(60000)
-    sum_prime(60000)
-    sum_prime(60000)
-    sum_prime(60000)
-    sum_prime(60000)
-    sum_prime(60000)
-    sum_prime(60000)
-    sum_prime(60000)
-    sum_prime(60000)
-    sum_prime(60000)
-    sum_prime(60000)
-    t2 = time.time()
-
-    delta = t2 - t1
-    print ("single thread duration = {}".format(delta))
-
-def test_multithread_map_longrun():
-    t2 = time.time()
-
-    list_augs = [60000, 60000, 60000, 60000, 60000, 60000, 60000, 60000, 60000, 60000, 60000, 60000]
-    p = mp.Pool(12)
-    t3 = time.time()
-
-    delta = t3 - t2
-    print ("pool 1 init = {}".format(delta))
-
-    p.map(sum_prime, list_augs)
-
-    t4 = time.time()
-    delta = t4 - t3
-    print ("map calculation = {}".format(delta))
-
-def test_multithread_mapstar_longrun():
-    t4 = time.time()
-    p = mp.Pool(processes=12)
-    list_augs = [60000, 60000, 60000, 60000, 60000, 60000, 60000, 60000, 60000, 60000, 60000, 60000]
-
-    t5 = time.time()
-    delta = t5 - t4
-    print ("pool 2 init  = {}".format(delta))
-
-    p.starmap(sum_prime, product(list_augs, repeat=1))
-
-    t6 = time.time()
-    delta = t6 - t5
-    print ("starmap  = {}".format(delta))
+def test_get_unlock_count():
+    x = ms.get_unlock_count(start_date, end_date)
+    assert x is not None
+    assert x is not 0

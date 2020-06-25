@@ -22,18 +22,3 @@ def test_switchid_boxplot():
     assert x is not None
 
 
-# def test_get_max():
-#     x = ms.get_max(start_date,end_date, 101, 4)
-#     assert x is not None
-
-# def test_gen_graph():
-#     x = ms.gen_graph(None, start_date,end_date, 0)
-#     assert x is not None
-
-# def test_gen_graph_1():
-#     x = ms.gen_graph(None, start_date,end_date, 0.0001)
-#     assert x is not None
-
-# def test_get_switch_filter_val_2():
-#     x = ms.get_switch_filter_val(start_date, end_date, 101, 0)
-#     assert x is not None

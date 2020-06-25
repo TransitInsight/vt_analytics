@@ -13,8 +13,10 @@ import time
 import sys
 import util as util
 
+import config as cfg
+
+
 def get_switch_count(start_date, end_date):
-    start_date, end_date = util.date2str2(start_date,end_date)
 
     query = ("SELECT switchId, COUNT(*) as amt from dlr_switch_move" 
             " where interval >= 0 and intervalDesc in ('Moving Time to Left' , 'Moving Time to Right' )" 
@@ -26,7 +28,6 @@ def get_switch_count(start_date, end_date):
     return L
 
 def get_switch_filter_val(start_date, end_date, switchId, Limit):
-    start_date, end_date = util.date2str2(start_date,end_date)
     if Limit != -1 and Limit != 0 and Limit > 1:
         Limit = int(Limit)
         Limit = 'LIMIT {}'.format(Limit)
@@ -44,7 +45,6 @@ def get_switch_filter_val(start_date, end_date, switchId, Limit):
 
 
 def get_avg(start_date, end_date, switchId, interval_max):
-    start_date, end_date = util.date2str2(start_date,end_date) 
     query = ("SELECT AVG(interval) as int_Avg from dlr_switch_move"
             " where interval > 0 and interval <= {}  and intervalDesc in ('Moving Time to Left' , 'Moving Time to Right' )"
             " and switchId = '{}' and loggedAt >= '{}' and loggedAt < '{}'" 
@@ -56,7 +56,6 @@ def get_avg(start_date, end_date, switchId, interval_max):
     return L["int_Avg"].min()
 
 def get_min(start_date, end_date, switchId, interval_max):
-    start_date, end_date = util.date2str2(start_date,end_date)
     query = ("SELECT interval from dlr_switch_move"
             " where interval > 0 and interval <= {}  and intervalDesc in ('Moving Time to Left' , 'Moving Time to Right' )"
             " and switchId = '{}' and loggedAt >= '{}' and loggedAt < '{}'" 
@@ -68,7 +67,6 @@ def get_min(start_date, end_date, switchId, interval_max):
     return L["interval"].min()
 
 def get_d0(start_date, end_date, switchId, avg):
-    start_date, end_date = util.date2str2(start_date,end_date)
 
     query = ("SELECT AVG(interval) as int_Avg from dlr_switch_move"
             " where interval > 0 and interval <= {}  and intervalDesc in ('Moving Time to Left' , 'Moving Time to Right' )"
@@ -81,8 +79,6 @@ def get_d0(start_date, end_date, switchId, avg):
     return L["int_Avg"].min()
 
 def get_d1(start_date, end_date, switchId, avg, interval_max):
-    start_date, end_date = util.date2str2(start_date,end_date)
-    
     query = ("SELECT AVG(interval) as int_Avg from dlr_switch_move"
             " where interval > {} and interval <= {}  and intervalDesc in ('Moving Time to Left' , 'Moving Time to Right')"
             " and switchId = '{}' and loggedAt >= '{}' and loggedAt < '{}'" 
@@ -93,18 +89,27 @@ def get_d1(start_date, end_date, switchId, avg, interval_max):
         return 0
     return L["int_Avg"].max()
 
-def get_max(start_date, end_date, switchId, interval_max):
-    start_date, end_date = util.date2str2(start_date,end_date)
-    
-    query = ("SELECT interval from dlr_switch_move"
-            " where interval < {}  and intervalDesc in ('Moving Time to Left' , 'Moving Time to Right')"
-            " and switchId = '{}' and loggedAt >= '{}' and loggedAt < '{}'" 
-            " order by interval DESC LIMIT 5").format( interval_max, switchId, start_date, end_date)
-
+def get_unlock_count( start_date, end_date): 
+    query = ("SELECT switchId, COUNT(*) as count from dlr_switch_move"
+    " where interval > 0 and loggedAt >= '2015-01-01T10:00:00' and loggedAt < '2016-01-01T20:00:00'" 
+    " and intervalDesc in ('Moving Time to Left' , 'Moving Time to Right' ) "
+    " and duration >= 10  group by switchId")
     L = util.run_query(query)
     if L is None or L.empty:
         return 0
-    return L["interval"].max()
+    return L
+
+# def get_max(start_date, end_date, switchId, interval_max):
+    
+#     query = ("SELECT interval from dlr_switch_move"
+#             " where interval < {}  and intervalDesc in ('Moving Time to Left' , 'Moving Time to Right')"
+#             " and switchId = '{}' and loggedAt >= '{}' and loggedAt < '{}'" 
+#             " order by interval DESC LIMIT 5").format( interval_max, switchId, start_date, end_date)
+
+#     L = util.run_query(query)
+#     if L is None or L.empty:
+#         return 0
+#     return L["interval"].max()
 
 
 def get_df(pool, start_date, end_date,filterout): 
@@ -112,6 +117,7 @@ def get_df(pool, start_date, end_date,filterout):
     df["amt"] = df["amt"]*filterout
     df['max'] = pool.starmap(get_switch_filter_val, [(start_date, end_date, df["switchId"][ind], df["amt"][ind]) for ind in df.index])
     return df
+
 
 
 def update_val_s(df, ind, start_date, end_date):
@@ -138,6 +144,7 @@ def update_val(pool, df, start_date, end_date):
     return df
 
 
+
 # def get_df(p, start_date, end_date, filterout): 
 #     df = get_switch_count(start_date, end_date)
 #     df["amt"] = df["amt"]*filterout
@@ -152,28 +159,61 @@ def update_val(pool, df, start_date, end_date):
     
 #     return df
 
+color_dict = {
+    0: "#FFA07A", 
+    1: "#FA8072", 
+    2: "#00BFFF", 
+    3: "#CD5C5C", 
+    4: "#DC143C",
+    5: "#B22222", 
+    6: "#FF0000",  
+    }
+
+def get_color(cnt):
+    if cnt < 7:
+        return color_dict[cnt]
+    return '#8B0000'
 def gen_graph_(df):
-    Lof = df['min'].tolist()
-    d0 = df['d0'].tolist()
-    avg = df['avg'].tolist()
-    d1 = df['d1'].tolist()
-    Uof = df['max'].tolist()
+    # Lof = df['min'].tolist()
+    # d0 = df['d0'].tolist()
+    # avg = df['avg'].tolist()
+    # d1 = df['d1'].tolist()
+    # Uof = df['max'].tolist()
 
     fig = go.Figure()
     
-    fig.add_trace(go.Box(
-                q1=d0, 
-                median=avg,
-                q3=d1, 
-                lowerfence=Lof,
-                upperfence=Uof
-                    ))
+    # fig.add_trace(go.Box(
+    #             q1=d0, 
+    #             median=avg,
+    #             q3=d1, 
+    #             lowerfence=Lof,
+    #             upperfence=Uof,
+    #             marker_color= "#FFA07A",
+                
+    #                 ))
+    for ind in df.index:
+        fig.add_trace(go.Box(
+                x = [ind],
+                q1=[df['d0'][ind]], 
+                median=[df['avg'][ind]],
+                q3=[df['d1'][ind]], 
+                lowerfence=[df['min'][ind]],
+                upperfence=[df['max'][ind]],
+                marker_color= get_color(df["count"][ind]),
+
+        ))
+
+    fig.update_xaxes(type="category")
     return fig 
 
 def gen_graph(pool, start_date, end_date, filterout):
+    start_date, end_date = util.date2str2(start_date,end_date)
     pool = mp.Pool(4)
     df = get_df(pool, start_date, end_date, filterout)
     df = update_val(pool, df,start_date, end_date)
+    df2 = get_unlock_count( start_date, end_date)
+    df = df.set_index('switchId').join(df2.set_index('switchId'))
+    df = df.fillna(value = 0)
     if len(df.index) == 0 or df is None:
         data_1 = []
     else:
