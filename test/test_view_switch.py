@@ -18,7 +18,7 @@ start_date, end_date  = util.date2str2(start_date, end_date )
 
 
 def test_switchid_boxplot():
-    x = vs._switchid_boxplot(start_date,end_date, .01)
+    x = vs._switchid_boxplot(start_date,end_date, '100%')
     assert x is not None
 
 

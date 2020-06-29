@@ -52,19 +52,18 @@ date_sw = dcc.DatePickerRange(
         )
 
 
-checkboxdict = [{'label':"All", "value": 0},
-                {'label':"0.01%", "value":0.0001},
-                {'label':"0.05%", "value":0.0005},
-                {'label':"0.1%", "value":0.001},
-                {'label':"0.5%", "value":.005},
-                {'label':"1%", "value":0.01},
-                {'label':"1.5%", "value":0.015},
-                {'label':"2%", "value":0.02},
+checkboxdict = [{'label':"All", "value": "100%"},
+                {'label':"0.1%", "value":"99.9%"},
+                {'label':"0.5%", "value":"99.5%"},
+                {'label':"1%", "value":"99%"},
+                {'label':"1.5%", "value":"98.5%"},
+                {'label':"2%", "value":'98%'},
+                
                 ]
 filter_dropdown_sw = dcc.Dropdown(
                 id = 'filter_out_dropdown',
                 options= checkboxdict,
-                value = 0.015,
+                value = "98%",
                 style={ 'display':'inline-block', 'font-size':'100%', 'width': '200px', 'margin-top':'2px'},
             )
 
