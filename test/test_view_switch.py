@@ -18,6 +18,8 @@ start_date, end_date  = util.date2str2(start_date, end_date )
 
 
 def test_switchid_boxplot():
+    if util.is_in_memory():
+        return
     x = vs._switchid_boxplot(start_date,end_date, '100%')
     assert x is not None
 

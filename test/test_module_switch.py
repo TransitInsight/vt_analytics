@@ -27,10 +27,14 @@ start_date, end_date  = util.date2str2(start_date, end_date )
 
 
 def test_gen_graph():
+    if util.is_in_memory():
+        return
     x = ms.gen_graph(None, start_date,end_date, '100%')
     assert x is not None
 
 def test_gen_graph_1():
+    if util.is_in_memory():
+        return
     x = ms.gen_graph(None, start_date,end_date, '99.9%')
     assert x is not None
 
