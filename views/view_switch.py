@@ -26,7 +26,6 @@ filter_start_date = dt(2015, 1, 1)
 filter_end_date = dt(2016, 1, 1)
 filter_start_date, filter_end_date  = util.date2str2(filter_start_date, filter_end_date )
 
-
 def datecheck(start_date, end_date):
     if start_date is None:
         start_date = filter_start_date
@@ -89,7 +88,10 @@ layout = html.Div([
             ),
             
             ]),
-        
+            
+            dcc.Graph(id = 'BoxGraphDate_sw' 
+                
+            ),
 
     ])
 
@@ -106,16 +108,36 @@ def update_switchid_boxplot(start_date,end_date, filter_out_dropdown):
 def _switchid_boxplot(start_date,end_date, filter_out_dropdown):
     start_date,end_date = datecheck(start_date, end_date)
     
-    df = ms.gen_graph(None, start_date, end_date, filter_out_dropdown)
+    df = ms.gen_box_df(start_date, end_date)
+    data = ms.gen_box_graph(df, filter_out_dropdown)
+    data.update_layout(
+    title="Switching time by SwitchId",
+    xaxis_title="SwitchId",
+    yaxis_title="Seconds",
+    )
+
+    return data
+
+@app.callback(Output('BoxGraphDate_sw', 'figure'),[
+                Input('date-range_sw', 'start_date'),
+                Input('date-range_sw', 'end_date'),
+                Input('filter_out_dropdown', 'value'),
+                Input('BoxGraph_sw', 'clickData'),
+                ])
+def update_switchid_boxplot_dates(start_date,end_date, filter_out_dropdown, clickData):
+    return _switchid_boxplot_dates(start_date,end_date, filter_out_dropdown, clickData)
+
+def _switchid_boxplot_dates(start_date,end_date, filter_out_dropdown,clickData):
+    start_date,end_date = datecheck(start_date, end_date)
     
-
-    return df
-
-    # return{'data': data_1,                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
-    #         'layout' : go.Layout(title = "SwitchId_boxplot")
-    #             #xaxis = {'title': 'SwitchId', 'categoryorder' : 'category ascending'},
-    #             #yaxis = {'title': 'Time to switch'},  
-    #             #hovermode="closest",
-    #             #clickmode =  'event+select')
-    #         }
-
+    if clickData is None:
+        return {}
+    switchId= clickData['points'][0]['x']
+    df = ms.gen_box_date_df(switchId, start_date, end_date)
+    data = ms.gen_box_graph(df, filter_out_dropdown)
+    data.update_layout(
+    title="SwitchId: {} Switching time by date".format(switchId),
+    xaxis_title="Dates",
+    yaxis_title="Seconds",
+    )
+    return data
