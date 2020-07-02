@@ -105,10 +105,14 @@ def test_switch_interval_by_date_es_native_query():
     assert(switch_1pct_n > 0)
 
 def test_get_switch_date():
+    if util.is_in_memory():
+        return
     df = ms.gen_bx_date_df_(101, start_date, end_date)
     assert df is not None
    
 def test_gen_box_date_df():
+    if util.is_in_memory():
+        return
     df = ms.gen_box_date_df(101, start_date, end_date)
     assert df is not None
 
