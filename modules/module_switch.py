@@ -16,7 +16,12 @@ import util as util
 import config as cfg
 
 
-
+def get_switch_linechart_data(switchId, start_date, end_date):
+    query = ("SELECT switchCommand, switchCommandDesc,statusDesc,positionDesc, loggedAt, switchId from dlr_switch_move"
+    " where switchId = {} and loggedAt >= '{}' and loggedAt < '{}'"
+    " order by loggedAt ").format(switchId, start_date, end_date)
+    L = util.run_query(query)
+    return L
 
 def get_unlock_count( start_date, end_date): 
     query = ("SELECT switchId, COUNT(*) as count from dlr_switch_move"
@@ -26,7 +31,7 @@ def get_unlock_count( start_date, end_date):
 
     L = util.run_query(query)
     return L
-    
+
 def get_unlock_count_by_date( switchId, start_date, end_date): 
     query = ("SELECT loggedDate, COUNT(*) as count from dlr_switch_move"
     " where interval > 0 and loggedAt >= '{}' and loggedAt < '{}' and switchId = {}" 
@@ -329,7 +334,7 @@ def gen_box_df(start_date, end_date):
     start_date, end_date  = util.date2str2(start_date, end_date )
     df = gen_bx_df_(start_date,end_date)
     df2 = get_unlock_count( start_date, end_date)
-    if df2 is not None:
+    if not df2.empty:
         df = df.set_index('switchId').join(df2.set_index('switchId'))
         df = df.fillna(value = 0)
     else:
@@ -343,13 +348,14 @@ def gen_box_date_df(switchId, start_date, end_date):
     df["loggedDate"] = pd.to_datetime(df["loggedDate"])
     # df["loggedDate"] = df["loggedDate"].tz_localize(None)
     df = df.set_index('loggedDate').tz_localize(None)
-    if df2 is not None and not df2.empty:
+    if not df2.empty:
         df2 = df2.set_index('loggedDate').tz_localize(None) 
         df = df.join(df2)
         df = df.fillna(value = 0)
     else:
-        df["count"] = 0 
-    return df 
+        df["count"] = 0
+    df.index = df.index.astype(str)
+    return df
     
 def gen_box_graph(df, filter_Val):
     
@@ -360,5 +366,54 @@ def gen_box_graph(df, filter_Val):
 
     return data_1 
 
+def get_switch_line_df(switchId, start_date, end_date):
+    start_date, end_date  = util.date2str2(start_date, end_date)
+    df = get_switch_linechart_data(switchId, start_date,end_date)
+    mapping = {'Left': 1, 'Moving': 2, 'Right': 3, "Locked": 5 , "UnLocked":6, "Move Left":8, "No Command":9,"Move Right":10}
+    df = df.replace({'positionDesc': mapping, 'statusDesc': mapping, 'switchCommandDesc':mapping})
+    return df
+    
 
 
+def create_switchId_line_fig(switchId, start_date, end_date):
+    df = get_switch_line_df(switchId, start_date, end_date)
+    fig = go.Figure()
+    fig = add_switch_pos(fig, df)
+    fig = add_lock_status(fig, df)
+    fig = add_move_cmd(fig, df)
+    return fig      
+        
+        
+def add_switch_pos(fig, df):
+    fig.add_trace(go.Scatter(x=df["loggedAt"], y=df['positionDesc'],
+                name = "Switch Position",
+                #line_color=color, 
+                mode='lines+markers', 
+                line_width=1,
+                connectgaps=False,
+                line_shape='hvh'
+                ) )
+    return fig
+
+def add_lock_status(fig, df):
+    fig.add_trace(go.Scatter(x=df["loggedAt"], y=df['statusDesc'],
+                name = "Lock_status",
+                #line_color=color, 
+                mode='lines+markers', 
+                line_width=1,
+                connectgaps=False,
+                line_shape='hvh'
+                ) )
+    return fig
+
+def add_move_cmd(fig, df):
+    fig.add_trace(go.Scatter(x=df["loggedAt"], y=df['switchCommandDesc'],
+                name = "move_cmd",
+                #line_color=color, 
+                mode='lines+markers', 
+                line_width=1,
+                connectgaps=False,
+                line_shape='hvh'
+                ) )
+    return fig
+    

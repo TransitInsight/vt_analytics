@@ -116,4 +116,13 @@ def test_gen_box_date_df():
     df = ms.gen_box_date_df(101, start_date, end_date)
     assert df is not None
 
+def test_get_switch_linechart_data():
+    df = ms.get_switch_linechart_data(101, start_date, end_date)
+    assert df is not None
 
+def test_get_switch_line_df():
+    df = ms.get_switch_line_df(101, start_date, end_date)
+    assert df is not None
+def test_create_switchId_line_fig():
+    fig = ms.create_switchId_line_fig(101, '2014-01-01T10:00','2014-01-01T11:00')
+    assert fig is not None 

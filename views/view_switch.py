@@ -43,7 +43,7 @@ def datecheck(start_date, end_date):
 
 date_sw = dcc.DatePickerRange(
             id='date-range_sw',
-            min_date_allowed=filter_start_date,
+            min_date_allowed=dt(2000, 1, 1),
             max_date_allowed=dt.today() + timedelta(days=1),
             start_date=filter_start_date,
             end_date=filter_end_date,
@@ -107,13 +107,18 @@ def update_switchid_boxplot(start_date,end_date, filter_out_dropdown):
 
 def _switchid_boxplot(start_date,end_date, filter_out_dropdown):
     start_date,end_date = datecheck(start_date, end_date)
-    
     df = ms.gen_box_df(start_date, end_date)
+    if df.empty:
+        return {}
     data = ms.gen_box_graph(df, filter_out_dropdown)
     data.update_layout(
     title="Switching time by SwitchId",
     xaxis_title="SwitchId",
     yaxis_title="Seconds",
+    showlegend=False,
+    xaxis = {
+    'categoryorder' : 'category ascending'   
+    }
     )
 
     return data
@@ -134,10 +139,20 @@ def _switchid_boxplot_dates(start_date,end_date, filter_out_dropdown,clickData):
         return {}
     switchId= clickData['points'][0]['x']
     df = ms.gen_box_date_df(switchId, start_date, end_date)
+    if df.empty:
+        return {}
     data = ms.gen_box_graph(df, filter_out_dropdown)
     data.update_layout(
     title="SwitchId: {} Switching time by date".format(switchId),
     xaxis_title="Dates",
     yaxis_title="Seconds",
+    showlegend=False,
+    xaxis = {
+    #'tickformat' : '%d-%m-%y',
+    'categoryorder' : 'category ascending'   
+    }
     )
+    
+        
+    
     return data
