@@ -22,7 +22,7 @@ from modules import module_switch as ms
 
 import util as util
 
-filter_start_date = dt(2015, 1, 1)
+filter_start_date = dt(2014, 1, 1)
 filter_end_date = dt(2016, 1, 1)
 filter_start_date, filter_end_date  = util.date2str2(filter_start_date, filter_end_date )
 
@@ -83,14 +83,17 @@ layout = html.Div([
     html.Div([    
         
           
-            dcc.Graph(id = 'BoxGraph_sw' 
-                
+            dcc.Graph(id = 'BoxGraph_sw', 
+                 style={ 'float': 'right', "display":"block",'width': "98vw","height" : "33vh"} 
             ),
             
             ]),
             
-            dcc.Graph(id = 'BoxGraphDate_sw' 
-                
+            dcc.Graph(id = 'BoxGraphDate_sw', 
+                 style={ 'float': 'right', "display":"block",'width': "98vw","height" : "33vh"} 
+            ),
+            dcc.Graph(id = 'swline' ,
+                 style={ 'float': 'right', "display":"block",'width': "98vw","height" : "33vh"} 
             ),
 
     ])
@@ -112,13 +115,15 @@ def _switchid_boxplot(start_date,end_date, filter_out_dropdown):
         return {}
     data = ms.gen_box_graph(df, filter_out_dropdown)
     data.update_layout(
-    title="Switching time by SwitchId",
+    #title="Switching time by SwitchId",
     xaxis_title="SwitchId",
-    yaxis_title="Seconds",
+    yaxis_title="Switching time by SwitchId",
     showlegend=False,
     xaxis = {
     'categoryorder' : 'category ascending'   
-    }
+    },
+    height= 300, 
+    margin = dict(l = 20 , r = 20, t = 0)
     )
 
     return data
@@ -143,16 +148,48 @@ def _switchid_boxplot_dates(start_date,end_date, filter_out_dropdown,clickData):
         return {}
     data = ms.gen_box_graph(df, filter_out_dropdown)
     data.update_layout(
-    title="SwitchId: {} Switching time by date".format(switchId),
+    #title="SwitchId: {} Switching time by date".format(switchId),
     xaxis_title="Dates",
-    yaxis_title="Seconds",
+    yaxis_title="SwitchId: {} Switching time by date".format(switchId),
     showlegend=False,
     xaxis = {
     #'tickformat' : '%d-%m-%y',
     'categoryorder' : 'category ascending'   
-    }
+    },
+
+    height= 300, 
+    margin = dict(l = 20 , r = 20, t = 0)
     )
     
-        
-    
+
     return data
+
+@app.callback(Output('swline', 'figure'),[
+                Input('BoxGraphDate_sw', 'clickData'),
+                Input('BoxGraph_sw', 'clickData')
+                ])
+def update_switchid_line_dates(clickData, clickData1):
+    return _switchid_line_dates( clickData, clickData1)
+
+def _switchid_line_dates(clickData,clickData1):
+    
+    
+    if clickData is None or clickData1 is None:
+        return {}
+
+    switchId= clickData1['points'][0]['x']
+    date = clickData['points'][0]['x']
+    date = util.str2date1(date)
+    start = date + timedelta(hours=5)
+    end = start + timedelta(hours=19) 
+    fig = ms.create_switchId_line_fig(switchId, start, end)
+    fig.update_layout(
+    #title="SwitchId: {} Switching data".format(switchId),
+    xaxis_title="Time",
+    yaxis_title = "SwitchId: {} Switching data".format(switchId),
+    showlegend=False,
+    height= 300, 
+    margin = dict(l = 20 , r = 20, t = 0)
+    )
+
+    return fig

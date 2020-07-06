@@ -381,6 +381,12 @@ def create_switchId_line_fig(switchId, start_date, end_date):
     fig = add_switch_pos(fig, df)
     fig = add_lock_status(fig, df)
     fig = add_move_cmd(fig, df)
+    fig.update_layout(
+        yaxis=dict(
+            ticktext=["Left", "Moving", "Right", "locked", 'UnLocked', "Move Left", "No Command", 'Move Right'],
+            tickvals=[1, 2, 3, 5, 6, 8, 9, 10],
+        )   
+    )
     return fig      
         
         
@@ -388,10 +394,10 @@ def add_switch_pos(fig, df):
     fig.add_trace(go.Scatter(x=df["loggedAt"], y=df['positionDesc'],
                 name = "Switch Position",
                 #line_color=color, 
-                mode='lines+markers', 
+                mode='lines', 
                 line_width=1,
                 connectgaps=False,
-                line_shape='hvh'
+                line_shape='hv'
                 ) )
     return fig
 
@@ -399,10 +405,10 @@ def add_lock_status(fig, df):
     fig.add_trace(go.Scatter(x=df["loggedAt"], y=df['statusDesc'],
                 name = "Lock_status",
                 #line_color=color, 
-                mode='lines+markers', 
+                mode='lines', 
                 line_width=1,
                 connectgaps=False,
-                line_shape='hvh'
+                line_shape='hv'
                 ) )
     return fig
 
@@ -410,10 +416,10 @@ def add_move_cmd(fig, df):
     fig.add_trace(go.Scatter(x=df["loggedAt"], y=df['switchCommandDesc'],
                 name = "move_cmd",
                 #line_color=color, 
-                mode='lines+markers', 
+                mode='lines', 
                 line_width=1,
                 connectgaps=False,
-                line_shape='hvh'
+                line_shape='hv'
                 ) )
     return fig
     
