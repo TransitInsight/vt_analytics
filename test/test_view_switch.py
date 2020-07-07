@@ -30,6 +30,8 @@ def test_switchid_boxplot_dates(mocker):
     mocker.patch("modules.module_switch.query_interval_by_date", return_value= s_ms.sample_result_dates)
     x = vs._switchid_boxplot_dates(start_date,end_date, '100%', click_data)
     assert x is not None
+    x = vs._switchid_boxplot_dates(start_date,end_date, '100%', None)
+    assert x == {}
 
 def test_datecheck():
     start_date = dt(2014, 1, 1)
@@ -37,9 +39,17 @@ def test_datecheck():
     start_date, end_date  = util.date2str2(start_date, end_date )
     start_date,end_date = vs.datecheck(start_date, end_date)
     start_date1,end_date1 = vs.datecheck(end_date,start_date)
+    start_date2,end_date2 = vs.datecheck(None, None)
     assert start_date == start_date1
     assert end_date == end_date1
+    assert start_date2 is not None
+    assert end_date2 is not None
 
 def test_switchid_line_dates():
     x = vs._switchid_line_dates(click_data1,click_data)
     assert x is not None
+
+def test_switchid_line_dates_2():
+    x = vs._switchid_line_dates(None,None)
+    assert x ==  {}
+
