@@ -18,25 +18,32 @@ import pytest
 import multiprocessing as mp
 from itertools import product
 import time
+import mock
+from pytest_mock import mocker
+import sample_data_module_switch as s_ms
 
- 
+
 start_date = dt(2014, 1, 1)
 end_date = dt(2020, 1, 1)
 start_date, end_date  = util.date2str2(start_date, end_date )
 
 
 
-def test_gen_graph():
-    if util.is_in_memory():
-        return
+def test_gen_graph(mocker):
+    mocker.patch("modules.module_switch.query_interval_by_switch", return_value= s_ms.sample_result_1)
     df = ms.gen_box_df(start_date, end_date)
+    assert df is not None
+    assert isinstance(df, pd.DataFrame)
+    assert df.empty == False
     x = ms.gen_box_graph(df, "100%")
     assert x is not None
 
-def test_gen_graph_1():
-    if util.is_in_memory():
-        return
+def test_gen_graph_1(mocker):
+    mocker.patch("modules.module_switch.query_interval_by_switch", return_value= s_ms.sample_result_1)
     df = ms.gen_box_df(start_date, end_date)
+    assert df is not None
+    assert isinstance(df, pd.DataFrame)
+    assert df.empty == False
     x = ms.gen_box_graph(df, "100%")
     assert x is not None
 
@@ -53,7 +60,6 @@ def test_get_unlock_count_by_date():
 
 
 def test_switch_interval_es_native_query():
-
     if util.is_in_memory():
         return
     result = ms.query_interval_by_switch('2014-1-1','2015-1-1')
@@ -104,25 +110,32 @@ def test_switch_interval_by_date_es_native_query():
     #assert(switch_990pct_n > switch_1pct_n)
     assert(switch_1pct_n > 0)
 
-def test_get_switch_date():
-    if util.is_in_memory():
-        return
+def test_get_switch_date(mocker):
+    mocker.patch("modules.module_switch.query_interval_by_date", return_value= s_ms.sample_result_dates)
     df = ms.gen_bx_date_df_(101, start_date, end_date)
     assert df is not None
+    assert isinstance(df, pd.DataFrame)
+    assert df.empty == False
    
-def test_gen_box_date_df():
-    if util.is_in_memory():
-        return
+def test_gen_box_date_df(mocker):
+    mocker.patch("modules.module_switch.query_interval_by_date", return_value= s_ms.sample_result_dates)
     df = ms.gen_box_date_df(101, start_date, end_date)
     assert df is not None
+    assert isinstance(df, pd.DataFrame)
+    assert df.empty == False
 
 def test_get_switch_linechart_data():
     df = ms.get_switch_linechart_data(101, start_date, end_date)
     assert df is not None
+    assert isinstance(df, pd.DataFrame)
+    assert df.empty == False
 
 def test_get_switch_line_df():
     df = ms.get_switch_line_df(101, start_date, end_date)
     assert df is not None
+    assert isinstance(df, pd.DataFrame)
+    assert df.empty == False
+
 def test_create_switchId_line_fig():
     fig = ms.create_switchId_line_fig(101, '2014-01-01T10:00','2014-01-01T11:00')
     assert fig is not None 

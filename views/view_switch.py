@@ -168,17 +168,17 @@ def _switchid_boxplot_dates(start_date,end_date, filter_out_dropdown,clickData):
                 Input('BoxGraphDate_sw', 'clickData'),
                 Input('BoxGraph_sw', 'clickData')
                 ])
-def update_switchid_line_dates(clickData, clickData1):
-    return _switchid_line_dates( clickData, clickData1)
+def update_switchid_line_dates(date_clickData, id_clickData):
+    return _switchid_line_dates( date_clickData, id_clickData)
 
-def _switchid_line_dates(clickData,clickData1):
+def _switchid_line_dates(date_clickData,id_clickData):
     
     
-    if clickData is None or clickData1 is None:
+    if date_clickData is None or id_clickData is None:
         return {}
 
-    switchId= clickData1['points'][0]['x']
-    date = clickData['points'][0]['x']
+    switchId= id_clickData['points'][0]['x']
+    date = date_clickData['points'][0]['x']
     date = util.str2date1(date)
     start = date + timedelta(hours=5)
     end = start + timedelta(hours=19) 
