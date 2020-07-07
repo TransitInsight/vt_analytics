@@ -61,9 +61,8 @@ def test_get_unlock_count_by_date():
 
 def test_switch_interval_es_native_query():
     if util.is_in_memory():
-        result = s_ms.sample_result_1
-    else:
-        result = ms.query_interval_by_switch('2014-1-1','2015-1-1')
+        return
+    result = ms.query_interval_by_switch('2014-1-1','2015-1-1')
 
     switch_1pct = result['aggregations']['switchId']['buckets'][0]['box_interval']['values']['1.0']
     switch_999pct = result['aggregations']['switchId']['buckets'][0]['box_interval']['values']['99.9']
@@ -91,9 +90,8 @@ def test_switch_interval_es_native_query():
 def test_switch_interval_by_date_es_native_query():
 
     if util.is_in_memory():
-        result = s_ms.sample_result_dates
-    else:
-        result = ms.query_interval_by_date(101, '2014-1-1','2015-1-1')
+        return
+    result = ms.query_interval_by_date(101, '2014-1-1','2015-1-1')
 
     switch_1pct = result['aggregations']['opDate']['buckets'][0]['box_interval']['values']['1.0']
     # switch_999pct = result['aggregations']['opDate']['buckets'][0]['box_interval']['values']['99.9']
