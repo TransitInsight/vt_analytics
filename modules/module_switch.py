@@ -377,6 +377,8 @@ def get_switch_line_df(switchId, start_date, end_date):
 
 def create_switchId_line_fig(switchId, start_date, end_date):
     df = get_switch_line_df(switchId, start_date, end_date)
+    if df.empty:
+        return {}
     fig = go.Figure()
     fig = add_switch_pos(fig, df)
     fig = add_lock_status(fig, df)

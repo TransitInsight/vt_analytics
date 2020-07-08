@@ -180,8 +180,8 @@ def _switchid_line_dates(date_clickData,id_clickData):
     switchId= id_clickData['points'][0]['x']
     date = date_clickData['points'][0]['x']
     date = util.str2date1(date)
-    start = date + timedelta(hours=5)
-    end = start + timedelta(hours=19) 
+    start = date + timedelta(hours=0)
+    end = start + timedelta(hours=23.5) 
     fig = ms.create_switchId_line_fig(switchId, start, end)
     fig.update_layout(
     #title="SwitchId: {} Switching data".format(switchId),
