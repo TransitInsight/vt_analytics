@@ -13,7 +13,7 @@ def Navbar():
                     #dbc.DropdownMenuItem("Communication", header=True),
                     dbc.DropdownMenuItem("Comm Loss Correlation", href="/views/commLoss"),
                     dbc.DropdownMenuItem("Switch Correlation", href="/views/view_switch"),
-
+                    dbc.DropdownMenuItem("Switch self move Correlation", href="/views/view_switch_self_move"),
                 ],
                 label="VOBC Report",
                 style={'backgroundColor':'lightgrey', 'color':'blue'},

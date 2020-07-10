@@ -15,7 +15,6 @@ import pprint
 import util as util
 import config as cfg
 import pytest
-import multiprocessing as mp
 from itertools import product
 import time
 import mock

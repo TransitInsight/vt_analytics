@@ -9,6 +9,7 @@ from views import view_scatter
 from views import view_vobcfault
 from views import view_commLoss
 from views import view_switch
+from views import view_switch_self_move
 import util
 import flask
 import multiprocessing as mp
@@ -53,6 +54,8 @@ def display_page(pathname):
         return view_commLoss.layout
     elif pathname == '/views/view_switch':
         return view_switch.layout
+    elif pathname == '/views/view_switch_self_move':
+        return view_switch_self_move.layout
     else:
         return '404: missing app = {}'.format(pathname)
 

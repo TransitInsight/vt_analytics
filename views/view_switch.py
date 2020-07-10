@@ -16,7 +16,6 @@ import dash as dash
 from datetime import datetime as dt
 from datetime import timedelta
 import re
-import multiprocessing as mp
 
 from modules import module_switch as ms
 
