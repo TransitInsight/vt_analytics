@@ -37,14 +37,14 @@ def get_switch_amts(SwitchId):
     L = util.run_query(query)
     return L
 
-def gen_graph(switchId):
-    df = get_switch_amts(switchId)
-    if df.empty:
-        return {}
-    x_data = df["Dates"].to_list()
-    y_data = df["amt"].to_list()
-    fig = go.Figure(data=go.Scatter(x=x_data, y=y_data, mode='markers'))
-    return fig
+# def gen_graph(switchId):
+#     df = get_switch_amts(switchId)
+#     if df.empty:
+#         return {}
+#     x_data = df["Dates"].to_list()
+#     y_data = df["amt"].to_list()
+#     fig = go.Figure(data=go.Scatter(x=x_data, y=y_data, mode='markers'))
+#     return fig
 
 def get_switch_count():
     query = ("SELECT switchId, count(*) as count from dlr_switch_move where intervalDesc in ('Moving Time to Left' , 'Moving Time to Right' ) group by switchId order by count desc")
