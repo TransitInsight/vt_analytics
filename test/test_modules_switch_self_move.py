@@ -31,7 +31,7 @@ def test_gen_3d_df():
     df = ms.gen_3d_df()
     assert df is not None
     assert isinstance(df, pd.DataFrame)
-    assert df.empty == False
+
 
 def test_gen_graph_3d():
     x = ms.gen_graph_3d()
