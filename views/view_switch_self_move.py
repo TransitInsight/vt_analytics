@@ -41,6 +41,9 @@ layout = html.Div([
             dcc.Graph(id = 'line_ssw' ,
                  style={ 'float': 'right', "display":"block",'width': "38vw"} 
             ),
+             dcc.Graph(id = 'boxplot_ssw' ,
+                 style={ 'float': 'right', "display":"block",'width': "38vw"} 
+            ),
 
     ])
 
@@ -76,3 +79,43 @@ def _switchid_self_move_line_dates(clickData):
     )
 
     return fig
+
+
+@app.callback(Output('boxplot_ssw', 'figure'),[
+                Input('3d_ssw', 'clickData'),
+                ])
+def update_switchid_self_move_bxplt(clickData):
+    return _switchid_self_move_bxplt(clickData)
+
+def _switchid_self_move_bxplt(clickData):
+    if clickData is None:
+        return {}
+    
+    switchId= clickData['points'][0]['y']
+    date = clickData['points'][0]['x']
+    date = util.str2date1(date)\
+
+    day  = 30
+    start = date - timedelta(days=day)
+    end = date + timedelta(days=day) 
+    
+    
+    df = ms.gen_box_date_df(switchId, start, end)
+    if df.empty:
+        return {}
+    data = ms.gen_box_graph(df, "100%")
+    data.update_layout(
+    #title="SwitchId: {} Switching time by date".format(switchId),
+    xaxis_title="Dates",
+    yaxis_title="SwitchId: {} Switching time by date".format(switchId),
+    showlegend=False,
+    xaxis = {
+    #'tickformat' : '%d-%m-%y',
+    'categoryorder' : 'category ascending'   
+    },
+
+    margin = dict(l = 20 , r = 20, t = 0)
+    )
+    
+
+    return data

@@ -33,7 +33,7 @@ end_date = dt(2015, 12, 31)
 
 
 def get_switch_amts(SwitchId):
-    query = ("SELECT * from switch_self_move where switchId = {} and amt > 10 order by amt desc").format(SwitchId)
+    query = ("SELECT * from self_move_delay where switchId = {} and self_move_amt > 3 order by self_move_amt desc").format(SwitchId)
     L = util.run_query(query)
     return L
 
@@ -64,8 +64,8 @@ def gen_graph_3d():
     df = gen_3d_df()
     if df.empty:
         return {}
-    x_data = df["Dates"].to_list()
-    z_data = df["amt"].to_list()
+    x_data = df["loggedAt"].to_list()
+    z_data = df["self_move_amt"].to_list()
     y_data = df["switchId"].to_list()
     fig = go.Figure(data=[go.Scatter3d(
     x=x_data, 
@@ -78,8 +78,17 @@ def gen_graph_3d():
         sizemode = 'area', 
         size = 3, 
         opacity=0.8
-    )
+    ),
     )])
+    fig.update_layout(
+    scene = dict(   xaxis_title="LoggedAt",
+                    yaxis_title="SwitchId",
+                    zaxis_title="Self_move_amount"),
+    )
+    
+
+
+
     return fig
 
 

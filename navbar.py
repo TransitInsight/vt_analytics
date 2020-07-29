@@ -9,7 +9,7 @@ def Navbar():
                     #dbc.DropdownMenuItem("VOBC Fault", header=True),
                     dbc.DropdownMenuItem("VOBC Fault Report", href="/views/vobcfault_v"),
                     dbc.DropdownMenuItem("VOBC Fault Correlation", href="/views/view2"),
-                    dbc.DropdownMenuItem("Page 3", href="/views/view3"),
+                    #dbc.DropdownMenuItem("Page 3", href="/views/view3"),
                     #dbc.DropdownMenuItem("Communication", header=True),
                     dbc.DropdownMenuItem("Comm Loss Correlation", href="/views/commLoss"),
                     dbc.DropdownMenuItem("Switch Correlation", href="/views/view_switch"),

@@ -1,3 +1,4 @@
+
 import dash_core_components as dcc
 import dash_html_components as html
 import dash_bootstrap_components as dbc
@@ -12,17 +13,15 @@ from views import view_switch
 from views import view_switch_self_move
 import util
 import flask
-import multiprocessing as mp
+from flask import Flask
+from waitress import serve
 
-#TILOGO = "https://transitinsight.com/site_media/images/logo-ti.png"
-TILOGO = "http://localhost:8050/system_icon.png"
+TILOGO = "https://transitinsight.com/site_media/images/logo-ti.png"
+#TILOGO = "http://localhost:8050/system_icon.png"
 
 nav = Navbar()
 app.title = "ViewTrac"
-# pool_sw = mp.Pool(4)
 
-# def get_pool():
-#     return pool_sw
 
 app.layout = html.Div([
     dcc.Location(id='url', refresh=False),
@@ -63,5 +62,7 @@ def display_page(pathname):
 def serve_image_system_icon():
     return flask.send_from_directory(".", "ti_logo_small.png")
 
+
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    #app.run_server(debug=True)
+    serve(app.server, host='0.0.0.0', port=8000, threads = 16)
