@@ -9,7 +9,9 @@ import pprint
 import util as util
 import config as cfg
 import pytest
-
+import mock
+from pytest_mock import mocker
+import sample_data_module_switch as s_ms
 
 start_date = dt(2014, 1, 1)
 end_date = dt(2020, 1, 1)
@@ -19,6 +21,7 @@ def test_switchid_self_move_line_dates():
     x = vs._switchid_self_move_line_dates(click_data)
     assert x is not None
 
-def test_switchid_self_move_bxplt():
+def test_switchid_self_move_bxplt(mocker):
+    mocker.patch("modules.module_switch.query_interval_by_date", return_value= s_ms.sample_result_dates)
     x =vs._switchid_self_move_bxplt(click_data)
     assert x is not None

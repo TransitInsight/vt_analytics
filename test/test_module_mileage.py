@@ -49,12 +49,12 @@ def test_gen_fleet_daily_mileage_graph():
     fig = mm.gen_fleet_daily_mileage_graph(start_date,end_date)
     assert fig is not None 
 
-def test_gen_mileage_by_train_table():
-    startdate = dt(2015, 2, 1)
-    fig = mm.gen_mileage_by_train_table(startdate)
-    assert fig is not None 
+# def test_gen_mileage_by_train_table():
+#     startdate = dt(2015, 2, 1)
+#     fig = mm.gen_mileage_by_train_table(startdate)
+#     assert fig is not None 
 
-def test_gen_train_mileage_table():
-    startdate = dt(2015, 2, 1)
-    fig = mm.gen_train_mileage_table(4, startdate)
-    assert fig is not None
+# def test_gen_train_mileage_table():
+#     startdate = dt(2015, 2, 1)
+#     fig = mm.gen_train_mileage_table(4, startdate)
+#     assert fig is not None

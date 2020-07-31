@@ -20,9 +20,9 @@ def test_fleet_mileage():
     fig = vm._fleet_mileage(start_date,end_date)
     assert fig is not None
 
-def test_mileage_by_train():
-    fig = vm._mileage_by_train(click_data)
-    assert fig is not None
+# def test_mileage_by_train():
+#     fig = vm._mileage_by_train(click_data)
+#     assert fig is not None
 
 def test__train_mileage():
     fig = vm._train_mileage(None, None)
