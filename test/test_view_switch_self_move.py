@@ -18,3 +18,7 @@ click_data = {'points':[{'curveNumber': 0, 'marker.color': 27, 'marker.size': 13
 def test_switchid_self_move_line_dates():
     x = vs._switchid_self_move_line_dates(click_data)
     assert x is not None
+
+def test_switchid_self_move_bxplt():
+    x =vs._switchid_self_move_bxplt(click_data)
+    assert x is not None

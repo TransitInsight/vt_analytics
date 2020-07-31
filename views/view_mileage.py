@@ -73,8 +73,9 @@ layout = html.Div([
                 columns=(
                     [
                         {'id': 'vobcid', 'name': 'VOBCID'},
-                        {'id': 'Distance', 'name': 'Distance(KM)'},
                         {'id': 'loggedDate', 'name': 'Date'},
+                        {'id': 'Distance', 'name': 'Distance(KM)'},
+                        
                     ] 
                 ),
             )],style={ 'float': 'Left', "display":"block",'width': "25vw", 'margin-left':'50px'} ),
@@ -85,18 +86,18 @@ layout = html.Div([
                 page_size=15,
                 editable=False,
                 columns=(
-                    [
-                        {'id': 'time', 'name': 'Time'},
+                    [   {'id': 'vobcid', 'name': 'VOBCID'},
                         {'id': 'loopName', 'name': 'loopName'},
+                        {'id': 'time', 'name': 'Time'},
                         {'id': 'Distance', 'name': 'Distance(M)'},
-                        {'id': 'vobcid', 'name': 'VOBCID'},
+                        
                     ] 
                 ),
             )],style={ 'float': 'Left', "display":"block",'width': "25vw", 'margin-left':'50px'} ),
              
             dcc.Graph(id = 'totals',
                 figure = mm.gen_train_total_mileage(), 
-                style={ 'float': 'Right', "display":"block",'width': "40vw","height" : "33vh"} 
+                style={ 'float': 'Right', "display":"block",'width': "40vw","height" : "48vh"} 
             ),
 
     ])

@@ -61,7 +61,12 @@ def gen_mileage_by_train_table(start_date):
     df = get_mileage_by_train(start_date, end_date)
     df = df.dropna()
     if df.empty:
-        return {}
+        return df
+    s = df["Distance"].sum()
+    df["vobcid"] = df["vobcid"].astype(str)
+    df2 = pd.DataFrame({"vobcid":["Total:"], "Distance":[s]}) 
+    df = df.append(df2, ignore_index=True, sort=False)
+    df = df.sort_values(by = 'Distance', ascending=False)
     df["loggedDate"] = start_date    
     data=df.to_dict('rows')
     return data 
@@ -83,8 +88,8 @@ def get_train_mileage_by_30min(vobcid, start_date, end_date):
     return L
 
 def get_train_mileage_by_loop(vobcid, start_date, end_date):
-    query = ("SELECT loopName, SUM(distance) as Distance FROM dlr_train_move "
-    " where vobcid = {} and loggedAt >= '{}' and loggedAt < '{}' group by loopName").format(vobcid, start_date, end_date)
+    query = ("SELECT HISTOGRAM(loggedAt, INTERVAL 30 MINUTES) as time, loopName, SUM(distance) as Distance FROM dlr_train_move "
+    " where vobcid = {} and loggedAt >= '{}' and loggedAt < '{}' group by time, loopName").format(vobcid, start_date, end_date)
     L = util.run_query(query)
     return L
 
@@ -94,13 +99,22 @@ def gen_train_mileage_table(vobcid, start_date):
     start_date, end_date  = util.date2str2(start_date, end_date)
     df = get_train_mileage_by_30min(vobcid, start_date, end_date)
     df = df.dropna()
+    
+    s = df["Distance"].sum()
+    
     df2 = get_train_mileage_by_loop(vobcid, start_date, end_date)
     df2 = df2.dropna()
     df = df.append(df2, ignore_index=True, sort=False)
     if df.empty:
-        return {}
-    df["vobcid"] = vobcid   
-    data=df.to_dict('rows')
+        return df
+    df = df.sort_values(by = 'time' )
+    df["vobcid"] = vobcid 
+    
+    df["vobcid"] = df["vobcid"].astype(str)
+    df2 = pd.DataFrame({"vobcid":["Total:"], "loopName":[""], "time":[""], "Distance":[s]}) 
+    df2 = df2.append(df, ignore_index=True, sort=False)
+      
+    data=df2.to_dict('rows')
     return data 
 
 def get_train_total_mileage():
@@ -112,5 +126,9 @@ def get_train_total_mileage():
 def gen_train_total_mileage():
     df = get_train_total_mileage()
     df = df.dropna()
-    fig = go.Figure([go.Bar(x=df["vobcid"], y=df['Distance'])])
+    fig = go.Figure([go.Bar(y=df["vobcid"], x=df['Distance'], orientation='h')])
+    fig.update_layout( margin=dict(l=20, r=10, t=30, b=10),
+    title="Total Distance Per Train",
+    xaxis_title="Distance Km",
+    yaxis_title="Vobcid",)
     return fig
