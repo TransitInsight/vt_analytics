@@ -11,6 +11,7 @@ from views import view_vobcfault
 from views import view_commLoss
 from views import view_switch
 from views import view_switch_self_move
+from views import view_mileage
 import util
 import flask
 from flask import Flask
@@ -55,6 +56,8 @@ def display_page(pathname):
         return view_switch.layout
     elif pathname == '/views/view_switch_self_move':
         return view_switch_self_move.layout
+    elif pathname == '/views/view_mileage':
+        return view_mileage.layout
     else:
         return '404: missing app = {}'.format(pathname)
 
@@ -64,5 +67,5 @@ def serve_image_system_icon():
 
 
 if __name__ == '__main__':
-    #app.run_server(debug=True)
-    serve(app.server, host='0.0.0.0', port=8000, threads = 16)
+    app.run_server(debug=True)
+    #serve(app.server, host='0.0.0.0', port=8000, threads = 16)
