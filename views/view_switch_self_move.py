@@ -93,7 +93,7 @@ def _switchid_self_move_bxplt(clickData):
     
     switchId= clickData['points'][0]['y']
     date = clickData['points'][0]['x']
-    date = util.str2date1(date)\
+    date = util.str2date1(date)
 
     day  = 30
     start = date - timedelta(days=day)

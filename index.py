@@ -12,6 +12,7 @@ from views import view_commLoss
 from views import view_switch
 from views import view_switch_self_move
 from views import view_mileage
+from views import view_fault_trend
 import util
 import flask
 from flask import Flask
@@ -58,6 +59,8 @@ def display_page(pathname):
         return view_switch_self_move.layout
     elif pathname == '/views/view_mileage':
         return view_mileage.layout
+    elif pathname == '/views/view_fault_trend':
+        return view_fault_trend.layout
     else:
         return '404: missing app = {}'.format(pathname)
 

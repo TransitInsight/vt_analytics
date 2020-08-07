@@ -15,6 +15,7 @@ def Navbar():
                     dbc.DropdownMenuItem("Switch Correlation", href="/views/view_switch"),
                     dbc.DropdownMenuItem("Switch self move Correlation", href="/views/view_switch_self_move"),
                     dbc.DropdownMenuItem("Train Mileage", href="/views/view_mileage"),
+                    dbc.DropdownMenuItem("Fault Trend", href='/views/view_fault_trend'),
                 ],
                 label="VOBC Report",
                 style={'backgroundColor':'lightgrey', 'color':'blue'},
@@ -56,6 +57,8 @@ def Navbar_simple():
                     dbc.DropdownMenuItem("Page 3", href="/views/view3"),
                     dbc.DropdownMenuItem("Communication", header=True),
                     dbc.DropdownMenuItem("Comm Loss Correlation", href="/views/view2"),
+                    dbc.DropdownMenuItem("Fault Trend", href='/views/view_fault_trend'),
+                    
 
                 ],
                 nav=True,
