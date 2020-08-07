@@ -77,26 +77,23 @@ layout = html.Div([
 
           
             dcc.Graph(id = 'FaultTrending', 
-                #figure = mft.gen_faultcount_per_month(),
+                style={ 'float': 'Left', "display":"block",'width': "100vw","height" : "33vh, 'margin-left':'50px'"} 
+            ),
+            dcc.Graph(id = 'Last_month_fault',               
                 style={ 'float': 'Left', "display":"block",'width': "25vw","height" : "33vh, 'margin-left':'50px'"} 
             ),
-            dcc.Graph(id = 'Last_month_fault', 
-                #figure = mft.gen_past_months_fault_by_type(end_date, 1),
+            dcc.Graph(id = 'Last_6_months_fault',               
                 style={ 'float': 'Left', "display":"block",'width': "25vw","height" : "33vh, 'margin-left':'50px'"} 
             ),
-            dcc.Graph(id = 'Last_6_months_fault', 
-                #figure = mft.gen_past_months_fault_by_type(end_date, 6),
+             dcc.Graph(id = 'Last_month_fault_by_vobc',             
                 style={ 'float': 'Left', "display":"block",'width': "25vw","height" : "33vh, 'margin-left':'50px'"} 
             ),
-             dcc.Graph(id = 'Last_month_fault_by_vobc', 
-                #figure = mft.gen_top_vobc_fault_past_months(end_date, 1),
+            dcc.Graph(id = 'Last_6_months_fault_by_vobc',           
                 style={ 'float': 'Left', "display":"block",'width': "25vw","height" : "33vh, 'margin-left':'50px'"} 
             ),
-            dcc.Graph(id = 'Last_6_months_fault_by_vobc', 
-                #figure = mft.gen_top_vobc_fault_past_months(end_date, 6),
-                style={ 'float': 'Left', "display":"block",'width': "25vw","height" : "33vh, 'margin-left':'50px'"} 
+            dcc.Graph(id = 'fault_type_bar',           
+                style={ 'float': 'Left', "display":"block",'width': "98vw","height" : "33vh, 'margin-left':'50px'"} 
             ),
-            
             
              
     ])
@@ -152,4 +149,14 @@ def update_top_vobc_fault_1_month(end_date):
                 ])
 def update_top_vobc_fault_6_month(end_date):
     data = mft.gen_top_vobc_fault_past_months(end_date, 6)
+    return data
+
+@app.callback(Output('fault_type_bar', 'figure'),[
+                Input('FaultTrending', 'clickData'),
+                ])
+def update_fault_bar_trend(clickdata):
+    if clickdata == None:
+        return mft.gen_fault_trend_bar(filter_start_date,1)
+    start_date= clickdata['points'][0]['x']
+    data = mft.gen_fault_trend_bar(start_date,1)
     return data

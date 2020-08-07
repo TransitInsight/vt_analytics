@@ -32,9 +32,9 @@ def test_get_operating_hours_by_month():
     assert isinstance(df, pd.DataFrame)
     assert df.empty == False
 
-def test_gen_faultcount_distance_ophour_list():
-    f = mft.gen_faultcount_distance_ophour_list(start_date, end_date)
-    assert f is not None    
+# def test_gen_faultcount_distance_ophour_list():
+#     f = mft.gen_faultcount_distance_ophour_list(start_date, end_date)
+#     assert f is not None    
 
 def test_gen_faultcount_per_month():
     f = mft.gen_faultcount_per_month(start_date, end_date)
