@@ -59,6 +59,8 @@ layout = html.Div([
                 ]
                 )
         ] ),
+
+        html.Div([
             html.Div([
             dash_table.DataTable(
                 id='FaultList',
@@ -73,28 +75,56 @@ layout = html.Div([
                         
                     ] 
                 ),
-            )],style={ 'float': 'Left', "display":"block",'width': "25vw", 'margin-left':'50px'} ),
+            )],style={ 'float': 'Left', "display":"block",'width': "20vw", 'margin-left':'25px'} ),
 
           
             dcc.Graph(id = 'FaultTrending', 
-                style={ 'float': 'Left', "display":"block",'width': "100vw","height" : "33vh, 'margin-left':'50px'"} 
+                style={ 'float': 'Left', "display":"block",'width': "30vw","height" : "33vh", 'margin-left':'25px'} 
             ),
             dcc.Graph(id = 'Last_month_fault',               
-                style={ 'float': 'Left', "display":"block",'width': "25vw","height" : "33vh, 'margin-left':'50px'"} 
+                style={ 'float': 'Left', "display":"block",'width': "30vw","height" : "33vh", 'margin-left':'25px'} 
             ),
             dcc.Graph(id = 'Last_6_months_fault',               
-                style={ 'float': 'Left', "display":"block",'width': "25vw","height" : "33vh, 'margin-left':'50px'"} 
+                style={ 'float': 'Left', "display":"block",'width': "30vw","height" : "33vh"} 
             ),
              dcc.Graph(id = 'Last_month_fault_by_vobc',             
-                style={ 'float': 'Left', "display":"block",'width': "25vw","height" : "33vh, 'margin-left':'50px'"} 
+                style={ 'float': 'Left', "display":"block",'width': "30vw","height" : "33vh"} 
             ),
             dcc.Graph(id = 'Last_6_months_fault_by_vobc',           
-                style={ 'float': 'Left', "display":"block",'width': "25vw","height" : "33vh, 'margin-left':'50px'"} 
+                style={ 'float': 'Left', "display":"block",'width': "30vw","height" : "33vh"} 
             ),
+
+            ],style={ 'float': 'Left', "display":"block",'width': "100vw"}),
+
             dcc.Graph(id = 'fault_type_bar',           
-                style={ 'float': 'Left', "display":"block",'width': "98vw","height" : "33vh, 'margin-left':'50px'"} 
+                style={ 'float': 'Left', "display":"block",'width': "100vw","height" : "33vh"} 
             ),
-            
+            html.Div([
+            dash_table.DataTable(
+                id='vobc_fault_list',
+                page_size=30,
+                editable=False,
+                #data = mft.gen_faultcount_distance_ophour_list(),
+                columns=(
+                    [
+                          
+                        {'id': 'loggedAt', 'name': 'Date'},
+                        {'id': 'faultCodeSet', 'name': 'FaultCodeSet'},
+                        {'id': 'faultCode', 'name': 'FaultCode'},
+                        {'id': 'parentTrainId', 'name': 'TrainID'},
+                        {'id': 'vehicleName', 'name': 'VehicleName'},
+                        {'id': 'vobcid', 'name': 'Vobcid'},
+                        {'id': 'VobcStatus', 'name': 'VobcStatus'},
+                        {'id': 'locationName', 'name': 'locationName'},
+                        {'id': 'loopName', 'name': 'loopName'},
+                        {'id': 'velocity', 'name': 'velocity'},
+                        #{'id': 'duration', 'name': 'duration'},
+                        {'id': 'faultDescription', 'name': 'faultDescription'},
+
+
+                    ] 
+                ),
+            )],style={ 'float': 'left', "display":"block",'width': "90vw", 'margin-left':'50px'} ),
              
     ])
 
@@ -152,11 +182,51 @@ def update_top_vobc_fault_6_month(end_date):
     return data
 
 @app.callback(Output('fault_type_bar', 'figure'),[
+                Input('date-range_ft', 'end_date'),
                 Input('FaultTrending', 'clickData'),
+                Input('Last_month_fault', 'clickData'),
+                Input('Last_6_months_fault', 'clickData'),
+                Input('Last_month_fault_by_vobc', 'clickData'),
+                Input('Last_6_months_fault_by_vobc', 'clickData'),
                 ])
-def update_fault_bar_trend(clickdata):
-    if clickdata == None:
-        return mft.gen_fault_trend_bar(filter_start_date,1)
-    start_date= clickdata['points'][0]['x']
-    data = mft.gen_fault_trend_bar(start_date,1)
+def update_fault_bar_trend(end_date, cd_1,cd_2,cd_3,cd_4,cd_5):
+    data = {}
+    tri = dash.callback_context.triggered[0]["prop_id"]
+    if tri == 'FaultTrending.clickData':
+        start_date= cd_1['points'][0]['x']
+        data = mft.gen_fault_trend_bar(start_date,1)
+        return data
+    start_date = end_date
+    if tri == 'Last_month_fault.clickData':
+        fault_code = cd_2['points'][0]['x']
+        data = mft.gen_fault_trend_bar(start_date,-1, fault_code)
+        return data
+    if tri == 'Last_6_months_fault.clickData':
+        fault_code = cd_3['points'][0]['x']
+        data = mft.gen_fault_trend_bar(start_date,-6, fault_code)
+        return data
+    if tri == 'Last_month_fault_by_vobc.clickData':
+        vobc = cd_4['points'][0]['x']
+        data = mft.gen_fault_trend_bar(start_date,-1, None, vobc)
+        return data
+    if tri == 'Last_6_months_fault_by_vobc.clickData':
+        vobc = cd_5['points'][0]['x']
+        data = mft.gen_fault_trend_bar(start_date,-1, None, vobc)
+        return data
+ 
+    
+    return data
+
+
+@app.callback(Output('vobc_fault_list', 'data'),[
+                Input('fault_type_bar', 'clickData'),
+                ])
+def update_vobc_list(clickData):
+    return _vobc_list(clickData)
+
+def _vobc_list(clickData):
+    if clickData is None:
+        return []
+    start_date = clickData['points'][0]['x']
+    data = mft.gen_vobc_fault_list(start_date)
     return data

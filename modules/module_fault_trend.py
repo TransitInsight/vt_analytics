@@ -65,6 +65,7 @@ def gen_faultcount_per_month(start_date, end_date):
     title="Fault Trending",
     yaxis_title="Fault Count",
     xaxis_title="Date",
+    margin = dict(l = 20 , r = 20, t = 30)
     )
     return fig
 
@@ -86,6 +87,7 @@ def gen_past_months_fault_by_type(end_date, month):
     title=("Past {} months fault").format(month),
     yaxis_title="Fault Count",
     xaxis_title="Fault Type",
+    margin = dict(l = 20 , r = 20, t = 30)
     )
     return fig
 
@@ -138,6 +140,7 @@ def gen_top_vobc_fault_past_months(end_date, months):
     fig.update_layout(
     title=("Top Vobc Fault past {} months").format(months),
     xaxis_title="VobcId",
+    margin = dict(l = 20 , r = 20, t = 30)
     )
     fig.update_yaxes(title_text="fault count", secondary_y=False)
     fig.update_yaxes(title_text="operating hours", secondary_y=True)
@@ -146,10 +149,14 @@ def gen_top_vobc_fault_past_months(end_date, months):
 
 
 
-def get_fault_types_per_day(start_date, end_date):
+def get_fault_types_per_day(start_date, end_date, vobcid = None):
     start_date, end_date  = util.date2str2(start_date, end_date)
+    if vobcid is not None:
+        x = ("and vobcid = {}").format(vobcid)
+    else:
+        x = ""
     query = ("SELECT HISTOGRAM(loggedAt, INTERVAL 1 Day) as loggedDay, faultName, count(*) as faultcount FROM dlr_vobc_fault "
-    " where faultCode > 0 and loggedAt >= '{}' and loggedAt < '{}' group by faultName, loggedDay").format(start_date, end_date)
+    " where faultCode > 0 and loggedAt >= '{}' and loggedAt < '{}' {} group by faultName, loggedDay").format(start_date, end_date, x)
     L = util.run_query(query)
     return L
 
@@ -169,10 +176,14 @@ def get_fault_name(faultCode):
         return L["faultName"].tolist()
     return []
 
-def gen_fault_trend_bar(start_date,months,faultCode = None):
+def gen_fault_trend_bar(start_date,months,faultCode = None, vobcid = None):
     start_date = dt.strptime(start_date, "%Y-%m-%d")
     end_date = start_date + relativedelta(months=months)
-    df = get_fault_types_per_day(start_date, end_date)
+    if start_date > end_date:
+        temp = end_date
+        end_date = start_date
+        start_date = temp
+    df = get_fault_types_per_day(start_date, end_date, vobcid)
     if faultCode == None:
         faults = get_fault_names(start_date, end_date)
     else:
@@ -180,8 +191,27 @@ def gen_fault_trend_bar(start_date,months,faultCode = None):
     
     fig = go.Figure()
     for faultName in faults:
-        fig.add_trace(go.Bar(name=('Fault Name: {}').format(faultName), x=df["loggedDay"], y=df["faultcount"]),)
+        df2 = df.loc[df['faultName'] == faultName]
+        fig.add_trace(go.Bar(name=('{}').format(faultName), x=df2["loggedDay"], y=df2["faultcount"]),)
     
     fig.update_layout(barmode='stack')
     return fig
 
+def get_vobc_fault_list(start_date, end_date):
+    start_date, end_date  = util.date2str2(start_date, end_date)
+    query = ("SELECT loggedAt, faultCodeSet, faultCode,parentTrainId, vehicleName,"
+    " vobcid, activePassiveStatus as VobcStatus, locationName, loopName, velocity, "
+    " faultDescription FROM dlr_vobc_fault where loggedAt >= '{}' and loggedAt < '{}'"
+    " and faultCodeSet = true").format(start_date, end_date)
+    L = util.run_query(query)
+    return L
+
+def gen_vobc_fault_list(start_date):
+    start_date = dt.strptime(start_date, "%Y-%m-%d")
+    end_date = start_date + relativedelta(days=1)
+    df = get_vobc_fault_list(start_date, end_date)
+    #df['duration']=df.groupby(df["faultCodeSet"].cumsum()).loggedAt.apply(lambda x : x.diff().dt.seconds.fillna(0).cumsum())
+    data=df.to_dict('rows')
+    return data
+
+#df['diff_days']=df.groupby(df.flag.cumsum()).date.apply(lambda x : x.diff().dt.seconds.fillna(0).cumsum())
