@@ -124,13 +124,15 @@ def gen_top_vobc_fault_past_months(end_date, months):
     fig = make_subplots(specs=[[{"secondary_y": True}]])
 
     fig.add_trace(
-        go.Bar(x=df.index, y= df["faultcount"]),
+        go.Bar(x=df.index, y= df["faultcount"],name = "FaultCount",),
+        
         secondary_y=False
         )
 
     fig.add_trace(
         go.Scatter(x=df.index, y=df["hour"],
                     mode='lines+markers',
+                    name = "Operating Hours",
                     #line_shape='linear',
                     connectgaps=True
                     ),
@@ -195,6 +197,13 @@ def gen_fault_trend_bar(start_date,months,faultCode = None, vobcid = None):
         fig.add_trace(go.Bar(name=('{}').format(faultName), x=df2["loggedDay"], y=df2["faultcount"]),)
     
     fig.update_layout(barmode='stack')
+
+    fig.update_layout(
+    title=("Fault trend {} - {}").format(start_date, end_date),
+    yaxis_title="Fault Count",
+    xaxis_title="Date",
+    margin = dict(l = 20 , r = 20, t = 30)
+    )
     return fig
 
 def get_vobc_fault_list(start_date, end_date):

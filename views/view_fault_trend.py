@@ -16,7 +16,7 @@ import dash_table
 
 from datetime import datetime as dt
 from datetime import timedelta
-
+from views.ViewTrainmoveClass import ViewTrainmoveClass
 from modules import module_fault_trend as mft
 
 import util as util
@@ -75,7 +75,7 @@ layout = html.Div([
                         
                     ] 
                 ),
-            )],style={ 'float': 'Left', "display":"block",'width': "20vw", 'margin-left':'25px'} ),
+            )],style={ 'float': 'Left', "display":"block",'width': "20vw", 'margin-left':'25px', 'margin-top':'10px'} ),
 
           
             dcc.Graph(id = 'FaultTrending', 
@@ -102,7 +102,7 @@ layout = html.Div([
             html.Div([
             dash_table.DataTable(
                 id='vobc_fault_list',
-                page_size=30,
+                page_size=15,
                 editable=False,
                 #data = mft.gen_faultcount_distance_ophour_list(),
                 columns=(
@@ -125,7 +125,18 @@ layout = html.Div([
                     ] 
                 ),
             )],style={ 'float': 'left', "display":"block",'width': "90vw", 'margin-left':'50px'} ),
-             
+            html.Div([
+                dcc.Graph(id='fig_by_trainmove_vft',
+                style={ 'float': 'right', "display":"block",'width': "98vw"} 
+                 ),
+                html.Button('<<', id='vft_button_prev_page'),
+                html.Button('<', id='vft_button_prev'),
+                html.Button('>', id='vft_button_next'),
+                html.Button('>>', id='vft_button_next_page')
+                
+            ],style={'width':'100%', 'display':'inline-block'}, 
+        ),
+            dcc.Store(id='vft_session_store')
     ])
 
 
@@ -230,3 +241,71 @@ def _vobc_list(clickData):
     start_date = clickData['points'][0]['x']
     data = mft.gen_vobc_fault_list(start_date)
     return data
+
+
+@app.callback(Output('vft_session_store', 'data'),
+              [
+                  Input('vft_button_prev_page', 'n_clicks'),
+                  Input('vft_button_prev', 'n_clicks'),
+                  Input('vft_button_next', 'n_clicks'),
+                  Input('vft_button_next_page', 'n_clicks'),
+              ],
+              [State('vft_session_store', 'data')])
+def update_offset_callback( prev_page, prev, next, next_page, data):
+
+    if any ('button' in item['prop_id'] for item in dash.callback_context.triggered): #not triggerred by button, it must be triggerred by others, reset offset
+        return update_offset(dash.callback_context.triggered, data)
+    else:
+        return {'offset': 0}
+
+def update_offset(triggeredItems, data):    
+    data = data or {'offset': 0}
+    offset = 0
+
+    if any ('vft_button_prev_page.n_clicks' == item['prop_id'] for item in triggeredItems):
+        offset = -2
+    elif any ('vft_button_next_page.n_clicks' == item['prop_id'] for item in triggeredItems):
+        offset = 2
+    elif any ('vft_button_prev.n_clicks' == item['prop_id'] for item in triggeredItems):
+        offset = -1
+    elif any ('vft_button_next.n_clicks' == item['prop_id'] for item in triggeredItems):
+        offset = 1
+
+    data['offset'] = data['offset'] + offset #-prev_page * 2 - prev + next + 2*next_page
+
+    return data
+
+
+
+@app.callback(
+    Output('fig_by_trainmove_vft', 'figure'),
+    [
+        Input('vobc_fault_list', 'active_cell'),
+        Input('vobc_fault_list', 'derived_viewport_data'),
+        Input('vft_session_store', 'data')
+    ]
+    )
+def display_figure_trainmove_callback( table_active_cell, table_data, timewindow_value):
+    return display_figure_trainmove( table_active_cell, table_data, timewindow_value)
+
+def display_figure_trainmove( table_active_cell, table_data, timewindow_value):
+    fault_code = None
+    p_train_id = None
+    op_date = None
+
+    offset = 0
+    if timewindow_value != None:
+        offset = timewindow_value['offset']
+
+    delta = timedelta(hours=offset/2)
+
+    if table_data is not None and len(table_data) != 0 and table_active_cell is not None and len(table_data) > table_active_cell['row']:
+        op_date = table_data[table_active_cell['row']]['loggedAt']
+        p_train_id = table_data[table_active_cell['row']]['parentTrainId']
+        fault_code = table_data[table_active_cell['row']]['faultCode']
+
+  
+    c = ViewTrainmoveClass(p_train_id, op_date, fault_code,delta)
+    c.create_fig()
+    fig = c.get_fig()
+    return fig
