@@ -47,11 +47,6 @@ def get_op_hours(startDate, endDate, trainId):
     while startDate < endDate:
         end = startDate + relativedelta(months=+1)
         start_, end_  = util.date2str2(startDate, end)
-        # l.acquire()
-        # try:
-        #     df = get_operating_hours_by_month(start_, end_, trainId)
-        # finally:
-        #     l.release()
         df = get_operating_hours_by_month(start_, end_, trainId)
         hours.append(df)
         month.append(startDate)
@@ -146,32 +141,6 @@ def gen_cmd_to_switch_by_dates(switchId, startDate, endDate, l):
     data["switchId"] = switchId
     return data
 
-# def gen_switch_data_df(switchId, startDate, endDate):
-#     data = pd.DataFrame()
-#     while startDate < endDate:
-#         end = startDate + timedelta(days=2)
-#         start_, end_  = util.date2str2(startDate, end)
-#         df = get_switch_data(switchId, start_, end_)
-#         data = data.append(df, ignore_index = True)
-#         startDate = end
-#     return data
-
-# def gen_cmd_to_switch_by_dates(switchId, startDate, endDate , l):
-#     mapping = {'Left': 1, 'Right': 2}
-    
-#     l.acquire()         
-#     try:             
-#         df = gen_switch_data_df(switchId, startDate, endDate)        
-#     finally:
-#         l.release()
-    
-#     if df is not None:
-#         if df.empty == False:
-#             df = df.replace({'positionDesc': mapping})
-#             df = getcmd_switch_times(df)
-#             df["switchId"] = switchId
-#             return df
-
 
 def add_fails(x):
     if x > 30:
@@ -192,15 +161,8 @@ def insertDataframeIntoElastic(dataFrame,index='index', typ = 'test', server = '
         data='\n'.join(actions[i:min([i+chunk_size,len(actions)])])
         data = data + '\n'
         requests.post(serverAPI, data = data, headers=headers)
-        #print (r.content)
         i = i+chunk_size
 
-# def upload_ELsearch(trainId_list, startDate, endDate,lock):
-#     for trainId in trainId_list:
-#         df = get_op_hours(startDate, endDate, trainId,lock)
-#         df["loggedMonth"] = df["loggedMonth"].apply(lambda x: x.isoformat())
-#         insertDataframeIntoElastic(df,index='op_hours')
-#         print(trainId)
 def upload_ELsearch(trainId, startDate, endDate):
     df = get_op_hours(startDate, endDate, trainId)
     df["loggedMonth"] = df["loggedMonth"].apply(lambda x: x.isoformat())
@@ -226,31 +188,18 @@ def chunker_list(seq, size):
 
 
 if __name__ == "__main__":
-    start_date = dt(2014, 1, 1)
-    end_date = dt(2015, 8, 24)
+    start_date = dt(2014, 1, 1)#set start date
+    end_date = dt(2015, 8, 24)#set end date
+    processes = 3 #processes, reduce if failure is encountered 
+    pool = mp.Pool(processes)
     lock = Lock()
     switches = get_switchId(start_date, end_date)
     trains = get_trainId(start_date, end_date)
-    processes = 6
-   
-    #tr = chunker_list(trains, processes)
-    sw = chunker_list(switches, processes)
-
-    # for i in tr:
-    #     Process(target=upload_ELsearch_smd, args=(i, start_date, end_date, lock)).start()
-
-    pool = mp.Pool(4)
+    sw = chunker_list(switches, processes+2)
+    
     pool.starmap(upload_ELsearch, [(i, start_date, end_date) for i in trains])
     pool.close()
 
     for i in sw:
-        Process(target=upload_ELsearch_smd, args=(i, start_date, end_date, lock)).start()
+         Process(target=upload_ELsearch_smd, args=(i, start_date, end_date, lock)).start()
     
-
-    # pool = mp.Pool(2)
-    # pool.starmap(upload_ELsearch, [(i, start_date, end_date) for i in trains])
-    # pool.close()
-
-    #pool.starmap(upload_ELsearch_smd, [(i, start_date, end_date, lock) for i in switches])
-    # for num in switches:
-    #     Process(target=f, args=(lock, num)).start()

@@ -87,9 +87,9 @@ def test_gen_fault_trend_bar():
     assert fig is not None
 
 def get_vobc_fault_list():
-    df = mft.get_vobc_fault_list(start_date, end_date)
+    df = mft.get_vobc_fault_list(start_date, end_date, 1)
     assert df is not None
    
 def test_gen_vobc_fault_list():
-    fig = mft.gen_vobc_fault_list(start_date)
+    fig = mft.gen_vobc_fault_list(start_date, 1)
     assert fig is not None

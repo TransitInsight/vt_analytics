@@ -53,6 +53,9 @@ def gen_faultcount_distance_ophour_list(start_date, end_date):
     df = df.reset_index()
     mask = (df['loggedMonth'] > start_date) & (df['loggedMonth'] <= end_date)
     df = df.loc[mask]
+    df['faultcount'] = df.apply(lambda x: "{:,}".format(x['faultcount']), axis=1)
+    df['Distance'] = df.apply(lambda x: "{:,}".format(x['Distance']), axis=1)
+    df.loggedMonth = df.loggedMonth.astype(str)
     data=df.to_dict('rows')
     return data 
 
@@ -82,8 +85,11 @@ def gen_past_months_fault_by_type(end_date, month):
     df = get_faults_by_type(start_date, end_date)
     if df.empty == True:
         return {}
-    fig = go.Figure([go.Bar(x=df["faultCode"], y= df["faultcount"])])
+    fig = go.Figure([go.Bar(x=df["faultCode"].astype(str), y= df["faultcount"])])
     fig.update_layout(
+    xaxis = dict(
+        tickmode = 'linear',
+        tick0 = 1,),
     title=("Past {} months fault").format(month),
     yaxis_title="Fault Count",
     xaxis_title="Fault Type",
@@ -206,19 +212,38 @@ def gen_fault_trend_bar(start_date,months,faultCode = None, vobcid = None):
     )
     return fig
 
-def get_vobc_fault_list(start_date, end_date):
+def get_vobc_fault_list(start_date, end_date,faultCode):
     start_date, end_date  = util.date2str2(start_date, end_date)
     query = ("SELECT loggedAt, faultCodeSet, faultCode,parentTrainId, vehicleName,"
     " vobcid, activePassiveStatus as VobcStatus, locationName, loopName, velocity, "
-    " faultDescription FROM dlr_vobc_fault where loggedAt >= '{}' and loggedAt < '{}'"
-    " and faultCodeSet = true").format(start_date, end_date)
+    " faultDescription FROM dlr_vobc_fault where loggedAt >= '{}' and loggedAt < '{}' and faultCode = {}"
+    " and faultCodeSet = true").format(start_date, end_date, faultCode)
     L = util.run_query(query)
     return L
 
-def gen_vobc_fault_list(start_date):
+
+def gen_vobc_fault_list(start_date,faultname):
+    dictionary ={
+    '01. Passenger Alarm': 1,
+    '02. FAR Level 2 Fault' : 2,
+    '03. FAR Level 3 Fault': 3,
+    '04. Failed to Dock': 4,
+    '05. Dynamic Brake Failure': 5,
+    '06. Converter Failure': 6,
+    '07. FAR Level 1 Fault': 7,
+    '08. Train Overspeed': 8,
+    '09. Target Point Overshoot': 9,
+    '10. Rollback': 10,
+    '11. V = 0 Failure': 11,
+    '12. Obstruction in AUTO Mode': 12,
+    '13. EB Test Failure': 13,
+    '14. Power Deselect Failure': 14,
+    '15.Loss of Door Closed Status': 15 }
+
     start_date = dt.strptime(start_date, "%Y-%m-%d")
     end_date = start_date + relativedelta(days=1)
-    df = get_vobc_fault_list(start_date, end_date)
+    faultCode = dictionary[faultname]
+    df = get_vobc_fault_list(start_date, end_date,faultCode)
     #df['duration']=df.groupby(df["faultCodeSet"].cumsum()).loggedAt.apply(lambda x : x.diff().dt.seconds.fillna(0).cumsum())
     data=df.to_dict('rows')
     return data

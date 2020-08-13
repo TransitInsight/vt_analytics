@@ -102,7 +102,7 @@ layout = html.Div([
             html.Div([
             dash_table.DataTable(
                 id='vobc_fault_list',
-                page_size=15,
+                page_size=6,
                 editable=False,
                 #data = mft.gen_faultcount_distance_ophour_list(),
                 columns=(
@@ -229,17 +229,20 @@ def update_fault_bar_trend(end_date, cd_1,cd_2,cd_3,cd_4,cd_5):
     return data
 
 
-@app.callback(Output('vobc_fault_list', 'data'),[
-                Input('fault_type_bar', 'clickData'),
-                ])
-def update_vobc_list(clickData):
-    return _vobc_list(clickData)
+@app.callback(Output('vobc_fault_list', 'data'),
+                [Input('fault_type_bar', 'clickData')],
+                [State('fault_type_bar', 'figure')])
+def update_vobc_list(clickData,figure):
+    return _vobc_list(clickData,figure)
 
-def _vobc_list(clickData):
+def _vobc_list(clickData,figure):
+    
     if clickData is None:
         return []
     start_date = clickData['points'][0]['x']
-    data = mft.gen_vobc_fault_list(start_date)
+    curve_number = clickData['points'][0]['curveNumber']
+    fault_code = figure['data'][curve_number]['name']
+    data = mft.gen_vobc_fault_list(start_date,fault_code)
     return data
 
 
