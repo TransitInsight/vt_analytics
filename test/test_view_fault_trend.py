@@ -28,9 +28,9 @@ def test_datecheck():
     assert start_date2 is not None
     assert end_date2 is not None
 
-def test_fc_list():
-    data = vft._fc_list(start_date,end_date)
-    assert data is not None
+# def test_fc_list():
+#     data = vft._fc_list(start_date,end_date)
+#     assert data is not None
 
 def test_fault_trend():
     data = vft._fault_trend(start_date,end_date)
