@@ -42,7 +42,22 @@ app.layout = html.Div([
 
     html.Div(id='page-content')
 ])
-
+index_page = html.Div([
+    
+    dcc.Link("VOBC Fault Report", href="/views/vobcfault_v"),
+    html.Br(),
+    dcc.Link("VOBC Fault Correlation", href="/views/view2"),
+    html.Br(),
+    dcc.Link("Train Mileage", href="/views/view_mileage"),
+    html.Br(),
+    dcc.Link("Comm Loss Correlation", href="/views/commLoss"),
+    html.Br(),
+    dcc.Link("Switch Correlation", href="/views/view_switch"),
+    html.Br(),
+    dcc.Link("Switch self move Correlation", href="/views/view_switch_self_move"),
+    html.Br(),
+    dcc.Link("Fault Trend", href='/views/view_fault_trend'),
+])
 
 @app.callback(Output('page-content', 'children'),
               [Input('url', 'pathname')])
@@ -62,7 +77,7 @@ def display_page(pathname):
     elif pathname == '/views/view_fault_trend':
         return view_fault_trend.layout
     else:
-        return '404: missing app = {}'.format(pathname)
+        return index_page
 
 @app.server.route('/system_icon.png')
 def serve_image_system_icon():
@@ -70,5 +85,5 @@ def serve_image_system_icon():
 
 
 if __name__ == '__main__':
-    #app.run_server(debug=True)
-    serve(app.server, host='0.0.0.0', port=80, threads = 16)
+    app.run_server(debug=True)
+    #serve(app.server, host='0.0.0.0', port=80, threads = 16)

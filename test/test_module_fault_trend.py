@@ -91,5 +91,5 @@ def get_vobc_fault_list():
     assert df is not None
    
 def test_gen_vobc_fault_list():
-    fig = mft.gen_vobc_fault_list(start_date, 1)
+    fig = mft.gen_vobc_fault_list(start_date, '01. Passenger Alarm')
     assert fig is not None

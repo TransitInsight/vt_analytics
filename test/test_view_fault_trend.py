@@ -27,3 +27,32 @@ def test_datecheck():
     assert end_date == end_date1
     assert start_date2 is not None
     assert end_date2 is not None
+
+def test_fc_list():
+    data = vft._fc_list(start_date,end_date)
+    assert data is not None
+
+def test_fault_trend():
+    data = vft._fault_trend(start_date,end_date)
+    assert data is not None
+
+cd_1 = {'points':[{'curveNumber': 0, 'marker.color': 27, 'marker.size': 1310.6796116504854, 'pointIndex': 69, 'pointNumber': 69, 'text': 27, 'x': 101, 'y': 158}]}
+
+
+def test_trainmove_offset_callback():
+
+    items = [{'prop_id': 'vft_button_next_page.n_clicks'}]
+    data = vft.update_offset( items, None)
+    assert data['offset'] == 2
+
+    items = [{'prop_id': 'vft_button_next.n_clicks'}]
+    data = vft.update_offset( items, None)
+    assert data['offset'] == 1
+
+    items = [{'prop_id': 'vft_button_prev_page.n_clicks'}]
+    data = vft.update_offset( items, None)
+    assert data['offset'] == -2
+
+    items = [{'prop_id': 'vft_button_prev.n_clicks'}]
+    data = vft.update_offset( items, None)
+    assert data['offset'] == -1

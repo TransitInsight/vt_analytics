@@ -4,17 +4,19 @@ import dash_html_components as html
 def Navbar():
     navbar = dbc.Navbar(
         [
+            
             dbc.DropdownMenu(
                 children=[
-                    #dbc.DropdownMenuItem("VOBC Fault", header=True),
+                    dbc.DropdownMenuItem("Train / VOBC reports", header=True),
                     dbc.DropdownMenuItem("VOBC Fault Report", href="/views/vobcfault_v"),
                     dbc.DropdownMenuItem("VOBC Fault Correlation", href="/views/view2"),
-                    
+                    dbc.DropdownMenuItem("Train Mileage", href="/views/view_mileage"),
                     dbc.DropdownMenuItem("Communication", header=True),
                     dbc.DropdownMenuItem("Comm Loss Correlation", href="/views/commLoss"),
+                    dbc.DropdownMenuItem("Switches", header=True),
                     dbc.DropdownMenuItem("Switch Correlation", href="/views/view_switch"),
                     dbc.DropdownMenuItem("Switch self move Correlation", href="/views/view_switch_self_move"),
-                    dbc.DropdownMenuItem("Train Mileage", href="/views/view_mileage"),
+                    dbc.DropdownMenuItem("Faults", header=True),
                     dbc.DropdownMenuItem("Fault Trend", href='/views/view_fault_trend'),
                 ],
                 label="VOBC Report",
